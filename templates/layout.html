@@ -14,40 +14,40 @@
     dialog::backdrop { background: rgba(0,0,0,0.22); }
   </style>
 </head>
-<body class="bg-gray-50 text-gray-900 antialiased">
+<body class="bg-gray-100 text-gray-900 antialiased">
 <div class="flex h-screen overflow-hidden">
 
   <!-- ── Sidebar ─────────────────────────────────────────────────── -->
-  <aside class="w-44 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 overflow-hidden">
+  <aside class="w-52 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 overflow-hidden">
 
     <!-- Logo -->
-    <div class="h-10 flex items-center px-3 border-b border-gray-100 flex-shrink-0">
-      <div class="flex items-center gap-2">
-        <div class="w-5 h-5 bg-indigo-600 rounded-md flex items-center justify-center">
-          <span class="text-white font-bold text-[9px] tracking-tight">SP</span>
+    <div class="h-12 flex items-center px-4 border-b border-gray-100 flex-shrink-0">
+      <div class="flex items-center gap-2.5">
+        <div class="w-6 h-6 bg-indigo-600 rounded-md flex items-center justify-center flex-shrink-0">
+          <span class="text-white font-bold text-[10px] tracking-tight">SP</span>
         </div>
-        <span class="text-gray-900 font-semibold text-sm">Sprinto</span>
+        <span class="text-gray-900 font-bold text-sm">Sprinto</span>
       </div>
     </div>
 
     <!-- Nav -->
-    <nav class="flex-1 py-2 px-1.5 space-y-2 overflow-y-auto">
+    <nav class="flex-1 py-3 px-2 space-y-3 overflow-y-auto">
 
       <!-- Workspace -->
       <div>
-        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-widest px-2 mb-1">Workspace</p>
+        <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest px-2 mb-1">Workspace</p>
         <div class="space-y-0.5">
           <a href="/projects"
-             class="{{if eq .Meta.CurrentPage "projects"}}bg-indigo-50 text-indigo-700 font-medium{{else}}text-gray-500 hover:bg-gray-50 hover:text-gray-800{{end}} flex items-center gap-2 px-2 py-1.5 rounded-md text-xs transition-colors">
-            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+             class="{{if eq .Meta.CurrentPage "projects"}}bg-indigo-600 text-white{{else}}text-gray-500 hover:bg-gray-100 hover:text-gray-800{{end}} flex items-center gap-2.5 px-2.5 py-2 rounded-md text-xs font-medium transition-colors">
+            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                 d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/>
             </svg>
             Projects
           </a>
           <a href="/team"
-             class="{{if eq .Meta.CurrentPage "team"}}bg-indigo-50 text-indigo-700 font-medium{{else}}text-gray-500 hover:bg-gray-50 hover:text-gray-800{{end}} flex items-center gap-2 px-2 py-1.5 rounded-md text-xs transition-colors">
-            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+             class="{{if eq .Meta.CurrentPage "team"}}bg-indigo-600 text-white{{else}}text-gray-500 hover:bg-gray-100 hover:text-gray-800{{end}} flex items-center gap-2.5 px-2.5 py-2 rounded-md text-xs font-medium transition-colors">
+            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                 d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
             </svg>
@@ -58,19 +58,19 @@
 
       <!-- Team Activity -->
       <div>
-        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-widest px-2 mb-1">Team Activity</p>
+        <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest px-2 mb-1">Team Activity</p>
         <div class="space-y-0.5">
           <a href="/"
-             class="{{if eq .Meta.CurrentPage "dashboard"}}bg-indigo-50 text-indigo-700 font-medium{{else}}text-gray-500 hover:bg-gray-50 hover:text-gray-800{{end}} flex items-center gap-2 px-2 py-1.5 rounded-md text-xs transition-colors">
-            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+             class="{{if eq .Meta.CurrentPage "dashboard"}}bg-indigo-600 text-white{{else}}text-gray-500 hover:bg-gray-100 hover:text-gray-800{{end}} flex items-center gap-2.5 px-2.5 py-2 rounded-md text-xs font-medium transition-colors">
+            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                 d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
             </svg>
             Dashboard
           </a>
           <a href="/standups"
-             class="{{if eq .Meta.CurrentPage "standups"}}bg-indigo-50 text-indigo-700 font-medium{{else}}text-gray-500 hover:bg-gray-50 hover:text-gray-800{{end}} flex items-center gap-2 px-2 py-1.5 rounded-md text-xs transition-colors">
-            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+             class="{{if eq .Meta.CurrentPage "standups"}}bg-indigo-600 text-white{{else}}text-gray-500 hover:bg-gray-100 hover:text-gray-800{{end}} flex items-center gap-2.5 px-2.5 py-2 rounded-md text-xs font-medium transition-colors">
+            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                 d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
             </svg>
@@ -79,29 +79,29 @@
         </div>
       </div>
 
-      <!-- Sprint Management -->
+      <!-- Sprint -->
       <div>
-        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-widest px-2 mb-1">Sprint</p>
+        <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest px-2 mb-1">Sprint</p>
         <div class="space-y-0.5">
           <a href="/sprints"
-             class="{{if eq .Meta.CurrentPage "sprints"}}bg-indigo-50 text-indigo-700 font-medium{{else}}text-gray-500 hover:bg-gray-50 hover:text-gray-800{{end}} flex items-center gap-2 px-2 py-1.5 rounded-md text-xs transition-colors">
-            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+             class="{{if eq .Meta.CurrentPage "sprints"}}bg-indigo-600 text-white{{else}}text-gray-500 hover:bg-gray-100 hover:text-gray-800{{end}} flex items-center gap-2.5 px-2.5 py-2 rounded-md text-xs font-medium transition-colors">
+            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                 d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/>
             </svg>
             Sprint Board
           </a>
           <a href="/releases"
-             class="{{if eq .Meta.CurrentPage "releases"}}bg-indigo-50 text-indigo-700 font-medium{{else}}text-gray-500 hover:bg-gray-50 hover:text-gray-800{{end}} flex items-center gap-2 px-2 py-1.5 rounded-md text-xs transition-colors">
-            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+             class="{{if eq .Meta.CurrentPage "releases"}}bg-indigo-600 text-white{{else}}text-gray-500 hover:bg-gray-100 hover:text-gray-800{{end}} flex items-center gap-2.5 px-2.5 py-2 rounded-md text-xs font-medium transition-colors">
+            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                 d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
             </svg>
             Releases
           </a>
           <a href="/devtasks"
-             class="{{if eq .Meta.CurrentPage "devtasks"}}bg-indigo-50 text-indigo-700 font-medium{{else}}text-gray-500 hover:bg-gray-50 hover:text-gray-800{{end}} flex items-center gap-2 px-2 py-1.5 rounded-md text-xs transition-colors">
-            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+             class="{{if eq .Meta.CurrentPage "devtasks"}}bg-indigo-600 text-white{{else}}text-gray-500 hover:bg-gray-100 hover:text-gray-800{{end}} flex items-center gap-2.5 px-2.5 py-2 rounded-md text-xs font-medium transition-colors">
+            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                 d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
             </svg>
@@ -112,19 +112,19 @@
 
       <!-- Planning -->
       <div>
-        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-widest px-2 mb-1">Planning</p>
+        <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest px-2 mb-1">Planning</p>
         <div class="space-y-0.5">
           <a href="/deadlines"
-             class="{{if eq .Meta.CurrentPage "deadlines"}}bg-indigo-50 text-indigo-700 font-medium{{else}}text-gray-500 hover:bg-gray-50 hover:text-gray-800{{end}} flex items-center gap-2 px-2 py-1.5 rounded-md text-xs transition-colors">
-            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+             class="{{if eq .Meta.CurrentPage "deadlines"}}bg-indigo-600 text-white{{else}}text-gray-500 hover:bg-gray-100 hover:text-gray-800{{end}} flex items-center gap-2.5 px-2.5 py-2 rounded-md text-xs font-medium transition-colors">
+            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
             </svg>
             Deadlines
           </a>
           <a href="/meetings"
-             class="{{if eq .Meta.CurrentPage "meetings"}}bg-indigo-50 text-indigo-700 font-medium{{else}}text-gray-500 hover:bg-gray-50 hover:text-gray-800{{end}} flex items-center gap-2 px-2 py-1.5 rounded-md text-xs transition-colors">
-            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+             class="{{if eq .Meta.CurrentPage "meetings"}}bg-indigo-600 text-white{{else}}text-gray-500 hover:bg-gray-100 hover:text-gray-800{{end}} flex items-center gap-2.5 px-2.5 py-2 rounded-md text-xs font-medium transition-colors">
+            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                 d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
             </svg>
@@ -136,12 +136,12 @@
     </nav>
 
     <!-- Project switcher -->
-    <div class="border-t border-gray-100 p-2.5 flex-shrink-0">
+    <div class="border-t border-gray-100 p-3 flex-shrink-0">
       {{if .Meta.AllProjects}}
-      <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-widest px-1 mb-1">Active Project</p>
+      <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-widest px-1 mb-1.5">Active Project</p>
       <form method="POST" action="/switch-project">
         <select name="project_id" onchange="this.form.submit()"
-          class="w-full text-[11px] text-gray-700 bg-gray-50 border border-gray-200 rounded-md px-2 py-1 focus:outline-none focus:border-indigo-400 cursor-pointer">
+          class="w-full text-xs text-gray-700 bg-gray-50 border border-gray-200 rounded-md px-2.5 py-1.5 focus:outline-none focus:border-indigo-400 cursor-pointer">
           <option value="">— none —</option>
           {{range .Meta.AllProjects}}
           <option value="{{.ID}}" {{if (and $.Meta.ActiveProject (eq $.Meta.ActiveProject.ID .ID))}}selected{{end}}>{{.Name}}</option>
@@ -149,8 +149,8 @@
         </select>
       </form>
       {{else}}
-      <a href="/projects" class="flex items-center gap-1 px-1 text-xs text-indigo-600 hover:underline font-medium">
-        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <a href="/projects" class="flex items-center gap-1.5 px-1 text-xs text-indigo-600 hover:underline font-medium">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
         </svg>
         Create project
@@ -164,25 +164,42 @@
   <div class="flex-1 flex flex-col overflow-hidden">
 
     <!-- Top bar -->
-    <header class="h-10 bg-white border-b border-gray-200 flex items-center justify-between px-5 flex-shrink-0">
-      <h1 class="text-sm font-semibold text-gray-900">{{.Meta.Title}}</h1>
+    <header class="h-12 bg-white border-b border-gray-200 flex items-center justify-between px-6 flex-shrink-0">
       <div class="flex items-center gap-2">
-        {{if .Meta.ActiveProject}}<span class="text-[11px] font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded">{{.Meta.ActiveProject.Name}}</span>{{end}}
-        {{if .Meta.SprintLabel}}<span class="text-[11px] text-gray-400 bg-gray-50 border border-gray-200 px-2 py-0.5 rounded">{{.Meta.SprintLabel}}</span>{{end}}
+        {{if .Meta.SprintLabel}}
+        <span class="text-xs text-gray-400 bg-gray-50 border border-gray-200 px-2.5 py-1 rounded-md">{{.Meta.SprintLabel}}</span>
+        {{end}}
+      </div>
+      <div class="flex items-center gap-2.5">
+        {{if .Meta.ActiveProject}}
+        <span class="text-xs font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-1 rounded-md">{{.Meta.ActiveProject.Name}}</span>
+        {{end}}
+        <div class="flex items-center gap-2 pl-2 border-l border-gray-200">
+          <div class="w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center flex-shrink-0">
+            <span class="text-white font-bold text-[10px]">EM</span>
+          </div>
+          <span class="text-xs font-medium text-gray-700">Engineering Manager</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page content -->
+    <main class="flex-1 overflow-y-auto bg-gray-100 px-6 py-5">
+
+      <!-- Page header: title + action button -->
+      <div class="flex items-center justify-between mb-5">
+        <h1 class="text-2xl font-bold text-indigo-700">{{.Meta.Title}}</h1>
         {{if .Meta.ActionLabel}}
         <button type="button" onclick="document.getElementById('add-dialog').showModal()"
-           class="flex items-center gap-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-2.5 py-1 rounded-md transition-colors">
-          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+           class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded-md transition-colors shadow-sm">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
           </svg>
           {{.Meta.ActionLabel}}
         </button>
         {{end}}
       </div>
-    </header>
 
-    <!-- Page content -->
-    <main class="flex-1 overflow-y-auto p-5">
       {{template "content" .}}
     </main>
 
