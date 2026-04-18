@@ -30,7 +30,7 @@ func (h *TeamHandler) List(c *gin.Context) {
 	}
 	allProjects, activeProject := projectMeta(c)
 	render(c, "team", TeamData{
-		Meta:    Meta{Title: "Team", CurrentPage: "team", AllProjects: allProjects, ActiveProject: activeProject},
+		Meta:    Meta{Title: "Team", CurrentPage: "team", ActionLabel: "Add Member", AllProjects: allProjects, ActiveProject: activeProject},
 		Members: members,
 	})
 }

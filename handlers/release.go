@@ -37,7 +37,7 @@ func (h *ReleaseHandler) List(c *gin.Context) {
 	}
 	allProjects, activeProject := projectMeta(c)
 	render(c, "releases", ReleasesData{
-		Meta:     Meta{Title: "Releases", CurrentPage: "releases", AllProjects: allProjects, ActiveProject: activeProject},
+		Meta:     Meta{Title: "Releases", CurrentPage: "releases", ActionLabel: "New Release", AllProjects: allProjects, ActiveProject: activeProject},
 		Releases: releases,
 	})
 }
@@ -69,7 +69,7 @@ func (h *ReleaseHandler) Detail(c *gin.Context) {
 	}
 	allProjects, activeProject := projectMeta(c)
 	render(c, "release_detail", ReleaseDetailData{
-		Meta:    Meta{Title: release.Name, CurrentPage: "releases", AllProjects: allProjects, ActiveProject: activeProject},
+		Meta:    Meta{Title: release.Name, CurrentPage: "releases", ActionLabel: "Add Stage", AllProjects: allProjects, ActiveProject: activeProject},
 		Release: release,
 	})
 }

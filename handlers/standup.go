@@ -38,7 +38,7 @@ func (h *StandupHandler) List(c *gin.Context) {
 
 	allProjects, activeProject := projectMeta(c)
 	render(c, "standups", StandupsData{
-		Meta:        Meta{Title: "Daily Standups", CurrentPage: "standups", AllProjects: allProjects, ActiveProject: activeProject},
+		Meta:        Meta{Title: "Daily Standups", CurrentPage: "standups", ActionLabel: "Add Entry", AllProjects: allProjects, ActiveProject: activeProject},
 		Date:        t.Format("Monday, January 2, 2006"),
 		DateRaw:     dateRaw,
 		Standups:    entries,

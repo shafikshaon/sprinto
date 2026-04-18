@@ -59,7 +59,7 @@ func (h *ProjectHandler) List(c *gin.Context) {
 	members, _ := h.teamSvc.All()
 	allProjects, activeProject := projectMeta(c)
 	render(c, "projects", ProjectsData{
-		Meta:       Meta{Title: "Projects", CurrentPage: "projects", AllProjects: allProjects, ActiveProject: activeProject},
+		Meta:       Meta{Title: "Projects", CurrentPage: "projects", ActionLabel: "New Project", AllProjects: allProjects, ActiveProject: activeProject},
 		Projects:   projects,
 		AllMembers: members,
 	})

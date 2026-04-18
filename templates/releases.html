@@ -1,22 +1,24 @@
 {{define "content"}}
 
 <!-- ── Release List ────────────────────────────────────────────────── -->
-<div class="space-y-3 mb-5">
+<div class="space-y-3">
   {{if not .Releases}}
-  <div class="bg-white rounded-xl border border-gray-200 px-5 py-8 text-center">
-    <p class="text-sm text-gray-400">No releases yet. Create your first one below.</p>
+  <div class="bg-white rounded-lg border border-gray-200 px-5 py-10 text-center">
+    <p class="text-sm text-gray-400 mb-2">No releases yet.</p>
+    <button type="button" onclick="document.getElementById('add-dialog').showModal()"
+      class="text-xs font-semibold text-indigo-600 hover:underline">Create your first release →</button>
   </div>
   {{end}}
   {{range .Releases}}
-  <div class="bg-white rounded-xl border border-gray-200 px-5 py-4 flex items-center justify-between hover:border-indigo-200 transition-colors">
+  <div class="bg-white rounded-lg border border-gray-200 px-4 py-3 flex items-center justify-between hover:border-indigo-200 transition-colors">
     <div class="flex items-start gap-4 min-w-0">
       <div class="min-w-0">
-        <div class="flex items-center gap-2 mb-1">
-          <h3 class="text-sm font-semibold text-gray-900 truncate">{{.Name}}</h3>
-          <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0 {{statusClass .Status}}">{{.Status}}</span>
+        <div class="flex items-center gap-2 mb-0.5">
+          <h3 class="text-xs font-semibold text-gray-900 truncate">{{.Name}}</h3>
+          <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-full flex-shrink-0 {{statusClass .Status}}">{{.Status}}</span>
         </div>
-        {{if .Description}}<p class="text-xs text-gray-400 truncate max-w-lg">{{.Description}}</p>{{end}}
-        <div class="flex items-center gap-3 mt-1">
+        {{if .Description}}<p class="text-[10px] text-gray-400 truncate max-w-lg">{{.Description}}</p>{{end}}
+        <div class="flex items-center gap-3 mt-0.5">
           {{if .TargetDate}}<span class="text-[10px] text-gray-400">Target: {{.TargetDate}}</span>{{end}}
           <span class="text-[10px] text-gray-400">{{len .Stages}} stage{{if ne (len .Stages) 1}}s{{end}}</span>
         </div>
@@ -32,44 +34,46 @@
   {{end}}
 </div>
 
-<!-- ── New Release Form ────────────────────────────────────────────── -->
-<div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-  <div class="px-5 py-3.5 border-b border-gray-100">
-    <h3 class="text-sm font-semibold text-gray-800">New Release</h3>
+<!-- ── New Release Modal ───────────────────────────────────────────── -->
+<dialog id="add-dialog">
+  <div class="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
+    <h3 class="text-sm font-semibold text-gray-900">New Release</h3>
+    <button type="button" onclick="document.getElementById('add-dialog').close()" class="text-gray-400 hover:text-gray-600 text-xl leading-none font-light">×</button>
   </div>
   <form method="POST" action="/releases" class="p-5">
-    <div class="grid grid-cols-2 gap-4 mb-4">
+    <div class="space-y-3 mb-4">
       <div>
-        <label class="text-xs font-medium text-gray-600 block mb-1">Release Name <span class="text-red-400">*</span></label>
+        <label class="text-[10px] font-medium text-gray-600 block mb-1">Release Name <span class="text-red-400">*</span></label>
         <input name="name" type="text" required placeholder="e.g. v2.3.0 – Auth Overhaul"
-          class="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-xs border border-gray-200 rounded-md px-2.5 py-1.5 focus:outline-none focus:border-indigo-400"/>
       </div>
       <div>
-        <label class="text-xs font-medium text-gray-600 block mb-1">Target Date</label>
-        <input name="target_date" type="date"
-          class="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-400"/>
-      </div>
-      <div class="col-span-2">
-        <label class="text-xs font-medium text-gray-600 block mb-1">Description</label>
+        <label class="text-[10px] font-medium text-gray-600 block mb-1">Description</label>
         <input name="description" type="text" placeholder="What's included in this release..."
-          class="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-xs border border-gray-200 rounded-md px-2.5 py-1.5 focus:outline-none focus:border-indigo-400"/>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-[10px] font-medium text-gray-600 block mb-1">Status</label>
+          <select name="status" class="w-full text-xs border border-gray-200 rounded-md px-2.5 py-1.5 focus:outline-none focus:border-indigo-400">
+            <option>Draft</option>
+            <option>In Progress</option>
+            <option>Released</option>
+            <option>Rolled Back</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-[10px] font-medium text-gray-600 block mb-1">Target Date</label>
+          <input name="target_date" type="date"
+            class="w-full text-xs border border-gray-200 rounded-md px-2.5 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        </div>
       </div>
     </div>
-    <div class="flex items-center gap-4">
-      <div>
-        <label class="text-xs font-medium text-gray-600 block mb-1">Status</label>
-        <select name="status" class="text-xs border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-400">
-          <option>Draft</option>
-          <option>In Progress</option>
-          <option>Released</option>
-          <option>Rolled Back</option>
-        </select>
-      </div>
-      <button type="submit" class="mt-5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
-        Create Release
-      </button>
+    <div class="flex items-center gap-2">
+      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-1.5 rounded-md transition-colors">Create Release</button>
+      <button type="button" onclick="document.getElementById('add-dialog').close()" class="text-xs text-gray-500 hover:text-gray-700 px-3 py-1.5 rounded-md border border-gray-200 transition-colors">Cancel</button>
     </div>
   </form>
-</div>
+</dialog>
 
 {{end}}

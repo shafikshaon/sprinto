@@ -23,7 +23,7 @@
 </div>
 
 <!-- ── Dev Task Table ──────────────────────────────────────────────── -->
-<div class="bg-white rounded-lg border border-gray-200 overflow-hidden mb-3">
+<div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
   <table class="w-full text-sm">
     <thead>
       <tr class="bg-gray-50 border-b border-gray-100">
@@ -67,14 +67,15 @@
   </table>
 </div>
 
-<!-- ── Add Dev Task Form ───────────────────────────────────────────── -->
-<div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
-  <div class="px-4 py-2.5 border-b border-gray-100">
-    <h3 class="text-xs font-semibold text-gray-800">Add Dev Task</h3>
+<!-- ── Add Dev Task Modal ──────────────────────────────────────────── -->
+<dialog id="add-dialog">
+  <div class="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
+    <h3 class="text-sm font-semibold text-gray-900">Add Dev Task</h3>
+    <button type="button" onclick="document.getElementById('add-dialog').close()" class="text-gray-400 hover:text-gray-600 text-xl leading-none font-light">×</button>
   </div>
-  <form method="POST" action="/devtasks" class="p-4">
-    <div class="grid grid-cols-2 gap-3 mb-3">
-      <div class="col-span-2">
+  <form method="POST" action="/devtasks" class="p-5">
+    <div class="space-y-3 mb-4">
+      <div>
         <label class="text-[10px] font-medium text-gray-600 block mb-1">Task Title <span class="text-red-400">*</span></label>
         <input name="title" type="text" required placeholder="e.g. Migrate REST to GraphQL"
           class="w-full text-xs border border-gray-200 rounded-md px-2.5 py-1.5 focus:outline-none focus:border-indigo-400"/>
@@ -113,10 +114,11 @@
         </div>
       </div>
     </div>
-    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-1.5 rounded-md transition-colors">
-      Add Task
-    </button>
+    <div class="flex items-center gap-2">
+      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-1.5 rounded-md transition-colors">Add Task</button>
+      <button type="button" onclick="document.getElementById('add-dialog').close()" class="text-xs text-gray-500 hover:text-gray-700 px-3 py-1.5 rounded-md border border-gray-200 transition-colors">Cancel</button>
+    </div>
   </form>
-</div>
+</dialog>
 
 {{end}}

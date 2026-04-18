@@ -36,7 +36,7 @@ func (h *SprintHandler) List(c *gin.Context) {
 	}
 	allProjects, activeProject := projectMeta(c)
 	render(c, "sprints", SprintsData{
-		Meta:   Meta{Title: "Sprint Board", CurrentPage: "sprints", SprintLabel: sprintLabel, AllProjects: allProjects, ActiveProject: activeProject},
+		Meta:   Meta{Title: "Sprint Board", CurrentPage: "sprints", ActionLabel: "Add Task", SprintLabel: sprintLabel, AllProjects: allProjects, ActiveProject: activeProject},
 		Sprint: sprint,
 		Stats:  models.ComputeStats(sprint.Tasks),
 	})

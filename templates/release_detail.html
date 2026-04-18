@@ -1,33 +1,33 @@
 {{define "content"}}
 
 <!-- ── Release Header ──────────────────────────────────────────────── -->
-<div class="bg-white rounded-xl border border-gray-200 px-5 py-4 mb-5">
+<div class="bg-white rounded-lg border border-gray-200 px-4 py-3 mb-3">
   <a href="/releases" class="text-[10px] text-gray-400 hover:text-indigo-600 font-medium">← All Releases</a>
   <div class="flex items-start justify-between mt-2">
     <div>
       <div class="flex items-center gap-2.5">
-        <h2 class="text-base font-semibold text-gray-900">{{.Release.Name}}</h2>
-        <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full {{statusClass .Release.Status}}">{{.Release.Status}}</span>
+        <h2 class="text-sm font-semibold text-gray-900">{{.Release.Name}}</h2>
+        <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-full {{statusClass .Release.Status}}">{{.Release.Status}}</span>
       </div>
       {{if .Release.Description}}<p class="text-xs text-gray-500 mt-1">{{.Release.Description}}</p>{{end}}
-      {{if .Release.TargetDate}}<p class="text-[10px] text-gray-400 mt-1">Target: {{.Release.TargetDate}}</p>{{end}}
+      {{if .Release.TargetDate}}<p class="text-[10px] text-gray-400 mt-0.5">Target: {{.Release.TargetDate}}</p>{{end}}
     </div>
-    <span class="text-xs text-gray-400 bg-gray-50 border border-gray-100 px-2.5 py-1 rounded-md">
+    <span class="text-xs text-gray-400 bg-gray-50 border border-gray-100 px-2 py-1 rounded-md">
       {{len .Release.Stages}} stage{{if ne (len .Release.Stages) 1}}s{{end}}
     </span>
   </div>
 </div>
 
 <!-- ── Stages ──────────────────────────────────────────────────────── -->
-<div class="space-y-5 mb-5">
+<div class="space-y-3">
   {{range .Release.Stages}}
-  <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+  <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
 
     <!-- Stage header -->
-    <div class="px-5 py-3 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
-      <div class="flex items-center gap-2.5">
-        <span class="text-sm font-semibold text-gray-800">{{.Name}}</span>
-        <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full {{statusClass .Status}}">{{.Status}}</span>
+    <div class="px-4 py-2.5 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-semibold text-gray-800">{{.Name}}</span>
+        <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-full {{statusClass .Status}}">{{.Status}}</span>
       </div>
       <div class="flex items-center gap-2">
         <form method="POST" action="/releases/stages/{{.ID}}/status" class="flex items-center gap-1.5">
@@ -48,8 +48,8 @@
     </div>
 
     <!-- Stories -->
-    <div class="px-5 py-3.5 border-b border-gray-100">
-      <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2.5">Stories / QA Items</p>
+    <div class="px-4 py-3 border-b border-gray-100">
+      <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Stories / QA Items</p>
       {{if .Stories}}
       <table class="w-full text-sm mb-3">
         <thead>
@@ -63,8 +63,8 @@
         <tbody class="divide-y divide-gray-50">
           {{range .Stories}}
           <tr class="hover:bg-gray-50 transition-colors">
-            <td class="py-2.5 pr-4"><span class="text-xs font-medium text-gray-800">{{.Title}}</span></td>
-            <td class="py-2.5 px-4">
+            <td class="py-2 pr-4"><span class="text-xs font-medium text-gray-800">{{.Title}}</span></td>
+            <td class="py-2 px-4">
               {{if .Assignee}}
               <div class="flex items-center gap-1.5">
                 <div class="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
@@ -74,10 +74,10 @@
               </div>
               {{else}}<span class="text-xs text-gray-400">—</span>{{end}}
             </td>
-            <td class="py-2.5 px-4">
-              <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full {{statusClass .Status}}">{{.Status}}</span>
+            <td class="py-2 px-4">
+              <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-full {{statusClass .Status}}">{{.Status}}</span>
             </td>
-            <td class="py-2.5 text-right">
+            <td class="py-2 text-right">
               <div class="flex items-center justify-end gap-2">
                 <form method="POST" action="/releases/stories/{{.ID}}/status" class="inline">
                   <input type="hidden" name="release_id" value="{{$.Release.ID}}">
@@ -105,30 +105,30 @@
         </tbody>
       </table>
       {{end}}
-      <!-- Add story inline form -->
+      <!-- Inline: add story -->
       <form method="POST" action="/releases/stages/{{.ID}}/stories" class="flex items-center gap-2">
         <input type="hidden" name="release_id" value="{{$.Release.ID}}">
         <input name="title" type="text" required placeholder="Story / ticket title..."
-          class="flex-1 text-xs border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
-        <input name="assignee" type="text" placeholder="Assignee (QA)"
-          class="w-40 text-xs border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
-        <button type="submit" class="text-xs bg-gray-100 hover:bg-indigo-50 hover:text-indigo-700 text-gray-600 font-semibold px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap">+ Story</button>
+          class="flex-1 text-xs border border-gray-200 rounded-md px-2.5 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        <input name="assignee" type="text" placeholder="Assignee"
+          class="w-32 text-xs border border-gray-200 rounded-md px-2.5 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        <button type="submit" class="text-xs bg-gray-100 hover:bg-indigo-50 hover:text-indigo-700 text-gray-600 font-semibold px-3 py-1.5 rounded-md transition-colors whitespace-nowrap">+ Story</button>
       </form>
     </div>
 
     <!-- Slack Updates -->
-    <div class="px-5 py-3.5">
-      <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2.5">
+    <div class="px-4 py-3">
+      <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">
         Slack Updates
-        {{if .SlackUpdates}}<span class="ml-1 text-[10px] font-semibold bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded-full">{{len .SlackUpdates}}</span>{{end}}
+        {{if .SlackUpdates}}<span class="ml-1 text-[10px] font-semibold bg-gray-100 text-gray-500 px-1 py-0.5 rounded-full">{{len .SlackUpdates}}</span>{{end}}
       </p>
       {{if .SlackUpdates}}
-      <div class="space-y-2 mb-3">
+      <div class="space-y-1.5 mb-3">
         {{range .SlackUpdates}}
-        <div class="flex items-start justify-between gap-3 bg-gray-50 rounded-lg px-3 py-2.5">
-          <div class="flex items-start gap-2.5 min-w-0">
-            <div class="w-5 h-5 rounded bg-[#4A154B] flex items-center justify-center flex-shrink-0 mt-0.5">
-              <span class="text-white font-bold text-[8px]">#</span>
+        <div class="flex items-start justify-between gap-3 bg-gray-50 rounded-md px-3 py-2">
+          <div class="flex items-start gap-2 min-w-0">
+            <div class="w-4 h-4 rounded bg-[#4A154B] flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span class="text-white font-bold text-[7px]">#</span>
             </div>
             <div class="min-w-0">
               <p class="text-xs text-gray-700 leading-relaxed">
@@ -147,18 +147,16 @@
         {{end}}
       </div>
       {{end}}
-      <!-- Add slack update form -->
-      <form method="POST" action="/releases/stages/{{.ID}}/slack" class="grid grid-cols-3 gap-2">
+      <!-- Inline: add slack update -->
+      <form method="POST" action="/releases/stages/{{.ID}}/slack" class="flex items-center gap-2">
         <input type="hidden" name="release_id" value="{{$.Release.ID}}">
-        <input name="channel" type="text" placeholder="#channel (e.g. #releases)"
-          class="text-xs border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        <input name="channel" type="text" placeholder="#channel"
+          class="w-28 text-xs border border-gray-200 rounded-md px-2.5 py-1.5 focus:outline-none focus:border-indigo-400"/>
         <input name="message" type="text" required placeholder="Message summary..."
-          class="text-xs border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
-        <div class="flex gap-2">
-          <input name="author" type="text" placeholder="Posted by"
-            class="flex-1 text-xs border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
-          <button type="submit" class="text-xs bg-[#4A154B] hover:bg-[#611f69] text-white font-semibold px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap">+ Slack</button>
-        </div>
+          class="flex-1 text-xs border border-gray-200 rounded-md px-2.5 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        <input name="author" type="text" placeholder="Posted by"
+          class="w-28 text-xs border border-gray-200 rounded-md px-2.5 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        <button type="submit" class="text-xs bg-[#4A154B] hover:bg-[#611f69] text-white font-semibold px-3 py-1.5 rounded-md transition-colors whitespace-nowrap">+ Slack</button>
       </form>
     </div>
 
@@ -166,30 +164,34 @@
   {{end}}
 </div>
 
-<!-- ── Add Stage Form ──────────────────────────────────────────────── -->
-<div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-  <div class="px-5 py-3.5 border-b border-gray-100">
-    <h3 class="text-sm font-semibold text-gray-800">Add Stage</h3>
+<!-- ── Add Stage Modal ─────────────────────────────────────────────── -->
+<dialog id="add-dialog">
+  <div class="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
+    <h3 class="text-sm font-semibold text-gray-900">Add Stage</h3>
+    <button type="button" onclick="document.getElementById('add-dialog').close()" class="text-gray-400 hover:text-gray-600 text-xl leading-none font-light">×</button>
   </div>
-  <form method="POST" action="/releases/{{.Release.ID}}/stages" class="p-5 flex items-end gap-4">
-    <div class="flex-1">
-      <label class="text-xs font-medium text-gray-600 block mb-1">Stage Name <span class="text-red-400">*</span></label>
-      <input name="name" type="text" required placeholder="e.g. QA Round 1, Staging Deploy, Canary, Full Prod..."
-        class="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+  <form method="POST" action="/releases/{{.Release.ID}}/stages" class="p-5">
+    <div class="space-y-3 mb-4">
+      <div>
+        <label class="text-[10px] font-medium text-gray-600 block mb-1">Stage Name <span class="text-red-400">*</span></label>
+        <input name="name" type="text" required placeholder="e.g. QA Round 1, Staging Deploy, Canary..."
+          class="w-full text-xs border border-gray-200 rounded-md px-2.5 py-1.5 focus:outline-none focus:border-indigo-400"/>
+      </div>
+      <div>
+        <label class="text-[10px] font-medium text-gray-600 block mb-1">Initial Status</label>
+        <select name="status" class="w-full text-xs border border-gray-200 rounded-md px-2.5 py-1.5 focus:outline-none focus:border-indigo-400">
+          <option>Pending</option>
+          <option>Active</option>
+          <option>Done</option>
+          <option>Failed</option>
+        </select>
+      </div>
     </div>
-    <div>
-      <label class="text-xs font-medium text-gray-600 block mb-1">Status</label>
-      <select name="status" class="text-xs border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-400">
-        <option>Pending</option>
-        <option>Active</option>
-        <option>Done</option>
-        <option>Failed</option>
-      </select>
+    <div class="flex items-center gap-2">
+      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-1.5 rounded-md transition-colors">Add Stage</button>
+      <button type="button" onclick="document.getElementById('add-dialog').close()" class="text-xs text-gray-500 hover:text-gray-700 px-3 py-1.5 rounded-md border border-gray-200 transition-colors">Cancel</button>
     </div>
-    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
-      Add Stage
-    </button>
   </form>
-</div>
+</dialog>
 
 {{end}}

@@ -10,6 +10,8 @@
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: #f1f5f9; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+    dialog { padding: 0; border: none; border-radius: 0.75rem; box-shadow: 0 25px 60px rgba(0,0,0,0.18); max-width: 30rem; width: 92%; }
+    dialog::backdrop { background: rgba(0,0,0,0.22); }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-900 antialiased">
@@ -168,13 +170,13 @@
         {{if .Meta.ActiveProject}}<span class="text-[11px] font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded">{{.Meta.ActiveProject.Name}}</span>{{end}}
         {{if .Meta.SprintLabel}}<span class="text-[11px] text-gray-400 bg-gray-50 border border-gray-200 px-2 py-0.5 rounded">{{.Meta.SprintLabel}}</span>{{end}}
         {{if .Meta.ActionLabel}}
-        <a href="{{.Meta.ActionHref}}"
+        <button type="button" onclick="document.getElementById('add-dialog').showModal()"
            class="flex items-center gap-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-2.5 py-1 rounded-md transition-colors">
           <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
           </svg>
           {{.Meta.ActionLabel}}
-        </a>
+        </button>
         {{end}}
       </div>
     </header>

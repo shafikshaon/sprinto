@@ -78,7 +78,7 @@ func (h *DashboardHandler) Get(c *gin.Context) {
 	allProjects, activeProject := projectMeta(c)
 
 	render(c, "dashboard", DashboardData{
-		Meta:              Meta{Title: "Dashboard", CurrentPage: "dashboard", ActionLabel: "Add Entry", ActionHref: "#", SprintLabel: sprintLabel, AllProjects: allProjects, ActiveProject: activeProject},
+		Meta:              Meta{Title: "Dashboard", CurrentPage: "dashboard", SprintLabel: sprintLabel, AllProjects: allProjects, ActiveProject: activeProject},
 		Sprint:            sprint,
 		Standups:          todayStandups,
 		StandupBlocked:    blocked,
