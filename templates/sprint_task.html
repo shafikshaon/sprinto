@@ -21,10 +21,14 @@
         <span class="text-xs font-semibold px-2 py-0.5 rounded-full {{priorityClass .Task.Priority}}">{{.Task.Priority}}</span>
       </div>
     </div>
-    <button type="button"
-      data-delete-action="/sprints/tasks/{{.Task.ID}}/delete"
-      data-delete-name="{{.Task.Title}}"
-      class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete Task</button>
+    <div class="flex items-center gap-2">
+      <button type="button" onclick="document.getElementById('edit-task-dialog').showModal()"
+        class="text-xs text-white bg-indigo-600 hover:bg-indigo-700 px-2.5 py-1 rounded transition-colors font-medium">Edit</button>
+      <button type="button"
+        data-delete-action="/sprints/tasks/{{.Task.ID}}/delete"
+        data-delete-name="{{.Task.Title}}"
+        class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete</button>
+    </div>
   </div>
 </div>
 
@@ -87,5 +91,67 @@
     </div>
   </form>
 </div>
+
+<!-- ── Edit Task Dialog ─────────────────────────────────────────────── -->
+<dialog id="edit-task-dialog">
+  <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+    <h3 class="text-sm font-semibold text-gray-900">Edit Task</h3>
+    <button type="button" onclick="document.getElementById('edit-task-dialog').close()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+  </div>
+  <form method="POST" action="/sprints/tasks/{{.Task.ID}}/update" class="p-5">
+    <div class="space-y-3 mb-5">
+      <div>
+        <label class="text-xs font-medium text-gray-600 block mb-1.5">Title <span class="text-red-400">*</span></label>
+        <input name="title" type="text" required value="{{.Task.Title}}"
+          class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+      </div>
+      <div>
+        <label class="text-xs font-medium text-gray-600 block mb-1.5">Assignees</label>
+        {{if .Members}}
+        <select id="edit-task-assignees" name="assignees" multiple class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400 h-24">
+          {{range .Members}}<option value="{{.Name}}">{{.Name}}{{if .Role}} · {{.Role}}{{end}}</option>{{end}}
+        </select>
+        <p class="text-xs text-gray-400 mt-1">Hold Ctrl / Cmd to select multiple</p>
+        <script>
+        (function(){
+          var current = [{{range $i,$a := .Task.Assignees}}{{if $i}},{{end}}"{{$a}}"{{end}}];
+          var sel = document.getElementById('edit-task-assignees');
+          for (var i = 0; i < sel.options.length; i++) {
+            if (current.indexOf(sel.options[i].value) !== -1) sel.options[i].selected = true;
+          }
+        })();
+        </script>
+        {{else}}
+        <input name="assignees" type="text" value="{{range $i,$a := .Task.Assignees}}{{if $i}}, {{end}}{{$a}}{{end}}"
+          class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+        {{end}}
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-xs font-medium text-gray-600 block mb-1.5">Status</label>
+          <select name="status" class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400">
+            <option {{if eq .Task.Status "Todo"}}selected{{end}}>Todo</option>
+            <option {{if eq .Task.Status "In Progress"}}selected{{end}}>In Progress</option>
+            <option {{if eq .Task.Status "Done"}}selected{{end}}>Done</option>
+            <option {{if eq .Task.Status "Blocked"}}selected{{end}}>Blocked</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-600 block mb-1.5">Priority</label>
+          <select name="priority" class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400">
+            <option {{if eq .Task.Priority "Low"}}selected{{end}}>Low</option>
+            <option {{if eq .Task.Priority "Medium"}}selected{{end}}>Medium</option>
+            <option {{if eq .Task.Priority "High"}}selected{{end}}>High</option>
+            <option {{if eq .Task.Priority "Critical"}}selected{{end}}>Critical</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-md transition-colors">Save Changes</button>
+      <button type="button" onclick="document.getElementById('edit-task-dialog').close()" class="text-sm text-gray-500 hover:text-gray-700 px-4 py-2 rounded-md border border-gray-200 transition-colors">Cancel</button>
+    </div>
+  </form>
+</dialog>
 
 {{end}}

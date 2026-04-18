@@ -115,6 +115,13 @@ func (h *ReleaseHandler) UpdateStoryStatus(c *gin.Context) {
 	redirectTo(c, fmt.Sprintf("/releases/%d", releaseID))
 }
 
+func (h *ReleaseHandler) UpdateStory(c *gin.Context) {
+	storyID, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	releaseID, _ := strconv.ParseUint(c.PostForm("release_id"), 10, 64)
+	h.svc.UpdateStory(uint(storyID), c.PostForm("title"), c.PostForm("assignee"))
+	redirectTo(c, fmt.Sprintf("/releases/%d", releaseID))
+}
+
 func (h *ReleaseHandler) CreateSlackUpdate(c *gin.Context) {
 	stageID, _ := strconv.ParseUint(c.Param("id"), 10, 64)
 	releaseID, _ := strconv.ParseUint(c.PostForm("release_id"), 10, 64)

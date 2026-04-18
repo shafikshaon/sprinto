@@ -17,8 +17,9 @@ type SprintsData struct {
 }
 
 type SprintTaskData struct {
-	Meta Meta
-	Task models.SprintTask
+	Meta    Meta
+	Task    models.SprintTask
+	Members []models.TeamMember
 }
 
 type SprintHandler struct {
@@ -86,10 +87,27 @@ func (h *SprintHandler) TaskDetail(c *gin.Context) {
 		return
 	}
 	allProjects, activeProject := projectMeta(c)
+	var members []models.TeamMember
+	if activeProject != nil {
+		members = activeProject.Members
+	}
 	render(c, "sprint_task", SprintTaskData{
-		Meta: Meta{Title: task.Title, CurrentPage: "sprints", AllProjects: allProjects, ActiveProject: activeProject},
-		Task: task,
+		Meta:    Meta{Title: task.Title, CurrentPage: "sprints", AllProjects: allProjects, ActiveProject: activeProject},
+		Task:    task,
+		Members: members,
 	})
+}
+
+func (h *SprintHandler) UpdateTask(c *gin.Context) {
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	h.svc.UpdateTask(
+		uint(id),
+		c.PostForm("title"),
+		c.PostFormArray("assignees"),
+		c.PostForm("status"),
+		c.PostForm("priority"),
+	)
+	redirectTo(c, "/sprints/tasks/"+c.Param("id"))
 }
 
 func (h *SprintHandler) AddComment(c *gin.Context) {

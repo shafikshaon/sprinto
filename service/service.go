@@ -20,6 +20,7 @@ type SprintService interface {
 	ActiveSprint(projectID uint) (models.Sprint, error)
 	TaskByID(id uint) (models.SprintTask, error)
 	AddTask(sprintID uint, title string, assignees []string, status, priority string) error
+	UpdateTask(id uint, title string, assignees []string, status, priority string) error
 	RemoveTask(id uint) error
 	UpdateProgress(sprintID uint, progress int) error
 	AddComment(taskID uint, author, content string) error
@@ -75,6 +76,13 @@ func splitAssignees(csv string) []string {
 		}
 	}
 	return out
+}
+
+func (s *sprintService) UpdateTask(id uint, title string, assignees []string, status, priority string) error {
+	if strings.TrimSpace(title) == "" {
+		return nil
+	}
+	return s.repo.UpdateTask(id, strings.TrimSpace(title), strings.Join(assignees, ","), status, priority)
 }
 
 func (s *sprintService) RemoveTask(id uint) error { return s.repo.DeleteTask(id) }
@@ -258,6 +266,7 @@ type DevTaskService interface {
 	All(projectID uint) ([]models.DevTask, error)
 	ByID(id uint) (models.DevTask, error)
 	Add(title, typ string, assignees []string, status, priority string, projectID uint) error
+	Update(id uint, title, typ string, assignees []string, status, priority string) error
 	Remove(id uint) error
 	OpenCountsByType(projectID uint) (map[string]int, error)
 	AddComment(taskID uint, author, content string) error
@@ -302,6 +311,13 @@ func (s *devTaskService) ByID(id uint) (models.DevTask, error) {
 	return task, err
 }
 
+func (s *devTaskService) Update(id uint, title, typ string, assignees []string, status, priority string) error {
+	if strings.TrimSpace(title) == "" {
+		return nil
+	}
+	return s.repo.Update(id, strings.TrimSpace(title), typ, strings.Join(assignees, ","), status, priority)
+}
+
 func (s *devTaskService) Remove(id uint) error { return s.repo.Delete(id) }
 
 func (s *devTaskService) OpenCountsByType(projectID uint) (map[string]int, error) {
@@ -339,6 +355,7 @@ type ReleaseService interface {
 	AddStory(stageID uint, title, assignee string) error
 	DeleteStory(id uint) error
 	UpdateStoryStatus(id uint, status string) error
+	UpdateStory(id uint, title, assignee string) error
 	AddSlackUpdate(stageID uint, channel, message, author string) error
 	DeleteSlackUpdate(id uint) error
 }
@@ -400,6 +417,13 @@ func (s *releaseService) AddStory(stageID uint, title, assignee string) error {
 func (s *releaseService) DeleteStory(id uint) error { return s.repo.DeleteStory(id) }
 func (s *releaseService) UpdateStoryStatus(id uint, status string) error {
 	return s.repo.UpdateStoryStatus(id, status)
+}
+
+func (s *releaseService) UpdateStory(id uint, title, assignee string) error {
+	if strings.TrimSpace(title) == "" {
+		return nil
+	}
+	return s.repo.UpdateStory(id, strings.TrimSpace(title), strings.TrimSpace(assignee))
 }
 
 func (s *releaseService) AddSlackUpdate(stageID uint, channel, message, author string) error {

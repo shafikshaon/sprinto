@@ -68,6 +68,7 @@ func main() {
 	r.GET("/sprints", sprintH.List)
 	r.POST("/sprints/tasks", sprintH.CreateTask)
 	r.GET("/sprints/tasks/:id", sprintH.TaskDetail)
+	r.POST("/sprints/tasks/:id/update", sprintH.UpdateTask)
 	r.POST("/sprints/tasks/:id/delete", sprintH.DeleteTask)
 	r.POST("/sprints/tasks/:id/comments", sprintH.AddComment)
 	r.POST("/sprints/comments/:id/delete", sprintH.DeleteComment)
@@ -88,6 +89,7 @@ func main() {
 	r.GET("/devtasks", devTaskH.List)
 	r.POST("/devtasks", devTaskH.Create)
 	r.GET("/devtasks/:id", devTaskH.Detail)
+	r.POST("/devtasks/:id/update", devTaskH.Update)
 	r.POST("/devtasks/:id/delete", devTaskH.Delete)
 	r.POST("/devtasks/:id/comments", devTaskH.AddComment)
 	r.POST("/devtasks/comments/:id/delete", devTaskH.DeleteComment)
@@ -102,6 +104,7 @@ func main() {
 	r.POST("/releases/stages/:id/stories", releaseH.CreateStory)
 	r.POST("/releases/stories/:id/delete", releaseH.DeleteStory)
 	r.POST("/releases/stories/:id/status", releaseH.UpdateStoryStatus)
+	r.POST("/releases/stories/:id/update", releaseH.UpdateStory)
 	r.POST("/releases/stages/:id/slack", releaseH.CreateSlackUpdate)
 	r.POST("/releases/slack/:id/delete", releaseH.DeleteSlackUpdate)
 

@@ -14,6 +14,7 @@ type SprintRepository interface {
 	ActiveSprint(projectID uint) (models.Sprint, error)
 	TaskByID(id uint) (models.SprintTask, error)
 	CreateTask(t models.SprintTask) error
+	UpdateTask(id uint, title, assignees, status, priority string) error
 	DeleteTask(id uint) error
 	UpdateProgress(sprintID uint, progress int) error
 	AddComment(c models.SprintTaskComment) error
@@ -46,6 +47,11 @@ func (r *sprintRepo) TaskByID(id uint) (models.SprintTask, error) {
 
 func (r *sprintRepo) CreateTask(t models.SprintTask) error {
 	return r.db.Create(&t).Error
+}
+
+func (r *sprintRepo) UpdateTask(id uint, title, assignees, status, priority string) error {
+	return r.db.Model(&models.SprintTask{}).Where("id = ?", id).
+		Updates(map[string]interface{}{"title": title, "assignees": assignees, "status": status, "priority": priority}).Error
 }
 
 func (r *sprintRepo) DeleteTask(id uint) error {
@@ -172,6 +178,7 @@ type DevTaskRepository interface {
 	All(projectID uint) ([]models.DevTask, error)
 	ByID(id uint) (models.DevTask, error)
 	Create(t models.DevTask) error
+	Update(id uint, title, typ, assignees, status, priority string) error
 	Delete(id uint) error
 	OpenCountsByType(projectID uint) (map[string]int, error)
 	AddComment(c models.DevTaskComment) error
@@ -202,6 +209,11 @@ func (r *devTaskRepo) ByID(id uint) (models.DevTask, error) {
 
 func (r *devTaskRepo) Create(t models.DevTask) error {
 	return r.db.Create(&t).Error
+}
+
+func (r *devTaskRepo) Update(id uint, title, typ, assignees, status, priority string) error {
+	return r.db.Model(&models.DevTask{}).Where("id = ?", id).
+		Updates(map[string]interface{}{"title": title, "type": typ, "assignees": assignees, "status": status, "priority": priority}).Error
 }
 
 func (r *devTaskRepo) Delete(id uint) error {
@@ -252,6 +264,7 @@ type ReleaseRepository interface {
 	CreateStory(s models.ReleaseStory) error
 	DeleteStory(id uint) error
 	UpdateStoryStatus(id uint, status string) error
+	UpdateStory(id uint, title, assignee string) error
 	CreateSlackUpdate(u models.ReleaseSlackUpdate) error
 	DeleteSlackUpdate(id uint) error
 }
@@ -313,6 +326,11 @@ func (r *releaseRepo) DeleteStory(id uint) error {
 
 func (r *releaseRepo) UpdateStoryStatus(id uint, status string) error {
 	return r.db.Model(&models.ReleaseStory{}).Where("id = ?", id).Update("status", status).Error
+}
+
+func (r *releaseRepo) UpdateStory(id uint, title, assignee string) error {
+	return r.db.Model(&models.ReleaseStory{}).Where("id = ?", id).
+		Updates(map[string]interface{}{"title": title, "assignee": assignee}).Error
 }
 
 func (r *releaseRepo) CreateSlackUpdate(u models.ReleaseSlackUpdate) error {

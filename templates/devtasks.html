@@ -62,10 +62,20 @@
           <span class="text-xs font-semibold px-2 py-1 rounded-full {{priorityClass .Priority}}">{{.Priority}}</span>
         </td>
         <td class="px-4 py-3.5 text-right">
-          <button type="button"
-            data-delete-action="/devtasks/{{.ID}}/delete"
-            data-delete-name="{{.Title}}"
-            class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete</button>
+          <div class="flex items-center justify-end gap-2">
+            <button type="button"
+              data-edit-task-id="{{.ID}}"
+              data-edit-task-title="{{.Title}}"
+              data-edit-task-type="{{.Type}}"
+              data-edit-task-assignees="{{.AssigneeCSV}}"
+              data-edit-task-status="{{.Status}}"
+              data-edit-task-priority="{{.Priority}}"
+              class="text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors">Edit</button>
+            <button type="button"
+              data-delete-action="/devtasks/{{.ID}}/delete"
+              data-delete-name="{{.Title}}"
+              class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete</button>
+          </div>
         </td>
       </tr>
       {{end}}
@@ -133,5 +143,79 @@
     </div>
   </form>
 </dialog>
+
+<!-- ── Edit Task Dialog ─────────────────────────────────────────────── -->
+<dialog id="edit-task-dialog">
+  <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+    <h3 class="text-sm font-semibold text-gray-900">Edit Task</h3>
+    <button type="button" onclick="document.getElementById('edit-task-dialog').close()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+  </div>
+  <form id="edit-task-form" method="POST" action="" class="p-5">
+    <div class="space-y-3 mb-5">
+      <div>
+        <label class="text-xs font-medium text-gray-600 block mb-1.5">Title <span class="text-red-400">*</span></label>
+        <input id="edit-task-title" name="title" type="text" required
+          class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+      </div>
+      <div>
+        <label class="text-xs font-medium text-gray-600 block mb-1.5">Assignees</label>
+        {{if .Members}}
+        <select id="edit-task-assignees" name="assignees" multiple class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400 h-24">
+          {{range .Members}}<option value="{{.Name}}">{{.Name}}{{if .Role}} · {{.Role}}{{end}}</option>{{end}}
+        </select>
+        <p class="text-xs text-gray-400 mt-1">Hold Ctrl / Cmd to select multiple</p>
+        {{else}}
+        <input id="edit-task-assignees-text" name="assignees" type="text" placeholder="Team member name"
+          class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+        {{end}}
+      </div>
+      <div class="grid grid-cols-3 gap-3">
+        <div>
+          <label class="text-xs font-medium text-gray-600 block mb-1.5">Type</label>
+          <select id="edit-task-type" name="type" class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400">
+            <option>Improvement</option><option>Tech Debt</option><option>Research</option><option>Other</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-600 block mb-1.5">Status</label>
+          <select id="edit-task-status" name="status" class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400">
+            <option>Todo</option><option>In Progress</option><option>Done</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-600 block mb-1.5">Priority</label>
+          <select id="edit-task-priority" name="priority" class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400">
+            <option>Low</option><option>Medium</option><option>High</option><option>Critical</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-md transition-colors">Save Changes</button>
+      <button type="button" onclick="document.getElementById('edit-task-dialog').close()" class="text-sm text-gray-500 hover:text-gray-700 px-4 py-2 rounded-md border border-gray-200 transition-colors">Cancel</button>
+    </div>
+  </form>
+</dialog>
+<script>
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest('[data-edit-task-id]');
+  if (!btn) return;
+  document.getElementById('edit-task-form').action = '/devtasks/' + btn.dataset.editTaskId + '/update';
+  document.getElementById('edit-task-title').value = btn.dataset.editTaskTitle;
+  document.getElementById('edit-task-type').value = btn.dataset.editTaskType;
+  document.getElementById('edit-task-status').value = btn.dataset.editTaskStatus;
+  document.getElementById('edit-task-priority').value = btn.dataset.editTaskPriority;
+  var current = btn.dataset.editTaskAssignees ? btn.dataset.editTaskAssignees.split(',').map(function(s){ return s.trim(); }) : [];
+  var sel = document.getElementById('edit-task-assignees');
+  if (sel) {
+    for (var i = 0; i < sel.options.length; i++) {
+      sel.options[i].selected = current.indexOf(sel.options[i].value) !== -1;
+    }
+  }
+  var txt = document.getElementById('edit-task-assignees-text');
+  if (txt) txt.value = current.join(', ');
+  document.getElementById('edit-task-dialog').showModal();
+});
+</script>
 
 {{end}}

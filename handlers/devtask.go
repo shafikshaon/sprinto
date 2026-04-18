@@ -17,8 +17,9 @@ type DevTasksData struct {
 }
 
 type DevTaskDetailData struct {
-	Meta Meta
-	Task models.DevTask
+	Meta    Meta
+	Task    models.DevTask
+	Members []models.TeamMember
 }
 
 type DevTaskHandler struct {
@@ -77,10 +78,28 @@ func (h *DevTaskHandler) Detail(c *gin.Context) {
 		return
 	}
 	allProjects, activeProject := projectMeta(c)
+	var members []models.TeamMember
+	if activeProject != nil {
+		members = activeProject.Members
+	}
 	render(c, "devtask_detail", DevTaskDetailData{
-		Meta: Meta{Title: task.Title, CurrentPage: "devtasks", AllProjects: allProjects, ActiveProject: activeProject},
-		Task: task,
+		Meta:    Meta{Title: task.Title, CurrentPage: "devtasks", AllProjects: allProjects, ActiveProject: activeProject},
+		Task:    task,
+		Members: members,
 	})
+}
+
+func (h *DevTaskHandler) Update(c *gin.Context) {
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	h.svc.Update(
+		uint(id),
+		c.PostForm("title"),
+		c.PostForm("type"),
+		c.PostFormArray("assignees"),
+		c.PostForm("status"),
+		c.PostForm("priority"),
+	)
+	redirectTo(c, "/devtasks/"+c.Param("id"))
 }
 
 func (h *DevTaskHandler) AddComment(c *gin.Context) {
