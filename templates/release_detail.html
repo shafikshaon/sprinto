@@ -147,9 +147,7 @@
               <span class="text-white font-bold text-[8px]">#</span>
             </div>
             <div class="min-w-0">
-              <p class="text-sm text-gray-700 leading-relaxed">
-                {{if .Channel}}<span class="font-semibold text-[#4A154B]">{{.Channel}}</span> · {{end}}{{.Message}}
-              </p>
+              <p class="text-sm text-gray-700 leading-relaxed">{{.Message}}</p>
               <p class="text-xs text-gray-400 mt-0.5">
                 {{if .Author}}{{.Author}}{{else}}Unknown{{end}}{{if .PostedAt}} · {{.PostedAt}}{{end}}
               </p>
@@ -168,8 +166,6 @@
       <!-- Inline: add slack update -->
       <form method="POST" action="/releases/stages/{{.ID}}/slack" class="flex items-center gap-2">
         <input type="hidden" name="release_id" value="{{$.Release.ID}}">
-        <input name="channel" type="text" placeholder="#channel"
-          class="w-32 text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
         <input name="message" type="text" required placeholder="Message summary..."
           class="flex-1 text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
         <input name="author" type="text" value="{{if .Meta.CurrentUser}}{{.Meta.CurrentUser.FullName}}{{end}}" placeholder="Posted by"

@@ -20,13 +20,6 @@ func main() {
 	if err := appdb.Migrate(db); err != nil {
 		log.Fatalf("migrate: %v", err)
 	}
-	if appdb.IsEmpty(db) {
-		if err := appdb.Seed(db); err != nil {
-			log.Fatalf("seed: %v", err)
-		}
-		log.Println("Database seeded with sample data")
-	}
-
 	// ── Repositories ──────────────────────────────────────────────
 	userRepo := repository.NewUserRepository(db)
 	sprintRepo := repository.NewSprintRepository(db)

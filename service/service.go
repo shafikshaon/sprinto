@@ -615,8 +615,8 @@ func clamp(v, min, max int) int {
 type SlackThreadService interface {
 	All(projectID uint, tag string) ([]models.SlackThread, error)
 	AllTags(projectID uint) ([]string, error)
-	Create(channel, topic, summary, tags, author string, projectID uint) error
-	Update(id uint, channel, topic, summary, tags, author string) error
+	Create(messageLink, topic, summary, tags, author string, projectID uint) error
+	Update(id uint, messageLink, topic, summary, tags, author string) error
 	Delete(id uint) error
 }
 
@@ -641,24 +641,24 @@ func (s *slackThreadService) AllTags(projectID uint) ([]string, error) {
 	return s.repo.AllTags(projectID)
 }
 
-func (s *slackThreadService) Create(channel, topic, summary, tags, author string, projectID uint) error {
+func (s *slackThreadService) Create(messageLink, topic, summary, tags, author string, projectID uint) error {
 	topic = strings.TrimSpace(topic)
 	if topic == "" {
 		return nil
 	}
 	return s.repo.Create(models.SlackThread{
-		ProjectID: projectID,
-		Channel:   strings.TrimSpace(channel),
-		Topic:     topic,
-		Summary:   strings.TrimSpace(summary),
-		TagCSV:    normaliseTags(tags),
-		Author:    strings.TrimSpace(author),
+		ProjectID:   projectID,
+		MessageLink: strings.TrimSpace(messageLink),
+		Topic:       topic,
+		Summary:     strings.TrimSpace(summary),
+		TagCSV:      normaliseTags(tags),
+		Author:      strings.TrimSpace(author),
 	})
 }
 
-func (s *slackThreadService) Update(id uint, channel, topic, summary, tags, author string) error {
+func (s *slackThreadService) Update(id uint, messageLink, topic, summary, tags, author string) error {
 	return s.repo.Update(id,
-		strings.TrimSpace(channel),
+		strings.TrimSpace(messageLink),
 		strings.TrimSpace(topic),
 		strings.TrimSpace(summary),
 		normaliseTags(tags),

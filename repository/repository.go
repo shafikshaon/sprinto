@@ -506,7 +506,7 @@ type SlackThreadRepository interface {
 	All(projectID uint, tag string) ([]models.SlackThread, error)
 	AllTags(projectID uint) ([]string, error)
 	Create(t models.SlackThread) error
-	Update(id uint, channel, topic, summary, tags, author string) error
+	Update(id uint, messageLink, topic, summary, tags, author string) error
 	Delete(id uint) error
 }
 
@@ -555,13 +555,13 @@ func (r *slackThreadRepo) AllTags(projectID uint) ([]string, error) {
 
 func (r *slackThreadRepo) Create(t models.SlackThread) error { return r.db.Create(&t).Error }
 
-func (r *slackThreadRepo) Update(id uint, channel, topic, summary, tags, author string) error {
+func (r *slackThreadRepo) Update(id uint, messageLink, topic, summary, tags, author string) error {
 	return r.db.Model(&models.SlackThread{}).Where("id = ?", id).Updates(map[string]interface{}{
-		"channel": channel,
-		"topic":   topic,
-		"summary": summary,
-		"tags":    tags,
-		"author":  author,
+		"message_link": messageLink,
+		"topic":        topic,
+		"summary":      summary,
+		"tags":         tags,
+		"author":       author,
 	}).Error
 }
 

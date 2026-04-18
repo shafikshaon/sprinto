@@ -201,12 +201,12 @@ func (ReleaseSlackUpdate) TableName() string { return "release_slack_updates" }
 
 type SlackThread struct {
 	gorm.Model
-	ProjectID uint   `gorm:"index"`
-	Channel   string
-	Topic     string `gorm:"not null"`
-	Summary   string
-	TagCSV    string `gorm:"column:tags"`
-	Author    string
+	ProjectID   uint   `gorm:"index"`
+	MessageLink string
+	Topic       string `gorm:"not null"`
+	Summary     string
+	TagCSV      string `gorm:"column:tags"`
+	Author      string
 	// Computed by service — not persisted
 	Tags []string `gorm:"-"`
 }
