@@ -29,7 +29,8 @@ func NewReleaseHandler(svc service.ReleaseService) *ReleaseHandler {
 }
 
 func (h *ReleaseHandler) List(c *gin.Context) {
-	releases, err := h.svc.All()
+	projectID := activeProjectIDFromCtx(c)
+	releases, err := h.svc.All(projectID)
 	if err != nil {
 		c.String(500, "DB error: %s", err.Error())
 		return
@@ -42,11 +43,13 @@ func (h *ReleaseHandler) List(c *gin.Context) {
 }
 
 func (h *ReleaseHandler) Create(c *gin.Context) {
+	projectID := activeProjectIDFromCtx(c)
 	h.svc.Create(
 		c.PostForm("name"),
 		c.PostForm("description"),
 		c.PostForm("status"),
 		c.PostForm("target_date"),
+		projectID,
 	)
 	redirectTo(c, "/releases")
 }

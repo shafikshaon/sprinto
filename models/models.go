@@ -6,6 +6,7 @@ import "gorm.io/gorm"
 
 type Sprint struct {
 	gorm.Model
+	ProjectID uint   `gorm:"index"`
 	Name      string `gorm:"not null"`
 	Goal      string `gorm:"default:''"`
 	Progress  int    `gorm:"default:0"`
@@ -52,6 +53,7 @@ func ComputeStats(tasks []SprintTask) SprintStats {
 
 type StandupEntry struct {
 	gorm.Model
+	ProjectID uint   `gorm:"index"`
 	Member    string `gorm:"not null"`
 	Role      string
 	Yesterday string
@@ -67,6 +69,7 @@ func (StandupEntry) TableName() string { return "standups" }
 
 type Deadline struct {
 	gorm.Model
+	ProjectID  uint   `gorm:"index"`
 	Title      string `gorm:"not null"`
 	Project    string
 	DueDateRaw string `gorm:"column:due_date;not null"` // "YYYY-MM-DD"
@@ -91,6 +94,7 @@ func (ActionItem) TableName() string { return "meeting_action_items" }
 
 type Meeting struct {
 	gorm.Model
+	ProjectID   uint   `gorm:"index"`
 	Title       string `gorm:"not null"`
 	Date        string `gorm:"not null"`
 	AttendeeCSV string `gorm:"column:attendees"`
@@ -104,11 +108,12 @@ type Meeting struct {
 
 type DevTask struct {
 	gorm.Model
-	Title    string `gorm:"not null"`
-	Type     string `gorm:"default:'Improvement'"`
-	Assignee string
-	Status   string `gorm:"default:'Todo'"`
-	Priority string `gorm:"default:'Medium'"`
+	ProjectID uint   `gorm:"index"`
+	Title     string `gorm:"not null"`
+	Type      string `gorm:"default:'Improvement'"`
+	Assignee  string
+	Status    string `gorm:"default:'Todo'"`
+	Priority  string `gorm:"default:'Medium'"`
 }
 
 func (DevTask) TableName() string { return "dev_tasks" }
@@ -117,6 +122,7 @@ func (DevTask) TableName() string { return "dev_tasks" }
 
 type Release struct {
 	gorm.Model
+	ProjectID   uint           `gorm:"index"`
 	Name        string         `gorm:"not null"`
 	Description string
 	Status      string         `gorm:"default:'Draft'"` // Draft, In Progress, Released, Rolled Back

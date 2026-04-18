@@ -11,7 +11,7 @@ import (
 // ─── Sprint ───────────────────────────────────────────────────────────────────
 
 type SprintRepository interface {
-	ActiveSprint() (models.Sprint, error)
+	ActiveSprint(projectID uint) (models.Sprint, error)
 	CreateTask(t models.SprintTask) error
 	DeleteTask(id uint) error
 	UpdateProgress(sprintID uint, progress int) error
@@ -21,11 +21,15 @@ type sprintRepo struct{ db *gorm.DB }
 
 func NewSprintRepository(db *gorm.DB) SprintRepository { return &sprintRepo{db: db} }
 
-func (r *sprintRepo) ActiveSprint() (models.Sprint, error) {
+func (r *sprintRepo) ActiveSprint(projectID uint) (models.Sprint, error) {
 	var s models.Sprint
-	result := r.db.Preload("Tasks", func(db *gorm.DB) *gorm.DB {
+	q := r.db.Preload("Tasks", func(db *gorm.DB) *gorm.DB {
 		return db.Order("created_at ASC")
-	}).Where("active = ?", true).Order("id DESC").First(&s)
+	}).Where("active = ?", true)
+	if projectID > 0 {
+		q = q.Where("project_id = ?", projectID)
+	}
+	result := q.Order("id DESC").First(&s)
 	return s, result.Error
 }
 
@@ -44,19 +48,23 @@ func (r *sprintRepo) UpdateProgress(sprintID uint, progress int) error {
 // ─── Standup ──────────────────────────────────────────────────────────────────
 
 type StandupRepository interface {
-	ByDate(date string) ([]models.StandupEntry, error)
+	ByDate(date string, projectID uint) ([]models.StandupEntry, error)
 	Create(e models.StandupEntry) error
 	Delete(id uint) error
-	RecentDates(limit int) ([]string, error)
+	RecentDates(limit int, projectID uint) ([]string, error)
 }
 
 type standupRepo struct{ db *gorm.DB }
 
 func NewStandupRepository(db *gorm.DB) StandupRepository { return &standupRepo{db: db} }
 
-func (r *standupRepo) ByDate(date string) ([]models.StandupEntry, error) {
+func (r *standupRepo) ByDate(date string, projectID uint) ([]models.StandupEntry, error) {
 	var entries []models.StandupEntry
-	result := r.db.Where("date = ?", date).Order("created_at ASC").Find(&entries)
+	q := r.db.Where("date = ?", date)
+	if projectID > 0 {
+		q = q.Where("project_id = ?", projectID)
+	}
+	result := q.Order("created_at ASC").Find(&entries)
 	return entries, result.Error
 }
 
@@ -68,20 +76,20 @@ func (r *standupRepo) Delete(id uint) error {
 	return r.db.Delete(&models.StandupEntry{}, id).Error
 }
 
-func (r *standupRepo) RecentDates(limit int) ([]string, error) {
+func (r *standupRepo) RecentDates(limit int, projectID uint) ([]string, error) {
 	var dates []string
-	result := r.db.Model(&models.StandupEntry{}).
-		Select("DISTINCT date").
-		Order("date DESC").
-		Limit(limit).
-		Pluck("date", &dates)
+	q := r.db.Model(&models.StandupEntry{}).Select("DISTINCT date")
+	if projectID > 0 {
+		q = q.Where("project_id = ?", projectID)
+	}
+	result := q.Order("date DESC").Limit(limit).Pluck("date", &dates)
 	return dates, result.Error
 }
 
 // ─── Deadline ─────────────────────────────────────────────────────────────────
 
 type DeadlineRepository interface {
-	All() ([]models.Deadline, error)
+	All(projectID uint) ([]models.Deadline, error)
 	Create(d models.Deadline) error
 	Delete(id uint) error
 }
@@ -90,9 +98,13 @@ type deadlineRepo struct{ db *gorm.DB }
 
 func NewDeadlineRepository(db *gorm.DB) DeadlineRepository { return &deadlineRepo{db: db} }
 
-func (r *deadlineRepo) All() ([]models.Deadline, error) {
+func (r *deadlineRepo) All(projectID uint) ([]models.Deadline, error) {
 	var dl []models.Deadline
-	result := r.db.Order("due_date ASC").Find(&dl)
+	q := r.db.Order("due_date ASC")
+	if projectID > 0 {
+		q = q.Where("project_id = ?", projectID)
+	}
+	result := q.Find(&dl)
 	return dl, result.Error
 }
 
@@ -107,7 +119,7 @@ func (r *deadlineRepo) Delete(id uint) error {
 // ─── Meeting ──────────────────────────────────────────────────────────────────
 
 type MeetingRepository interface {
-	All() ([]models.Meeting, error)
+	All(projectID uint) ([]models.Meeting, error)
 	Create(m models.Meeting) error
 	Delete(id uint) error
 }
@@ -116,9 +128,14 @@ type meetingRepo struct{ db *gorm.DB }
 
 func NewMeetingRepository(db *gorm.DB) MeetingRepository { return &meetingRepo{db: db} }
 
-func (r *meetingRepo) All() ([]models.Meeting, error) {
+func (r *meetingRepo) All(projectID uint) ([]models.Meeting, error) {
 	var meetings []models.Meeting
-	result := r.db.Preload("ActionItems").Order("created_at DESC").Find(&meetings)
+	q := r.db.Preload("ActionItems").Order("created_at DESC")
+	if projectID > 0 {
+		// Show meetings for this project AND global meetings (project_id = 0)
+		q = q.Where("project_id = ? OR project_id = 0", projectID)
+	}
+	result := q.Find(&meetings)
 	return meetings, result.Error
 }
 
@@ -133,19 +150,23 @@ func (r *meetingRepo) Delete(id uint) error {
 // ─── Dev Task ─────────────────────────────────────────────────────────────────
 
 type DevTaskRepository interface {
-	All() ([]models.DevTask, error)
+	All(projectID uint) ([]models.DevTask, error)
 	Create(t models.DevTask) error
 	Delete(id uint) error
-	OpenCountsByType() (map[string]int, error)
+	OpenCountsByType(projectID uint) (map[string]int, error)
 }
 
 type devTaskRepo struct{ db *gorm.DB }
 
 func NewDevTaskRepository(db *gorm.DB) DevTaskRepository { return &devTaskRepo{db: db} }
 
-func (r *devTaskRepo) All() ([]models.DevTask, error) {
+func (r *devTaskRepo) All(projectID uint) ([]models.DevTask, error) {
 	var tasks []models.DevTask
-	result := r.db.Order("created_at DESC").Find(&tasks)
+	q := r.db.Order("created_at DESC")
+	if projectID > 0 {
+		q = q.Where("project_id = ?", projectID)
+	}
+	result := q.Find(&tasks)
 	return tasks, result.Error
 }
 
@@ -157,10 +178,33 @@ func (r *devTaskRepo) Delete(id uint) error {
 	return r.db.Delete(&models.DevTask{}, id).Error
 }
 
+func (r *devTaskRepo) OpenCountsByType(projectID uint) (map[string]int, error) {
+	type row struct {
+		Type  string
+		Count int
+	}
+	var rows []row
+	q := r.db.Model(&models.DevTask{}).
+		Select("type, COUNT(*) as count").
+		Where("status != ?", "Done")
+	if projectID > 0 {
+		q = q.Where("project_id = ?", projectID)
+	}
+	result := q.Group("type").Scan(&rows)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	counts := map[string]int{"Improvement": 0, "Tech Debt": 0, "Research": 0}
+	for _, r := range rows {
+		counts[r.Type] = r.Count
+	}
+	return counts, nil
+}
+
 // ─── Release ──────────────────────────────────────────────────────────────────
 
 type ReleaseRepository interface {
-	All() ([]models.Release, error)
+	All(projectID uint) ([]models.Release, error)
 	ByID(id uint) (models.Release, error)
 	Create(r models.Release) error
 	Delete(id uint) error
@@ -178,9 +222,13 @@ type releaseRepo struct{ db *gorm.DB }
 
 func NewReleaseRepository(db *gorm.DB) ReleaseRepository { return &releaseRepo{db: db} }
 
-func (r *releaseRepo) All() ([]models.Release, error) {
+func (r *releaseRepo) All(projectID uint) ([]models.Release, error) {
 	var releases []models.Release
-	result := r.db.Preload("Stages").Order("created_at DESC").Find(&releases)
+	q := r.db.Preload("Stages").Order("created_at DESC")
+	if projectID > 0 {
+		q = q.Where("project_id = ?", projectID)
+	}
+	result := q.Find(&releases)
 	return releases, result.Error
 }
 
@@ -335,25 +383,4 @@ func (r *teamMemberRepo) Delete(id uint) error {
 	}
 	r.db.Model(&m).Association("Projects").Clear()
 	return r.db.Delete(&m).Error
-}
-
-func (r *devTaskRepo) OpenCountsByType() (map[string]int, error) {
-	type row struct {
-		Type  string
-		Count int
-	}
-	var rows []row
-	result := r.db.Model(&models.DevTask{}).
-		Select("type, COUNT(*) as count").
-		Where("status != ?", "Done").
-		Group("type").
-		Scan(&rows)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	counts := map[string]int{"Improvement": 0, "Tech Debt": 0, "Research": 0}
-	for _, r := range rows {
-		counts[r.Type] = r.Count
-	}
-	return counts, nil
 }

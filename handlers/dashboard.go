@@ -37,14 +37,15 @@ func NewDashboardHandler(
 }
 
 func (h *DashboardHandler) Get(c *gin.Context) {
-	sprint, err := h.sprints.ActiveSprint()
+	projectID := activeProjectIDFromCtx(c)
+	sprint, err := h.sprints.ActiveSprint(projectID)
 	if err != nil {
 		c.String(500, "DB error: %s", err.Error())
 		return
 	}
-	todayStandups, _ := h.standups.ByDate(time.Now().Format("2006-01-02"))
-	allDeadlines, _ := h.deadlines.All()
-	allTasks, _ := h.devTasks.All()
+	todayStandups, _ := h.standups.ByDate(time.Now().Format("2006-01-02"), projectID)
+	allDeadlines, _ := h.deadlines.All(projectID)
+	allTasks, _ := h.devTasks.All(projectID)
 
 	open, blocked, atRisk, critical := 0, 0, 0, 0
 	for _, t := range allTasks {

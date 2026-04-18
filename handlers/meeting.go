@@ -23,7 +23,8 @@ func NewMeetingHandler(svc service.MeetingService) *MeetingHandler {
 }
 
 func (h *MeetingHandler) List(c *gin.Context) {
-	meetings, err := h.svc.All()
+	projectID := activeProjectIDFromCtx(c)
+	meetings, err := h.svc.All(projectID)
 	if err != nil {
 		c.String(500, "DB error: %s", err.Error())
 		return
@@ -36,11 +37,13 @@ func (h *MeetingHandler) List(c *gin.Context) {
 }
 
 func (h *MeetingHandler) Create(c *gin.Context) {
+	projectID := activeProjectIDFromCtx(c)
 	h.svc.Add(
 		c.PostForm("title"),
 		c.PostForm("date"),
 		c.PostForm("attendees"),
 		c.PostForm("notes"),
+		projectID,
 	)
 	redirectTo(c, "/meetings")
 }

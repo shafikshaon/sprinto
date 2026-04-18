@@ -24,12 +24,13 @@ func NewDevTaskHandler(svc service.DevTaskService) *DevTaskHandler {
 }
 
 func (h *DevTaskHandler) List(c *gin.Context) {
-	tasks, err := h.svc.All()
+	projectID := activeProjectIDFromCtx(c)
+	tasks, err := h.svc.All(projectID)
 	if err != nil {
 		c.String(500, "DB error: %s", err.Error())
 		return
 	}
-	counts, _ := h.svc.OpenCountsByType()
+	counts, _ := h.svc.OpenCountsByType(projectID)
 	allProjects, activeProject := projectMeta(c)
 	render(c, "devtasks", DevTasksData{
 		Meta:     Meta{Title: "Dev Tasks & Improvements", CurrentPage: "devtasks", AllProjects: allProjects, ActiveProject: activeProject},
@@ -39,12 +40,14 @@ func (h *DevTaskHandler) List(c *gin.Context) {
 }
 
 func (h *DevTaskHandler) Create(c *gin.Context) {
+	projectID := activeProjectIDFromCtx(c)
 	h.svc.Add(
 		c.PostForm("title"),
 		c.PostForm("type"),
 		c.PostForm("assignee"),
 		c.PostForm("status"),
 		c.PostForm("priority"),
+		projectID,
 	)
 	redirectTo(c, "/devtasks")
 }

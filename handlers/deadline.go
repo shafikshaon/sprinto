@@ -31,7 +31,8 @@ func NewDeadlineHandler(svc service.DeadlineService) *DeadlineHandler {
 }
 
 func (h *DeadlineHandler) List(c *gin.Context) {
-	deadlines, err := h.svc.All()
+	projectID := activeProjectIDFromCtx(c)
+	deadlines, err := h.svc.All(projectID)
 	if err != nil {
 		c.String(500, "DB error: %s", err.Error())
 		return
@@ -59,11 +60,13 @@ func (h *DeadlineHandler) List(c *gin.Context) {
 }
 
 func (h *DeadlineHandler) Create(c *gin.Context) {
+	projectID := activeProjectIDFromCtx(c)
 	h.svc.Add(
 		c.PostForm("title"),
 		c.PostForm("project"),
 		c.PostForm("due_date"),
 		c.PostForm("priority"),
+		projectID,
 	)
 	redirectTo(c, "/deadlines")
 }

@@ -24,7 +24,8 @@ func NewSprintHandler(svc service.SprintService) *SprintHandler {
 }
 
 func (h *SprintHandler) List(c *gin.Context) {
-	sprint, err := h.svc.ActiveSprint()
+	projectID := activeProjectIDFromCtx(c)
+	sprint, err := h.svc.ActiveSprint(projectID)
 	if err != nil {
 		c.String(500, "DB error: %s", err.Error())
 		return

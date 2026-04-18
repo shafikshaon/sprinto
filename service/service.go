@@ -3,9 +3,12 @@
 package service
 
 import (
+	"errors"
 	"math"
 	"strings"
 	"time"
+
+	"gorm.io/gorm"
 
 	"sprinto/models"
 	"sprinto/repository"
@@ -14,7 +17,7 @@ import (
 // ─── Sprint ───────────────────────────────────────────────────────────────────
 
 type SprintService interface {
-	ActiveSprint() (models.Sprint, error)
+	ActiveSprint(projectID uint) (models.Sprint, error)
 	AddTask(sprintID uint, title, assignee, status, priority string) error
 	RemoveTask(id uint) error
 	UpdateProgress(sprintID uint, progress int) error
@@ -26,8 +29,12 @@ func NewSprintService(r repository.SprintRepository) SprintService {
 	return &sprintService{repo: r}
 }
 
-func (s *sprintService) ActiveSprint() (models.Sprint, error) {
-	return s.repo.ActiveSprint()
+func (s *sprintService) ActiveSprint(projectID uint) (models.Sprint, error) {
+	sprint, err := s.repo.ActiveSprint(projectID)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return models.Sprint{}, nil
+	}
+	return sprint, err
 }
 
 func (s *sprintService) AddTask(sprintID uint, title, assignee, status, priority string) error {
@@ -56,10 +63,10 @@ type DateNav struct {
 }
 
 type StandupService interface {
-	ByDate(date string) ([]models.StandupEntry, error)
-	Add(member, role, yesterday, today, blockers, status string) error
+	ByDate(date string, projectID uint) ([]models.StandupEntry, error)
+	Add(member, role, yesterday, today, blockers, status string, projectID uint) error
 	Remove(id uint) error
-	RecentDates(limit int) ([]DateNav, error)
+	RecentDates(limit int, projectID uint) ([]DateNav, error)
 }
 
 type standupService struct{ repo repository.StandupRepository }
@@ -68,11 +75,11 @@ func NewStandupService(r repository.StandupRepository) StandupService {
 	return &standupService{repo: r}
 }
 
-func (s *standupService) ByDate(date string) ([]models.StandupEntry, error) {
-	return s.repo.ByDate(date)
+func (s *standupService) ByDate(date string, projectID uint) ([]models.StandupEntry, error) {
+	return s.repo.ByDate(date, projectID)
 }
 
-func (s *standupService) Add(member, role, yesterday, today, blockers, status string) error {
+func (s *standupService) Add(member, role, yesterday, today, blockers, status string, projectID uint) error {
 	if strings.TrimSpace(member) == "" {
 		return nil
 	}
@@ -80,6 +87,7 @@ func (s *standupService) Add(member, role, yesterday, today, blockers, status st
 		blockers = "None"
 	}
 	return s.repo.Create(models.StandupEntry{
+		ProjectID: projectID,
 		Member:    strings.TrimSpace(member),
 		Role:      strings.TrimSpace(role),
 		Yesterday: strings.TrimSpace(yesterday),
@@ -92,8 +100,8 @@ func (s *standupService) Add(member, role, yesterday, today, blockers, status st
 
 func (s *standupService) Remove(id uint) error { return s.repo.Delete(id) }
 
-func (s *standupService) RecentDates(limit int) ([]DateNav, error) {
-	raw, err := s.repo.RecentDates(limit)
+func (s *standupService) RecentDates(limit int, projectID uint) ([]DateNav, error) {
+	raw, err := s.repo.RecentDates(limit, projectID)
 	if err != nil {
 		return nil, err
 	}
@@ -108,8 +116,8 @@ func (s *standupService) RecentDates(limit int) ([]DateNav, error) {
 // ─── Deadline ─────────────────────────────────────────────────────────────────
 
 type DeadlineService interface {
-	All() ([]models.Deadline, error)
-	Add(title, project, dueDateRaw, priority string) error
+	All(projectID uint) ([]models.Deadline, error)
+	Add(title, project, dueDateRaw, priority string, projectID uint) error
 	Remove(id uint) error
 }
 
@@ -119,8 +127,8 @@ func NewDeadlineService(r repository.DeadlineRepository) DeadlineService {
 	return &deadlineService{repo: r}
 }
 
-func (s *deadlineService) All() ([]models.Deadline, error) {
-	deadlines, err := s.repo.All()
+func (s *deadlineService) All(projectID uint) ([]models.Deadline, error) {
+	deadlines, err := s.repo.All(projectID)
 	if err != nil {
 		return nil, err
 	}
@@ -131,11 +139,12 @@ func (s *deadlineService) All() ([]models.Deadline, error) {
 	return deadlines, nil
 }
 
-func (s *deadlineService) Add(title, project, dueDateRaw, priority string) error {
+func (s *deadlineService) Add(title, project, dueDateRaw, priority string, projectID uint) error {
 	if strings.TrimSpace(title) == "" || dueDateRaw == "" {
 		return nil
 	}
 	return s.repo.Create(models.Deadline{
+		ProjectID:  projectID,
 		Title:      strings.TrimSpace(title),
 		Project:    strings.TrimSpace(project),
 		DueDateRaw: dueDateRaw,
@@ -148,8 +157,8 @@ func (s *deadlineService) Remove(id uint) error { return s.repo.Delete(id) }
 // ─── Meeting ──────────────────────────────────────────────────────────────────
 
 type MeetingService interface {
-	All() ([]models.Meeting, error)
-	Add(title, date, attendeesCSV, notes string) error
+	All(projectID uint) ([]models.Meeting, error)
+	Add(title, date, attendeesCSV, notes string, projectID uint) error
 	Remove(id uint) error
 }
 
@@ -159,12 +168,11 @@ func NewMeetingService(r repository.MeetingRepository) MeetingService {
 	return &meetingService{repo: r}
 }
 
-func (s *meetingService) All() ([]models.Meeting, error) {
-	meetings, err := s.repo.All()
+func (s *meetingService) All(projectID uint) ([]models.Meeting, error) {
+	meetings, err := s.repo.All(projectID)
 	if err != nil {
 		return nil, err
 	}
-	// Populate computed Attendees slice from CSV string
 	for i := range meetings {
 		if meetings[i].AttendeeCSV != "" {
 			for _, a := range strings.Split(meetings[i].AttendeeCSV, ",") {
@@ -177,7 +185,7 @@ func (s *meetingService) All() ([]models.Meeting, error) {
 	return meetings, nil
 }
 
-func (s *meetingService) Add(title, date, attendeesCSV, notes string) error {
+func (s *meetingService) Add(title, date, attendeesCSV, notes string, projectID uint) error {
 	if strings.TrimSpace(title) == "" || strings.TrimSpace(date) == "" {
 		return nil
 	}
@@ -188,6 +196,7 @@ func (s *meetingService) Add(title, date, attendeesCSV, notes string) error {
 		}
 	}
 	return s.repo.Create(models.Meeting{
+		ProjectID:   projectID,
 		Title:       strings.TrimSpace(title),
 		Date:        strings.TrimSpace(date),
 		AttendeeCSV: strings.Join(attendees, ","),
@@ -200,10 +209,10 @@ func (s *meetingService) Remove(id uint) error { return s.repo.Delete(id) }
 // ─── Dev Task ─────────────────────────────────────────────────────────────────
 
 type DevTaskService interface {
-	All() ([]models.DevTask, error)
-	Add(title, typ, assignee, status, priority string) error
+	All(projectID uint) ([]models.DevTask, error)
+	Add(title, typ, assignee, status, priority string, projectID uint) error
 	Remove(id uint) error
-	OpenCountsByType() (map[string]int, error)
+	OpenCountsByType(projectID uint) (map[string]int, error)
 }
 
 type devTaskService struct{ repo repository.DevTaskRepository }
@@ -212,32 +221,35 @@ func NewDevTaskService(r repository.DevTaskRepository) DevTaskService {
 	return &devTaskService{repo: r}
 }
 
-func (s *devTaskService) All() ([]models.DevTask, error) { return s.repo.All() }
+func (s *devTaskService) All(projectID uint) ([]models.DevTask, error) {
+	return s.repo.All(projectID)
+}
 
-func (s *devTaskService) Add(title, typ, assignee, status, priority string) error {
+func (s *devTaskService) Add(title, typ, assignee, status, priority string, projectID uint) error {
 	if strings.TrimSpace(title) == "" {
 		return nil
 	}
 	return s.repo.Create(models.DevTask{
-		Title:    strings.TrimSpace(title),
-		Type:     typ,
-		Assignee: strings.TrimSpace(assignee),
-		Status:   status,
-		Priority: priority,
+		ProjectID: projectID,
+		Title:     strings.TrimSpace(title),
+		Type:      typ,
+		Assignee:  strings.TrimSpace(assignee),
+		Status:    status,
+		Priority:  priority,
 	})
 }
 
 func (s *devTaskService) Remove(id uint) error { return s.repo.Delete(id) }
-func (s *devTaskService) OpenCountsByType() (map[string]int, error) {
-	return s.repo.OpenCountsByType()
+func (s *devTaskService) OpenCountsByType(projectID uint) (map[string]int, error) {
+	return s.repo.OpenCountsByType(projectID)
 }
 
 // ─── Release ──────────────────────────────────────────────────────────────────
 
 type ReleaseService interface {
-	All() ([]models.Release, error)
+	All(projectID uint) ([]models.Release, error)
 	ByID(id uint) (models.Release, error)
-	Create(name, description, status, targetDate string) error
+	Create(name, description, status, targetDate string, projectID uint) error
 	Delete(id uint) error
 	AddStage(releaseID uint, name, status string) error
 	DeleteStage(id uint) error
@@ -255,14 +267,17 @@ func NewReleaseService(r repository.ReleaseRepository) ReleaseService {
 	return &releaseService{repo: r}
 }
 
-func (s *releaseService) All() ([]models.Release, error) { return s.repo.All() }
+func (s *releaseService) All(projectID uint) ([]models.Release, error) {
+	return s.repo.All(projectID)
+}
 func (s *releaseService) ByID(id uint) (models.Release, error) { return s.repo.ByID(id) }
 
-func (s *releaseService) Create(name, description, status, targetDate string) error {
+func (s *releaseService) Create(name, description, status, targetDate string, projectID uint) error {
 	if strings.TrimSpace(name) == "" {
 		return nil
 	}
 	return s.repo.Create(models.Release{
+		ProjectID:   projectID,
 		Name:        strings.TrimSpace(name),
 		Description: strings.TrimSpace(description),
 		Status:      status,

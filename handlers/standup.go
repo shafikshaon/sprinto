@@ -27,13 +27,14 @@ func NewStandupHandler(svc service.StandupService) *StandupHandler {
 }
 
 func (h *StandupHandler) List(c *gin.Context) {
+	projectID := activeProjectIDFromCtx(c)
 	dateRaw := c.Query("date")
 	if dateRaw == "" {
 		dateRaw = time.Now().Format("2006-01-02")
 	}
 	t, _ := time.Parse("2006-01-02", dateRaw)
-	entries, _ := h.svc.ByDate(dateRaw)
-	recentDates, _ := h.svc.RecentDates(5)
+	entries, _ := h.svc.ByDate(dateRaw, projectID)
+	recentDates, _ := h.svc.RecentDates(5, projectID)
 
 	allProjects, activeProject := projectMeta(c)
 	render(c, "standups", StandupsData{
@@ -46,6 +47,7 @@ func (h *StandupHandler) List(c *gin.Context) {
 }
 
 func (h *StandupHandler) Create(c *gin.Context) {
+	projectID := activeProjectIDFromCtx(c)
 	h.svc.Add(
 		c.PostForm("member"),
 		c.PostForm("role"),
@@ -53,6 +55,7 @@ func (h *StandupHandler) Create(c *gin.Context) {
 		c.PostForm("today"),
 		c.PostForm("blockers"),
 		c.PostForm("status"),
+		projectID,
 	)
 	redirectTo(c, "/standups")
 }

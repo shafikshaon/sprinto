@@ -32,6 +32,15 @@ func projectMeta(c *gin.Context) ([]models.Project, *models.Project) {
 	return projects, activePrj
 }
 
+// activeProjectIDFromCtx returns the active project's ID (0 if none selected).
+func activeProjectIDFromCtx(c *gin.Context) uint {
+	_, active := projectMeta(c)
+	if active != nil {
+		return active.ID
+	}
+	return 0
+}
+
 var funcMap = template.FuncMap{
 	"initials": func(name string) string {
 		parts := strings.Fields(name)
