@@ -36,9 +36,9 @@ func (h *StandupHandler) List(c *gin.Context) {
 	entries, _ := h.svc.ByDate(dateRaw, projectID)
 	recentDates, _ := h.svc.RecentDates(5, projectID)
 
-	allProjects, activeProject := projectMeta(c)
+	allProjects, activeProject, currentUser := projectMeta(c)
 	render(c, "standups", StandupsData{
-		Meta:        Meta{Title: "Daily Standups", CurrentPage: "standups", ActionLabel: "Add Entry", AllProjects: allProjects, ActiveProject: activeProject},
+		Meta:        Meta{Title: "Daily Standups", CurrentPage: "standups", ActionLabel: "Add Entry", AllProjects: allProjects, ActiveProject: activeProject, CurrentUser: currentUser},
 		Date:        t.Format("Monday, January 2, 2006"),
 		DateRaw:     dateRaw,
 		Standups:    entries,
@@ -58,6 +58,20 @@ func (h *StandupHandler) Create(c *gin.Context) {
 		projectID,
 	)
 	redirectTo(c, "/standups")
+}
+
+func (h *StandupHandler) Update(c *gin.Context) {
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	h.svc.Update(
+		uint(id),
+		c.PostForm("member"),
+		c.PostForm("role"),
+		c.PostForm("yesterday"),
+		c.PostForm("today"),
+		c.PostForm("blockers"),
+		c.PostForm("status"),
+	)
+	redirectTo(c, c.PostForm("redirect"))
 }
 
 func (h *StandupHandler) Delete(c *gin.Context) {

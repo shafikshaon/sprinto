@@ -64,7 +64,7 @@
         data-delete-name="comment by {{.Author}}"
         data-delete-extra-name="task_id"
         data-delete-extra-value="{{$.Task.ID}}"
-        class="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 text-xs text-gray-300 hover:text-red-500 transition-colors font-bold">✕</button>
+        class="text-xs text-gray-300 hover:text-red-500 transition-colors font-bold flex-shrink-0">✕</button>
     </div>
     {{end}}
   </div>
@@ -78,13 +78,13 @@
     <div class="space-y-3">
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1.5">Your Name</label>
-        <input name="author" type="text" placeholder="e.g. Alice Chen"
-          class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+        <input name="author" type="text" value="{{if .Meta.CurrentUser}}{{.Meta.CurrentUser.FullName}}{{end}}" placeholder="e.g. Alice Chen"
+          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1.5">Comment <span class="text-red-400">*</span></label>
         <textarea name="content" rows="3" required placeholder="Add a comment, update, or note..."
-          class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400 resize-none"></textarea>
+          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400 resize-none"></textarea>
       </div>
       <div>
         <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-md transition-colors">Post Comment</button>
@@ -104,12 +104,12 @@
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1.5">Title <span class="text-red-400">*</span></label>
         <input name="title" type="text" required value="{{.Task.Title}}"
-          class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1.5">Assignees</label>
         {{if .Members}}
-        <select id="edit-task-assignees" name="assignees" multiple class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400 h-24">
+        <select id="edit-task-assignees" name="assignees" multiple class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400 h-24">
           {{range .Members}}<option value="{{.Name}}">{{.Name}}{{if .Role}} · {{.Role}}{{end}}</option>{{end}}
         </select>
         <p class="text-xs text-gray-400 mt-1">Hold Ctrl / Cmd to select multiple</p>
@@ -124,13 +124,13 @@
         </script>
         {{else}}
         <input name="assignees" type="text" value="{{range $i,$a := .Task.Assignees}}{{if $i}}, {{end}}{{$a}}{{end}}"
-          class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
         {{end}}
       </div>
       <div class="grid grid-cols-3 gap-3">
         <div>
           <label class="text-xs font-medium text-gray-600 block mb-1.5">Type</label>
-          <select name="type" class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400">
+          <select name="type" class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400">
             <option {{if eq .Task.Type "Improvement"}}selected{{end}}>Improvement</option>
             <option {{if eq .Task.Type "Tech Debt"}}selected{{end}}>Tech Debt</option>
             <option {{if eq .Task.Type "Research"}}selected{{end}}>Research</option>
@@ -139,7 +139,7 @@
         </div>
         <div>
           <label class="text-xs font-medium text-gray-600 block mb-1.5">Status</label>
-          <select name="status" class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400">
+          <select name="status" class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400">
             <option {{if eq .Task.Status "Todo"}}selected{{end}}>Todo</option>
             <option {{if eq .Task.Status "In Progress"}}selected{{end}}>In Progress</option>
             <option {{if eq .Task.Status "Done"}}selected{{end}}>Done</option>
@@ -147,7 +147,7 @@
         </div>
         <div>
           <label class="text-xs font-medium text-gray-600 block mb-1.5">Priority</label>
-          <select name="priority" class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400">
+          <select name="priority" class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400">
             <option {{if eq .Task.Priority "Low"}}selected{{end}}>Low</option>
             <option {{if eq .Task.Priority "Medium"}}selected{{end}}>Medium</option>
             <option {{if eq .Task.Priority "High"}}selected{{end}}>High</option>

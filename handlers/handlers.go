@@ -23,20 +23,23 @@ type Meta struct {
 	SprintLabel   string // e.g. "Sprint 12 · Apr 14 – 28"
 	AllProjects   []models.Project
 	ActiveProject *models.Project
+	CurrentUser   *models.User
 }
 
 // projectMeta reads project context injected by ProjectMiddleware.
-func projectMeta(c *gin.Context) ([]models.Project, *models.Project) {
+func projectMeta(c *gin.Context) ([]models.Project, *models.Project, *models.User) {
 	all, _ := c.Get("all_projects")
 	active, _ := c.Get("active_project")
+	cu, _ := c.Get("current_user")
 	projects, _ := all.([]models.Project)
 	activePrj, _ := active.(*models.Project)
-	return projects, activePrj
+	currentUser, _ := cu.(*models.User)
+	return projects, activePrj, currentUser
 }
 
 // activeProjectIDFromCtx returns the active project's ID (0 if none selected).
 func activeProjectIDFromCtx(c *gin.Context) uint {
-	_, active := projectMeta(c)
+	_, active, _ := projectMeta(c)
 	if active != nil {
 		return active.ID
 	}

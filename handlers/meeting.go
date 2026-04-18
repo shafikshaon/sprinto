@@ -29,9 +29,9 @@ func (h *MeetingHandler) List(c *gin.Context) {
 		c.String(500, "DB error: %s", err.Error())
 		return
 	}
-	allProjects, activeProject := projectMeta(c)
+	allProjects, activeProject, currentUser := projectMeta(c)
 	render(c, "meetings", MeetingsData{
-		Meta:     Meta{Title: "Meeting Minutes", CurrentPage: "meetings", ActionLabel: "New Meeting", AllProjects: allProjects, ActiveProject: activeProject},
+		Meta:     Meta{Title: "Meeting Minutes", CurrentPage: "meetings", ActionLabel: "New Meeting", AllProjects: allProjects, ActiveProject: activeProject, CurrentUser: currentUser},
 		Meetings: meetings,
 	})
 }

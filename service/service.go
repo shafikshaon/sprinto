@@ -8,11 +8,61 @@ import (
 	"strings"
 	"time"
 
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 
 	"sprinto/models"
 	"sprinto/repository"
 )
+
+// ─── Auth ─────────────────────────────────────────────────────────────────────
+
+type AuthService interface {
+	Register(fullName, email, password string) error
+	Login(email, password string) (models.User, error)
+	UserByID(id uint) (models.User, error)
+}
+
+type authService struct{ repo repository.UserRepository }
+
+func NewAuthService(r repository.UserRepository) AuthService {
+	return &authService{repo: r}
+}
+
+func (s *authService) Register(fullName, email, password string) error {
+	fullName = strings.TrimSpace(fullName)
+	email = strings.TrimSpace(email)
+	if fullName == "" || email == "" || password == "" {
+		return errors.New("all fields are required")
+	}
+	if len(password) < 6 {
+		return errors.New("password must be at least 6 characters")
+	}
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	return s.repo.Create(models.User{
+		FullName:     fullName,
+		Email:        email,
+		PasswordHash: string(hash),
+	})
+}
+
+func (s *authService) Login(email, password string) (models.User, error) {
+	user, err := s.repo.ByEmail(strings.TrimSpace(email))
+	if err != nil {
+		return models.User{}, errors.New("invalid email or password")
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)); err != nil {
+		return models.User{}, errors.New("invalid email or password")
+	}
+	return user, nil
+}
+
+func (s *authService) UserByID(id uint) (models.User, error) {
+	return s.repo.ByID(id)
+}
 
 // ─── Sprint ───────────────────────────────────────────────────────────────────
 
@@ -119,6 +169,7 @@ type DateNav struct {
 type StandupService interface {
 	ByDate(date string, projectID uint) ([]models.StandupEntry, error)
 	Add(member, role, yesterday, today, blockers, status string, projectID uint) error
+	Update(id uint, member, role, yesterday, today, blockers, status string) error
 	Remove(id uint) error
 	RecentDates(limit int, projectID uint) ([]DateNav, error)
 }
@@ -152,6 +203,13 @@ func (s *standupService) Add(member, role, yesterday, today, blockers, status st
 	})
 }
 
+func (s *standupService) Update(id uint, member, role, yesterday, today, blockers, status string) error {
+	if blockers == "" {
+		blockers = "None"
+	}
+	return s.repo.Update(id, strings.TrimSpace(member), strings.TrimSpace(role), yesterday, today, blockers, status)
+}
+
 func (s *standupService) Remove(id uint) error { return s.repo.Delete(id) }
 
 func (s *standupService) RecentDates(limit int, projectID uint) ([]DateNav, error) {
@@ -172,6 +230,7 @@ func (s *standupService) RecentDates(limit int, projectID uint) ([]DateNav, erro
 type DeadlineService interface {
 	All(projectID uint) ([]models.Deadline, error)
 	Add(title, project, dueDateRaw, priority string, projectID uint) error
+	Update(id uint, title, project, dueDateRaw, priority string) error
 	Remove(id uint) error
 }
 
@@ -204,6 +263,10 @@ func (s *deadlineService) Add(title, project, dueDateRaw, priority string, proje
 		DueDateRaw: dueDateRaw,
 		Priority:   priority,
 	})
+}
+
+func (s *deadlineService) Update(id uint, title, project, dueDateRaw, priority string) error {
+	return s.repo.Update(id, strings.TrimSpace(title), strings.TrimSpace(project), dueDateRaw, priority)
 }
 
 func (s *deadlineService) Remove(id uint) error { return s.repo.Delete(id) }
@@ -469,6 +532,7 @@ type ProjectService interface {
 	All() ([]models.Project, error)
 	AllWithMembers() ([]models.Project, error)
 	Create(name, description string) error
+	Update(id uint, name, description string) error
 	Delete(id uint) error
 	AddMember(projectID, memberID uint) error
 	RemoveMember(projectID, memberID uint) error
@@ -493,6 +557,10 @@ func (s *projectService) Create(name, description string) error {
 		Name:        strings.TrimSpace(name),
 		Description: strings.TrimSpace(description),
 	})
+}
+
+func (s *projectService) Update(id uint, name, description string) error {
+	return s.repo.Update(id, strings.TrimSpace(name), strings.TrimSpace(description))
 }
 
 func (s *projectService) Delete(id uint) error         { return s.repo.Delete(id) }

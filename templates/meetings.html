@@ -24,7 +24,7 @@
         <button type="button"
           data-delete-action="/meetings/{{.ID}}/delete"
           data-delete-name="{{.Title}}"
-          class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium ml-1">Delete</button>
+          class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete</button>
       </div>
     </div>
     <div class="px-5 py-3.5 border-b border-gray-50">
@@ -74,23 +74,23 @@
         <div>
           <label class="text-xs font-medium text-gray-600 block mb-1.5">Meeting Title <span class="text-red-400">*</span></label>
           <input name="title" type="text" required placeholder="e.g. Sprint 13 Planning"
-            class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+            class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
         </div>
         <div>
           <label class="text-xs font-medium text-gray-600 block mb-1.5">Date <span class="text-red-400">*</span></label>
           <input name="date" type="text" required placeholder="e.g. Apr 18, 2026"
-            class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+            class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
         </div>
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1.5">Attendees <span class="text-gray-400 font-normal">(comma-separated)</span></label>
         <input name="attendees" type="text" placeholder="Alice Chen, Bob Martinez"
-          class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1.5">Notes</label>
         <textarea name="notes" rows="3" placeholder="Key discussion points, decisions made..."
-          class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400 resize-none"></textarea>
+          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400 resize-none"></textarea>
       </div>
     </div>
     <div class="flex items-center gap-2">

@@ -141,7 +141,7 @@
       <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-widest px-1 mb-1.5">Active Project</p>
       <form method="POST" action="/switch-project">
         <select name="project_id" onchange="this.form.submit()"
-          class="w-full text-xs text-gray-700 bg-gray-50 border border-gray-200 rounded-md px-2.5 py-1.5 focus:outline-none focus:border-indigo-400 cursor-pointer">
+          class="w-full text-xs text-gray-700 bg-gray-50 border-[1.5px] border-gray-200 rounded px-2.5 py-1.5 focus:outline-none focus:border-indigo-400 cursor-pointer">
           <option value="">— none —</option>
           {{range .Meta.AllProjects}}
           <option value="{{.ID}}" {{if (and $.Meta.ActiveProject (eq $.Meta.ActiveProject.ID .ID))}}selected{{end}}>{{.Name}}</option>
@@ -177,12 +177,18 @@
         {{end}}
         <!-- Gregorian date -->
         <span class="text-xs text-gray-600 font-medium">{{gregorianDate}}</span>
-        <span class="text-gray-200">·</span>
-        <!-- Hijri / Arabic date -->
-        <span class="text-xs text-gray-500" dir="rtl" lang="ar">{{hijriDate}}</span>
-        <span class="text-gray-200">·</span>
-        <!-- Bengali date -->
-        <span class="text-xs text-gray-500" lang="bn">{{bengaliDate}}</span>
+        <span class="text-gray-200">|</span>
+        {{if .Meta.CurrentUser}}
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
+            <span class="text-indigo-700 font-bold text-[10px]">{{initials .Meta.CurrentUser.FullName}}</span>
+          </div>
+          <span class="text-xs font-medium text-gray-700">{{.Meta.CurrentUser.FullName}}</span>
+          <form method="POST" action="/logout" class="inline">
+            <button type="submit" class="text-xs text-gray-400 hover:text-red-500 transition-colors font-medium">Sign out</button>
+          </form>
+        </div>
+        {{end}}
       </div>
     </header>
 

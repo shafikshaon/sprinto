@@ -35,9 +35,9 @@ func (h *ReleaseHandler) List(c *gin.Context) {
 		c.String(500, "DB error: %s", err.Error())
 		return
 	}
-	allProjects, activeProject := projectMeta(c)
+	allProjects, activeProject, currentUser := projectMeta(c)
 	render(c, "releases", ReleasesData{
-		Meta:     Meta{Title: "Releases", CurrentPage: "releases", ActionLabel: "New Release", AllProjects: allProjects, ActiveProject: activeProject},
+		Meta:     Meta{Title: "Releases", CurrentPage: "releases", ActionLabel: "New Release", AllProjects: allProjects, ActiveProject: activeProject, CurrentUser: currentUser},
 		Releases: releases,
 	})
 }
@@ -67,9 +67,9 @@ func (h *ReleaseHandler) Detail(c *gin.Context) {
 		c.String(404, "Release not found")
 		return
 	}
-	allProjects, activeProject := projectMeta(c)
+	allProjects, activeProject, currentUser := projectMeta(c)
 	render(c, "release_detail", ReleaseDetailData{
-		Meta:    Meta{Title: release.Name, CurrentPage: "releases", ActionLabel: "Add Stage", AllProjects: allProjects, ActiveProject: activeProject},
+		Meta:    Meta{Title: release.Name, CurrentPage: "releases", ActionLabel: "Add Stage", AllProjects: allProjects, ActiveProject: activeProject, CurrentUser: currentUser},
 		Release: release,
 	})
 }

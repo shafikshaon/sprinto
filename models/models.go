@@ -2,6 +2,17 @@ package models
 
 import "gorm.io/gorm"
 
+// ─── User ─────────────────────────────────────────────────────────────────────
+
+type User struct {
+	gorm.Model
+	FullName     string `gorm:"not null"`
+	Email        string `gorm:"uniqueIndex;not null"`
+	PasswordHash string `gorm:"not null"`
+}
+
+func (User) TableName() string { return "users" }
+
 // ─── Sprint ───────────────────────────────────────────────────────────────────
 
 type Sprint struct {

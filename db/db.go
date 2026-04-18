@@ -23,6 +23,7 @@ func Connect(dsn string) *gorm.DB {
 
 func Migrate(db *gorm.DB) error {
 	if err := db.AutoMigrate(
+		&models.User{},
 		&models.Sprint{},
 		&models.SprintTask{},
 		&models.SprintTaskComment{},

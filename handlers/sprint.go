@@ -41,13 +41,13 @@ func (h *SprintHandler) List(c *gin.Context) {
 	if sprint.StartDate != "" && sprint.EndDate != "" {
 		sprintLabel += " · " + sprint.StartDate + " – " + sprint.EndDate
 	}
-	allProjects, activeProject := projectMeta(c)
+	allProjects, activeProject, currentUser := projectMeta(c)
 	var members []models.TeamMember
 	if activeProject != nil {
 		members = activeProject.Members
 	}
 	render(c, "sprints", SprintsData{
-		Meta:    Meta{Title: "Sprint Board", CurrentPage: "sprints", ActionLabel: "Add Task", SprintLabel: sprintLabel, AllProjects: allProjects, ActiveProject: activeProject},
+		Meta:    Meta{Title: "Sprint Board", CurrentPage: "sprints", ActionLabel: "Add Task", SprintLabel: sprintLabel, AllProjects: allProjects, ActiveProject: activeProject, CurrentUser: currentUser},
 		Sprint:  sprint,
 		Stats:   models.ComputeStats(sprint.Tasks),
 		Members: members,
@@ -86,13 +86,13 @@ func (h *SprintHandler) TaskDetail(c *gin.Context) {
 		c.String(404, "Task not found")
 		return
 	}
-	allProjects, activeProject := projectMeta(c)
+	allProjects, activeProject, currentUser := projectMeta(c)
 	var members []models.TeamMember
 	if activeProject != nil {
 		members = activeProject.Members
 	}
 	render(c, "sprint_task", SprintTaskData{
-		Meta:    Meta{Title: task.Title, CurrentPage: "sprints", AllProjects: allProjects, ActiveProject: activeProject},
+		Meta:    Meta{Title: task.Title, CurrentPage: "sprints", AllProjects: allProjects, ActiveProject: activeProject, CurrentUser: currentUser},
 		Task:    task,
 		Members: members,
 	})

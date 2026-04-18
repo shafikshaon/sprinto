@@ -51,9 +51,9 @@ func (h *DeadlineHandler) List(c *gin.Context) {
 		}
 	}
 
-	allProjects, activeProject := projectMeta(c)
+	allProjects, activeProject, currentUser := projectMeta(c)
 	render(c, "deadlines", DeadlinesData{
-		Meta:      Meta{Title: "Deadlines", CurrentPage: "deadlines", ActionLabel: "Add Deadline", AllProjects: allProjects, ActiveProject: activeProject},
+		Meta:      Meta{Title: "Deadlines", CurrentPage: "deadlines", ActionLabel: "Add Deadline", AllProjects: allProjects, ActiveProject: activeProject, CurrentUser: currentUser},
 		Deadlines: deadlines,
 		Urgency:   urgency,
 	})
@@ -67,6 +67,18 @@ func (h *DeadlineHandler) Create(c *gin.Context) {
 		c.PostForm("due_date"),
 		c.PostForm("priority"),
 		projectID,
+	)
+	redirectTo(c, "/deadlines")
+}
+
+func (h *DeadlineHandler) Update(c *gin.Context) {
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	h.svc.Update(
+		uint(id),
+		c.PostForm("title"),
+		c.PostForm("project"),
+		c.PostForm("due_date"),
+		c.PostForm("priority"),
 	)
 	redirectTo(c, "/deadlines")
 }

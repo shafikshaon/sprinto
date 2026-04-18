@@ -38,13 +38,13 @@ func (h *DevTaskHandler) List(c *gin.Context) {
 		return
 	}
 	counts, _ := h.svc.OpenCountsByType(projectID)
-	allProjects, activeProject := projectMeta(c)
+	allProjects, activeProject, currentUser := projectMeta(c)
 	var members []models.TeamMember
 	if activeProject != nil {
 		members = activeProject.Members
 	}
 	render(c, "devtasks", DevTasksData{
-		Meta:     Meta{Title: "Dev Tasks & Improvements", CurrentPage: "devtasks", ActionLabel: "Add Task", AllProjects: allProjects, ActiveProject: activeProject},
+		Meta:     Meta{Title: "Dev Tasks & Improvements", CurrentPage: "devtasks", ActionLabel: "Add Task", AllProjects: allProjects, ActiveProject: activeProject, CurrentUser: currentUser},
 		DevTasks: tasks,
 		Counts:   counts,
 		Members:  members,
@@ -77,13 +77,13 @@ func (h *DevTaskHandler) Detail(c *gin.Context) {
 		c.String(404, "Task not found")
 		return
 	}
-	allProjects, activeProject := projectMeta(c)
+	allProjects, activeProject, currentUser := projectMeta(c)
 	var members []models.TeamMember
 	if activeProject != nil {
 		members = activeProject.Members
 	}
 	render(c, "devtask_detail", DevTaskDetailData{
-		Meta:    Meta{Title: task.Title, CurrentPage: "devtasks", AllProjects: allProjects, ActiveProject: activeProject},
+		Meta:    Meta{Title: task.Title, CurrentPage: "devtasks", AllProjects: allProjects, ActiveProject: activeProject, CurrentUser: currentUser},
 		Task:    task,
 		Members: members,
 	})

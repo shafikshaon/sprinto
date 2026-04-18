@@ -57,9 +57,9 @@ func (h *ProjectHandler) List(c *gin.Context) {
 		return
 	}
 	members, _ := h.teamSvc.All()
-	allProjects, activeProject := projectMeta(c)
+	allProjects, activeProject, currentUser := projectMeta(c)
 	render(c, "projects", ProjectsData{
-		Meta:       Meta{Title: "Projects", CurrentPage: "projects", ActionLabel: "New Project", AllProjects: allProjects, ActiveProject: activeProject},
+		Meta:       Meta{Title: "Projects", CurrentPage: "projects", ActionLabel: "New Project", AllProjects: allProjects, ActiveProject: activeProject, CurrentUser: currentUser},
 		Projects:   projects,
 		AllMembers: members,
 	})
@@ -67,6 +67,12 @@ func (h *ProjectHandler) List(c *gin.Context) {
 
 func (h *ProjectHandler) Create(c *gin.Context) {
 	h.svc.Create(c.PostForm("name"), c.PostForm("description"))
+	redirectTo(c, "/projects")
+}
+
+func (h *ProjectHandler) Update(c *gin.Context) {
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	h.svc.Update(uint(id), c.PostForm("name"), c.PostForm("description"))
 	redirectTo(c, "/projects")
 }
 

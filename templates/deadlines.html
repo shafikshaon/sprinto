@@ -61,10 +61,19 @@
           <span class="text-xs font-semibold px-2 py-1 rounded-full {{priorityClass .Priority}}">{{.Priority}}</span>
         </td>
         <td class="px-4 py-3.5 text-right">
-          <button type="button"
-            data-delete-action="/deadlines/{{.ID}}/delete"
-            data-delete-name="{{.Title}}"
-            class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete</button>
+          <div class="flex items-center justify-end gap-2">
+            <button type="button"
+              data-edit-deadline-id="{{.ID}}"
+              data-edit-deadline-title="{{.Title}}"
+              data-edit-deadline-project="{{.Project}}"
+              data-edit-deadline-due="{{.DueDateRaw}}"
+              data-edit-deadline-priority="{{.Priority}}"
+              class="text-xs text-white bg-indigo-600 hover:bg-indigo-700 px-2.5 py-1 rounded transition-colors font-medium">Edit</button>
+            <button type="button"
+              data-delete-action="/deadlines/{{.ID}}/delete"
+              data-delete-name="{{.Title}}"
+              class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete</button>
+          </div>
         </td>
       </tr>
       {{end}}
@@ -91,23 +100,23 @@
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1.5">Deadline Name <span class="text-red-400">*</span></label>
         <input name="title" type="text" required placeholder="e.g. API v2 Launch"
-          class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
       </div>
       <div class="grid grid-cols-2 gap-3">
         <div>
           <label class="text-xs font-medium text-gray-600 block mb-1.5">Project</label>
           <input name="project" type="text" placeholder="Platform, Mobile..."
-            class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+            class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
         </div>
         <div>
           <label class="text-xs font-medium text-gray-600 block mb-1.5">Due Date <span class="text-red-400">*</span></label>
           <input name="due_date" type="date" required
-            class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+            class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
         </div>
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1.5">Priority</label>
-        <select name="priority" class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400">
+        <select name="priority" class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400">
           <option>Medium</option><option>High</option><option>Critical</option><option>Low</option>
         </select>
       </div>
@@ -118,5 +127,59 @@
     </div>
   </form>
 </dialog>
+
+<!-- ── Edit Deadline Dialog ────────────────────────────────────────── -->
+<dialog id="edit-deadline-dialog">
+  <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+    <h3 class="text-sm font-semibold text-gray-900">Edit Deadline</h3>
+    <button type="button" onclick="document.getElementById('edit-deadline-dialog').close()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+  </div>
+  <form id="edit-deadline-form" method="POST" action="" class="p-5">
+    <div class="space-y-3 mb-5">
+      <div>
+        <label class="text-xs font-medium text-gray-600 block mb-1.5">Deadline Name <span class="text-red-400">*</span></label>
+        <input id="edit-deadline-title" name="title" type="text" required
+          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-xs font-medium text-gray-600 block mb-1.5">Project</label>
+          <input id="edit-deadline-project" name="project" type="text" placeholder="Platform, Mobile..."
+            class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-600 block mb-1.5">Due Date <span class="text-red-400">*</span></label>
+          <input id="edit-deadline-due" name="due_date" type="date" required
+            class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+        </div>
+      </div>
+      <div>
+        <label class="text-xs font-medium text-gray-600 block mb-1.5">Priority</label>
+        <select id="edit-deadline-priority" name="priority" class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400">
+          <option>Medium</option><option>High</option><option>Critical</option><option>Low</option>
+        </select>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-md transition-colors">Save Changes</button>
+      <button type="button" onclick="document.getElementById('edit-deadline-dialog').close()" class="text-sm text-gray-500 hover:text-gray-700 px-4 py-2 rounded-md border border-gray-200 transition-colors">Cancel</button>
+    </div>
+  </form>
+</dialog>
+<script>
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest('[data-edit-deadline-id]');
+  if (!btn) return;
+  document.getElementById('edit-deadline-form').action = '/deadlines/' + btn.dataset.editDeadlineId + '/update';
+  document.getElementById('edit-deadline-title').value = btn.dataset.editDeadlineTitle;
+  document.getElementById('edit-deadline-project').value = btn.dataset.editDeadlineProject;
+  document.getElementById('edit-deadline-due').value = btn.dataset.editDeadlineDue;
+  var sel = document.getElementById('edit-deadline-priority');
+  for (var i = 0; i < sel.options.length; i++) {
+    sel.options[i].selected = sel.options[i].value === btn.dataset.editDeadlinePriority;
+  }
+  document.getElementById('edit-deadline-dialog').showModal();
+});
+</script>
 
 {{end}}

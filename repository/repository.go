@@ -8,6 +8,32 @@ import (
 	"sprinto/models"
 )
 
+// ─── User ─────────────────────────────────────────────────────────────────────
+
+type UserRepository interface {
+	Create(u models.User) error
+	ByEmail(email string) (models.User, error)
+	ByID(id uint) (models.User, error)
+}
+
+type userRepo struct{ db *gorm.DB }
+
+func NewUserRepository(db *gorm.DB) UserRepository { return &userRepo{db: db} }
+
+func (r *userRepo) Create(u models.User) error { return r.db.Create(&u).Error }
+
+func (r *userRepo) ByEmail(email string) (models.User, error) {
+	var u models.User
+	result := r.db.Where("email = ?", email).First(&u)
+	return u, result.Error
+}
+
+func (r *userRepo) ByID(id uint) (models.User, error) {
+	var u models.User
+	result := r.db.First(&u, id)
+	return u, result.Error
+}
+
 // ─── Sprint ───────────────────────────────────────────────────────────────────
 
 type SprintRepository interface {
@@ -75,6 +101,7 @@ func (r *sprintRepo) DeleteComment(id uint) error {
 type StandupRepository interface {
 	ByDate(date string, projectID uint) ([]models.StandupEntry, error)
 	Create(e models.StandupEntry) error
+	Update(id uint, member, role, yesterday, today, blockers, status string) error
 	Delete(id uint) error
 	RecentDates(limit int, projectID uint) ([]string, error)
 }
@@ -97,6 +124,17 @@ func (r *standupRepo) Create(e models.StandupEntry) error {
 	return r.db.Create(&e).Error
 }
 
+func (r *standupRepo) Update(id uint, member, role, yesterday, today, blockers, status string) error {
+	return r.db.Model(&models.StandupEntry{}).Where("id = ?", id).Updates(map[string]interface{}{
+		"member":    member,
+		"role":      role,
+		"yesterday": yesterday,
+		"today":     today,
+		"blockers":  blockers,
+		"status":    status,
+	}).Error
+}
+
 func (r *standupRepo) Delete(id uint) error {
 	return r.db.Delete(&models.StandupEntry{}, id).Error
 }
@@ -116,6 +154,7 @@ func (r *standupRepo) RecentDates(limit int, projectID uint) ([]string, error) {
 type DeadlineRepository interface {
 	All(projectID uint) ([]models.Deadline, error)
 	Create(d models.Deadline) error
+	Update(id uint, title, project, dueDateRaw, priority string) error
 	Delete(id uint) error
 }
 
@@ -135,6 +174,15 @@ func (r *deadlineRepo) All(projectID uint) ([]models.Deadline, error) {
 
 func (r *deadlineRepo) Create(d models.Deadline) error {
 	return r.db.Create(&d).Error
+}
+
+func (r *deadlineRepo) Update(id uint, title, project, dueDateRaw, priority string) error {
+	return r.db.Model(&models.Deadline{}).Where("id = ?", id).Updates(map[string]interface{}{
+		"title":    title,
+		"project":  project,
+		"due_date": dueDateRaw,
+		"priority": priority,
+	}).Error
 }
 
 func (r *deadlineRepo) Delete(id uint) error {
@@ -348,6 +396,7 @@ type ProjectRepository interface {
 	AllWithMembers() ([]models.Project, error)
 	ByID(id uint) (models.Project, error)
 	Create(p models.Project) error
+	Update(id uint, name, description string) error
 	Delete(id uint) error
 	AddMember(projectID, memberID uint) error
 	RemoveMember(projectID, memberID uint) error
@@ -376,6 +425,13 @@ func (r *projectRepo) ByID(id uint) (models.Project, error) {
 }
 
 func (r *projectRepo) Create(p models.Project) error { return r.db.Create(&p).Error }
+
+func (r *projectRepo) Update(id uint, name, description string) error {
+	return r.db.Model(&models.Project{}).Where("id = ?", id).Updates(map[string]interface{}{
+		"name":        name,
+		"description": description,
+	}).Error
+}
 
 func (r *projectRepo) Delete(id uint) error {
 	var p models.Project

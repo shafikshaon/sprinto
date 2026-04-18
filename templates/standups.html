@@ -57,10 +57,22 @@
           <span class="text-xs font-semibold px-2 py-1 rounded-full {{statusClass .Status}}">{{.Status}}</span>
         </td>
         <td class="px-4 py-3.5 text-right">
-          <button type="button"
-            data-delete-action="/standups/{{.ID}}/delete"
-            data-delete-name="{{.Member}}'s standup"
-            class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete</button>
+          <div class="flex items-center justify-end gap-2">
+            <button type="button"
+              data-edit-standup-id="{{.ID}}"
+              data-edit-standup-member="{{.Member}}"
+              data-edit-standup-role="{{.Role}}"
+              data-edit-standup-yesterday="{{.Yesterday}}"
+              data-edit-standup-today="{{.Today}}"
+              data-edit-standup-blockers="{{.Blockers}}"
+              data-edit-standup-status="{{.Status}}"
+              data-edit-standup-date="{{$.DateRaw}}"
+              class="text-xs text-white bg-indigo-600 hover:bg-indigo-700 px-2.5 py-1 rounded transition-colors font-medium">Edit</button>
+            <button type="button"
+              data-delete-action="/standups/{{.ID}}/delete"
+              data-delete-name="{{.Member}}'s standup"
+              class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete</button>
+          </div>
         </td>
       </tr>
       {{end}}
@@ -82,34 +94,34 @@
       <div class="grid grid-cols-2 gap-3">
         <div>
           <label class="text-xs font-medium text-gray-600 block mb-1.5">Member Name <span class="text-red-400">*</span></label>
-          <input name="member" type="text" required placeholder="Alice Chen"
-            class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+          <input name="member" type="text" required value="{{if .Meta.CurrentUser}}{{.Meta.CurrentUser.FullName}}{{end}}" placeholder="e.g. Alice Chen"
+            class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
         </div>
         <div>
           <label class="text-xs font-medium text-gray-600 block mb-1.5">Role</label>
           <input name="role" type="text" placeholder="Backend, Frontend..."
-            class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+            class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
         </div>
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1.5">Yesterday</label>
         <input name="yesterday" type="text" placeholder="What did you work on?"
-          class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1.5">Today <span class="text-red-400">*</span></label>
         <input name="today" type="text" required placeholder="What will you work on?"
-          class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
       </div>
       <div class="grid grid-cols-2 gap-3">
         <div>
           <label class="text-xs font-medium text-gray-600 block mb-1.5">Blockers</label>
           <input name="blockers" type="text" placeholder="None"
-            class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+            class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
         </div>
         <div>
           <label class="text-xs font-medium text-gray-600 block mb-1.5">Status</label>
-          <select name="status" class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400">
+          <select name="status" class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400">
             <option>On Track</option><option>At Risk</option><option>Blocked</option>
           </select>
         </div>
@@ -121,5 +133,75 @@
     </div>
   </form>
 </dialog>
+
+<!-- ── Edit Standup Dialog ─────────────────────────────────────────── -->
+<dialog id="edit-standup-dialog">
+  <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+    <h3 class="text-sm font-semibold text-gray-900">Edit Standup Entry</h3>
+    <button type="button" onclick="document.getElementById('edit-standup-dialog').close()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+  </div>
+  <form id="edit-standup-form" method="POST" action="" class="p-5">
+    <input type="hidden" id="edit-standup-redirect" name="redirect" value="">
+    <div class="space-y-3 mb-5">
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-xs font-medium text-gray-600 block mb-1.5">Member Name <span class="text-red-400">*</span></label>
+          <input id="edit-standup-member" name="member" type="text" required
+            class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-600 block mb-1.5">Role</label>
+          <input id="edit-standup-role" name="role" type="text"
+            class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+        </div>
+      </div>
+      <div>
+        <label class="text-xs font-medium text-gray-600 block mb-1.5">Yesterday</label>
+        <input id="edit-standup-yesterday" name="yesterday" type="text"
+          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+      </div>
+      <div>
+        <label class="text-xs font-medium text-gray-600 block mb-1.5">Today <span class="text-red-400">*</span></label>
+        <input id="edit-standup-today" name="today" type="text" required
+          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-xs font-medium text-gray-600 block mb-1.5">Blockers</label>
+          <input id="edit-standup-blockers" name="blockers" type="text" placeholder="None"
+            class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-600 block mb-1.5">Status</label>
+          <select id="edit-standup-status" name="status" class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400">
+            <option>On Track</option><option>At Risk</option><option>Blocked</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-md transition-colors">Save Changes</button>
+      <button type="button" onclick="document.getElementById('edit-standup-dialog').close()" class="text-sm text-gray-500 hover:text-gray-700 px-4 py-2 rounded-md border border-gray-200 transition-colors">Cancel</button>
+    </div>
+  </form>
+</dialog>
+<script>
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest('[data-edit-standup-id]');
+  if (!btn) return;
+  document.getElementById('edit-standup-form').action = '/standups/' + btn.dataset.editStandupId + '/update';
+  document.getElementById('edit-standup-redirect').value = '/standups?date=' + btn.dataset.editStandupDate;
+  document.getElementById('edit-standup-member').value = btn.dataset.editStandupMember;
+  document.getElementById('edit-standup-role').value = btn.dataset.editStandupRole;
+  document.getElementById('edit-standup-yesterday').value = btn.dataset.editStandupYesterday;
+  document.getElementById('edit-standup-today').value = btn.dataset.editStandupToday;
+  document.getElementById('edit-standup-blockers').value = btn.dataset.editStandupBlockers === 'None' ? '' : btn.dataset.editStandupBlockers;
+  var sel = document.getElementById('edit-standup-status');
+  for (var i = 0; i < sel.options.length; i++) {
+    sel.options[i].selected = sel.options[i].value === btn.dataset.editStandupStatus;
+  }
+  document.getElementById('edit-standup-dialog').showModal();
+});
+</script>
 
 {{end}}

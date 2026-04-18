@@ -70,7 +70,7 @@
               data-edit-task-assignees="{{.AssigneeCSV}}"
               data-edit-task-status="{{.Status}}"
               data-edit-task-priority="{{.Priority}}"
-              class="text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors">Edit</button>
+              class="text-xs text-white bg-indigo-600 hover:bg-indigo-700 px-2.5 py-1 rounded transition-colors font-medium">Edit</button>
             <button type="button"
               data-delete-action="/devtasks/{{.ID}}/delete"
               data-delete-name="{{.Title}}"
@@ -102,36 +102,36 @@
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1.5">Task Title <span class="text-red-400">*</span></label>
         <input name="title" type="text" required placeholder="e.g. Migrate REST to GraphQL"
-          class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1.5">Assignees</label>
         {{if .Members}}
-        <select name="assignees" multiple class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400 h-24">
+        <select name="assignees" multiple class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400 h-24">
           {{range .Members}}<option value="{{.Name}}">{{.Name}}{{if .Role}} · {{.Role}}{{end}}</option>{{end}}
         </select>
         <p class="text-xs text-gray-400 mt-1">Hold Ctrl / Cmd to select multiple</p>
         {{else}}
         <input name="assignees" type="text" placeholder="Team member name"
-          class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
         {{end}}
       </div>
       <div class="grid grid-cols-3 gap-3">
         <div>
           <label class="text-xs font-medium text-gray-600 block mb-1.5">Type</label>
-          <select name="type" class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400">
+          <select name="type" class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400">
             <option>Improvement</option><option>Tech Debt</option><option>Research</option><option>Other</option>
           </select>
         </div>
         <div>
           <label class="text-xs font-medium text-gray-600 block mb-1.5">Status</label>
-          <select name="status" class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400">
+          <select name="status" class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400">
             <option>Todo</option><option>In Progress</option><option>Done</option>
           </select>
         </div>
         <div>
           <label class="text-xs font-medium text-gray-600 block mb-1.5">Priority</label>
-          <select name="priority" class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400">
+          <select name="priority" class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400">
             <option>Medium</option><option>High</option><option>Critical</option><option>Low</option>
           </select>
         </div>
@@ -155,36 +155,36 @@
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1.5">Title <span class="text-red-400">*</span></label>
         <input id="edit-task-title" name="title" type="text" required
-          class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1.5">Assignees</label>
         {{if .Members}}
-        <select id="edit-task-assignees" name="assignees" multiple class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400 h-24">
+        <select id="edit-task-assignees" name="assignees" multiple class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400 h-24">
           {{range .Members}}<option value="{{.Name}}">{{.Name}}{{if .Role}} · {{.Role}}{{end}}</option>{{end}}
         </select>
         <p class="text-xs text-gray-400 mt-1">Hold Ctrl / Cmd to select multiple</p>
         {{else}}
         <input id="edit-task-assignees-text" name="assignees" type="text" placeholder="Team member name"
-          class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
         {{end}}
       </div>
       <div class="grid grid-cols-3 gap-3">
         <div>
           <label class="text-xs font-medium text-gray-600 block mb-1.5">Type</label>
-          <select id="edit-task-type" name="type" class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400">
+          <select id="edit-task-type" name="type" class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400">
             <option>Improvement</option><option>Tech Debt</option><option>Research</option><option>Other</option>
           </select>
         </div>
         <div>
           <label class="text-xs font-medium text-gray-600 block mb-1.5">Status</label>
-          <select id="edit-task-status" name="status" class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400">
+          <select id="edit-task-status" name="status" class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400">
             <option>Todo</option><option>In Progress</option><option>Done</option>
           </select>
         </div>
         <div>
           <label class="text-xs font-medium text-gray-600 block mb-1.5">Priority</label>
-          <select id="edit-task-priority" name="priority" class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400">
+          <select id="edit-task-priority" name="priority" class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400">
             <option>Low</option><option>Medium</option><option>High</option><option>Critical</option>
           </select>
         </div>

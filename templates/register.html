@@ -1,0 +1,55 @@
+{{define "register"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Create Account — Sprinto</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+  <div class="w-full max-w-sm">
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center gap-2.5 mb-3">
+        <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+          <span class="text-white font-bold text-xs tracking-tight">SP</span>
+        </div>
+        <span class="text-gray-900 font-bold text-lg">Sprinto</span>
+      </div>
+      <h1 class="text-xl font-bold text-gray-900">Create your account</h1>
+      <p class="text-sm text-gray-500 mt-1">Start managing your team today</p>
+    </div>
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm px-6 py-6">
+      {{if .Error}}
+      <div class="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 mb-4">{{.Error}}</div>
+      {{end}}
+      <form method="POST" action="/register" class="space-y-4">
+        <div>
+          <label class="text-xs font-medium text-gray-700 block mb-1.5">Full Name</label>
+          <input name="full_name" type="text" required value="{{.FullName}}" placeholder="Alice Chen"
+            class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2.5 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-200"/>
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-700 block mb-1.5">Email</label>
+          <input name="email" type="email" required value="{{.Email}}" placeholder="you@company.com"
+            class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2.5 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-200"/>
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-700 block mb-1.5">Password <span class="text-gray-400 font-normal">(min 6 chars)</span></label>
+          <input name="password" type="password" required placeholder="••••••••"
+            class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2.5 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-200"/>
+        </div>
+        <button type="submit"
+          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold py-2.5 rounded-lg transition-colors">
+          Create Account
+        </button>
+      </form>
+    </div>
+    <p class="text-center text-sm text-gray-500 mt-4">
+      Already have an account?
+      <a href="/login" class="text-indigo-600 hover:underline font-medium">Sign in</a>
+    </p>
+  </div>
+</body>
+</html>
+{{end}}

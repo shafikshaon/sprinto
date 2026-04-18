@@ -28,9 +28,9 @@ func (h *TeamHandler) List(c *gin.Context) {
 		c.String(500, "DB error: %s", err.Error())
 		return
 	}
-	allProjects, activeProject := projectMeta(c)
+	allProjects, activeProject, currentUser := projectMeta(c)
 	render(c, "team", TeamData{
-		Meta:    Meta{Title: "Team", CurrentPage: "team", ActionLabel: "Add Member", AllProjects: allProjects, ActiveProject: activeProject},
+		Meta:    Meta{Title: "Team", CurrentPage: "team", ActionLabel: "Add Member", AllProjects: allProjects, ActiveProject: activeProject, CurrentUser: currentUser},
 		Members: members,
 	})
 }

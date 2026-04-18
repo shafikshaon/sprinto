@@ -38,7 +38,7 @@
       <div class="flex items-center gap-2">
         <form method="POST" action="/releases/stages/{{.ID}}/status" class="flex items-center gap-2">
           <input type="hidden" name="release_id" value="{{$.Release.ID}}">
-          <select name="status" class="text-xs border border-gray-200 rounded-md px-2.5 py-1.5 focus:outline-none focus:border-indigo-400 bg-white text-gray-700">
+          <select name="status" class="text-xs border-[1.5px] border-gray-200 rounded px-2.5 py-1.5 focus:outline-none focus:border-indigo-400 bg-white text-gray-700">
             <option {{if eq .Status "Pending"}}selected{{end}}>Pending</option>
             <option {{if eq .Status "Active"}}selected{{end}}>Active</option>
             <option {{if eq .Status "Done"}}selected{{end}}>Done</option>
@@ -107,13 +107,13 @@
                   data-edit-story-title="{{.Title}}"
                   data-edit-story-assignee="{{.Assignee}}"
                   data-edit-story-release="{{$.Release.ID}}"
-                  class="text-xs text-gray-400 hover:text-indigo-600 transition-colors font-medium ml-1">Edit</button>
+                  class="text-xs text-white bg-indigo-600 hover:bg-indigo-700 px-2.5 py-1 rounded transition-colors font-medium">Edit</button>
                 <button type="button"
                   data-delete-action="/releases/stories/{{.ID}}/delete"
                   data-delete-name="{{.Title}}"
                   data-delete-extra-name="release_id"
                   data-delete-extra-value="{{$.Release.ID}}"
-                  class="text-xs text-gray-300 hover:text-red-500 transition-colors font-bold ml-1">✕</button>
+                  class="text-xs text-gray-300 hover:text-red-500 transition-colors font-bold flex-shrink-0">✕</button>
               </div>
             </td>
           </tr>
@@ -125,9 +125,9 @@
       <form method="POST" action="/releases/stages/{{.ID}}/stories" class="flex items-center gap-2">
         <input type="hidden" name="release_id" value="{{$.Release.ID}}">
         <input name="title" type="text" required placeholder="Story / ticket title..."
-          class="flex-1 text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+          class="flex-1 text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
         <input name="assignee" type="text" placeholder="Assignee"
-          class="w-36 text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+          class="w-36 text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
         <button type="submit" class="text-sm bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-md transition-colors whitespace-nowrap">+ Story</button>
       </form>
     </div>
@@ -169,11 +169,11 @@
       <form method="POST" action="/releases/stages/{{.ID}}/slack" class="flex items-center gap-2">
         <input type="hidden" name="release_id" value="{{$.Release.ID}}">
         <input name="channel" type="text" placeholder="#channel"
-          class="w-32 text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+          class="w-32 text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
         <input name="message" type="text" required placeholder="Message summary..."
-          class="flex-1 text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
-        <input name="author" type="text" placeholder="Posted by"
-          class="w-32 text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+          class="flex-1 text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+        <input name="author" type="text" value="{{if .Meta.CurrentUser}}{{.Meta.CurrentUser.FullName}}{{end}}" placeholder="Posted by"
+          class="w-32 text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
         <button type="submit" class="text-sm bg-[#4A154B] hover:bg-[#611f69] text-white font-semibold px-4 py-2 rounded-md transition-colors whitespace-nowrap">+ Slack</button>
       </form>
     </div>
@@ -195,12 +195,12 @@
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1.5">Story Title <span class="text-red-400">*</span></label>
         <input id="edit-story-title" name="title" type="text" required
-          class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1.5">Assignee</label>
         <input id="edit-story-assignee" name="assignee" type="text" placeholder="e.g. Eva Park"
-          class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
       </div>
     </div>
     <div class="flex items-center gap-2">
@@ -232,11 +232,11 @@ document.addEventListener('click', function(e) {
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1.5">Stage Name <span class="text-red-400">*</span></label>
         <input name="name" type="text" required placeholder="e.g. QA Round 1, Staging Deploy, Canary..."
-          class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1.5">Initial Status</label>
-        <select name="status" class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400">
+        <select name="status" class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400">
           <option>Pending</option>
           <option>Active</option>
           <option>Done</option>
