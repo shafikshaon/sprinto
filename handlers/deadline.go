@@ -50,8 +50,9 @@ func (h *DeadlineHandler) List(c *gin.Context) {
 		}
 	}
 
+	allProjects, activeProject := projectMeta(c)
 	render(c, "deadlines", DeadlinesData{
-		Meta:      Meta{Title: "Deadlines", CurrentPage: "deadlines"},
+		Meta:      Meta{Title: "Deadlines", CurrentPage: "deadlines", AllProjects: allProjects, ActiveProject: activeProject},
 		Deadlines: deadlines,
 		Urgency:   urgency,
 	})

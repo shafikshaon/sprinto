@@ -33,6 +33,9 @@ func main() {
 	deadlineRepo := repository.NewDeadlineRepository(db)
 	meetingRepo := repository.NewMeetingRepository(db)
 	devTaskRepo := repository.NewDevTaskRepository(db)
+	releaseRepo := repository.NewReleaseRepository(db)
+	projectRepo := repository.NewProjectRepository(db)
+	teamMemberRepo := repository.NewTeamMemberRepository(db)
 
 	// ── Services ──────────────────────────────────────────────────
 	sprintSvc := service.NewSprintService(sprintRepo)
@@ -40,6 +43,9 @@ func main() {
 	deadlineSvc := service.NewDeadlineService(deadlineRepo)
 	meetingSvc := service.NewMeetingService(meetingRepo)
 	devTaskSvc := service.NewDevTaskService(devTaskRepo)
+	releaseSvc := service.NewReleaseService(releaseRepo)
+	projectSvc := service.NewProjectService(projectRepo)
+	teamMemberSvc := service.NewTeamMemberService(teamMemberRepo)
 
 	// ── Handlers ──────────────────────────────────────────────────
 	dashH := handlers.NewDashboardHandler(sprintSvc, standupSvc, deadlineSvc, devTaskSvc)
@@ -48,10 +54,14 @@ func main() {
 	deadlineH := handlers.NewDeadlineHandler(deadlineSvc)
 	meetingH := handlers.NewMeetingHandler(meetingSvc)
 	devTaskH := handlers.NewDevTaskHandler(devTaskSvc)
+	releaseH := handlers.NewReleaseHandler(releaseSvc)
+	projectH := handlers.NewProjectHandler(projectSvc, teamMemberSvc)
+	teamH := handlers.NewTeamHandler(teamMemberSvc)
 
 	// ── Router ────────────────────────────────────────────────────
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
+	r.Use(handlers.ProjectMiddleware(projectSvc))
 
 	r.GET("/", dashH.Get)
 
@@ -75,6 +85,30 @@ func main() {
 	r.GET("/devtasks", devTaskH.List)
 	r.POST("/devtasks", devTaskH.Create)
 	r.POST("/devtasks/:id/delete", devTaskH.Delete)
+
+	r.GET("/releases", releaseH.List)
+	r.POST("/releases", releaseH.Create)
+	r.POST("/releases/:id/delete", releaseH.Delete)
+	r.GET("/releases/:id", releaseH.Detail)
+	r.POST("/releases/:id/stages", releaseH.CreateStage)
+	r.POST("/releases/stages/:id/delete", releaseH.DeleteStage)
+	r.POST("/releases/stages/:id/status", releaseH.UpdateStageStatus)
+	r.POST("/releases/stages/:id/stories", releaseH.CreateStory)
+	r.POST("/releases/stories/:id/delete", releaseH.DeleteStory)
+	r.POST("/releases/stories/:id/status", releaseH.UpdateStoryStatus)
+	r.POST("/releases/stages/:id/slack", releaseH.CreateSlackUpdate)
+	r.POST("/releases/slack/:id/delete", releaseH.DeleteSlackUpdate)
+
+	r.GET("/projects", projectH.List)
+	r.POST("/projects", projectH.Create)
+	r.POST("/projects/:id/delete", projectH.Delete)
+	r.POST("/projects/:id/members", projectH.AddMember)
+	r.POST("/projects/members/:id/remove", projectH.RemoveMember)
+	r.POST("/switch-project", projectH.SwitchProject)
+
+	r.GET("/team", teamH.List)
+	r.POST("/team", teamH.Create)
+	r.POST("/team/:id/delete", teamH.Delete)
 
 	log.Printf("Sprinto running → http://localhost:%s", cfg.Port)
 	r.Run(":" + cfg.Port)

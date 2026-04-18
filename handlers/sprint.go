@@ -33,8 +33,9 @@ func (h *SprintHandler) List(c *gin.Context) {
 	if sprint.StartDate != "" && sprint.EndDate != "" {
 		sprintLabel += " · " + sprint.StartDate + " – " + sprint.EndDate
 	}
+	allProjects, activeProject := projectMeta(c)
 	render(c, "sprints", SprintsData{
-		Meta:   Meta{Title: "Sprint Board", CurrentPage: "sprints", SprintLabel: sprintLabel},
+		Meta:   Meta{Title: "Sprint Board", CurrentPage: "sprints", SprintLabel: sprintLabel, AllProjects: allProjects, ActiveProject: activeProject},
 		Sprint: sprint,
 		Stats:  models.ComputeStats(sprint.Tasks),
 	})

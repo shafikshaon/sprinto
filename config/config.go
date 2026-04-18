@@ -1,6 +1,10 @@
 package config
 
-import "os"
+import (
+	"os"
+
+	"github.com/joho/godotenv"
+)
 
 type Config struct {
 	DatabaseURL string
@@ -8,6 +12,9 @@ type Config struct {
 }
 
 func Load() Config {
+	// Load .env if present (ignored in production where env vars are set directly)
+	_ = godotenv.Load()
+
 	dsn := os.Getenv("DATABASE_URL")
 	if dsn == "" {
 		// Default for local development

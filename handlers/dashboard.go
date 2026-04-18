@@ -74,9 +74,10 @@ func (h *DashboardHandler) Get(c *gin.Context) {
 	if sprint.StartDate != "" && sprint.EndDate != "" {
 		sprintLabel += " · " + sprint.StartDate + " – " + sprint.EndDate
 	}
+	allProjects, activeProject := projectMeta(c)
 
 	render(c, "dashboard", DashboardData{
-		Meta:              Meta{Title: "Dashboard", CurrentPage: "dashboard", ActionLabel: "Add Entry", ActionHref: "#", SprintLabel: sprintLabel},
+		Meta:              Meta{Title: "Dashboard", CurrentPage: "dashboard", ActionLabel: "Add Entry", ActionHref: "#", SprintLabel: sprintLabel, AllProjects: allProjects, ActiveProject: activeProject},
 		Sprint:            sprint,
 		Standups:          todayStandups,
 		StandupBlocked:    blocked,

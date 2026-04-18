@@ -112,3 +112,65 @@ type DevTask struct {
 }
 
 func (DevTask) TableName() string { return "dev_tasks" }
+
+// ─── Release ──────────────────────────────────────────────────────────────────
+
+type Release struct {
+	gorm.Model
+	Name        string         `gorm:"not null"`
+	Description string
+	Status      string         `gorm:"default:'Draft'"` // Draft, In Progress, Released, Rolled Back
+	TargetDate  string
+	Stages      []ReleaseStage `gorm:"foreignKey:ReleaseID"`
+}
+
+type ReleaseStage struct {
+	gorm.Model
+	ReleaseID    uint                 `gorm:"not null;index"`
+	Name         string               `gorm:"not null"`
+	Status       string               `gorm:"default:'Pending'"` // Pending, Active, Done, Failed
+	Stories      []ReleaseStory       `gorm:"foreignKey:StageID"`
+	SlackUpdates []ReleaseSlackUpdate `gorm:"foreignKey:StageID"`
+}
+
+func (ReleaseStage) TableName() string { return "release_stages" }
+
+type ReleaseStory struct {
+	gorm.Model
+	StageID  uint   `gorm:"not null;index"`
+	Title    string `gorm:"not null"`
+	Assignee string
+	Status   string `gorm:"default:'Pending'"` // Pending, In QA, Passed, Failed
+}
+
+func (ReleaseStory) TableName() string { return "release_stories" }
+
+type ReleaseSlackUpdate struct {
+	gorm.Model
+	StageID  uint   `gorm:"not null;index"`
+	Channel  string
+	Message  string `gorm:"not null"`
+	Author   string
+	PostedAt string
+}
+
+func (ReleaseSlackUpdate) TableName() string { return "release_slack_updates" }
+
+// ─── Project & Team ───────────────────────────────────────────────────────────
+
+type Project struct {
+	gorm.Model
+	Name        string       `gorm:"not null;uniqueIndex"`
+	Description string
+	Members     []TeamMember `gorm:"many2many:project_members;"`
+}
+
+type TeamMember struct {
+	gorm.Model
+	Name     string    `gorm:"not null"`
+	Role     string
+	Email    string
+	Projects []Project `gorm:"many2many:project_members;"`
+}
+
+func (TeamMember) TableName() string { return "team_members" }

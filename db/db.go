@@ -30,6 +30,12 @@ func Migrate(db *gorm.DB) error {
 		&models.Meeting{},
 		&models.ActionItem{},
 		&models.DevTask{},
+		&models.Release{},
+		&models.ReleaseStage{},
+		&models.ReleaseStory{},
+		&models.ReleaseSlackUpdate{},
+		&models.Project{},
+		&models.TeamMember{},
 	)
 }
 
@@ -115,5 +121,79 @@ func Seed(db *gorm.DB) error {
 		{Title: "Consolidate app config management", Type: "Tech Debt", Assignee: "Carol Singh", Status: "Todo", Priority: "Medium"},
 		{Title: "Load testing with k6", Type: "Research", Assignee: "Eva Park", Status: "Todo", Priority: "Medium"},
 	}
-	return db.Create(&devTasks).Error
+	if err := db.Create(&devTasks).Error; err != nil {
+		return err
+	}
+
+	// ── Releases ──────────────────────────────────────────────────
+	rel1 := &models.Release{
+		Name:        "v2.3.0 – Auth Overhaul",
+		Description: "OAuth2 integration and JWT improvements",
+		Status:      "In Progress",
+		TargetDate:  "2026-04-28",
+	}
+	if err := db.Create(rel1).Error; err != nil {
+		return err
+	}
+	stage1 := &models.ReleaseStage{ReleaseID: rel1.ID, Name: "QA Round 1", Status: "Done"}
+	stage2 := &models.ReleaseStage{ReleaseID: rel1.ID, Name: "QA Round 2", Status: "Active"}
+	stage3 := &models.ReleaseStage{ReleaseID: rel1.ID, Name: "Staging Deploy", Status: "Pending"}
+	db.Create(stage1)
+	db.Create(stage2)
+	db.Create(stage3)
+
+	db.Create(&models.ReleaseStory{StageID: stage1.ID, Title: "Fix authentication token refresh", Assignee: "Eva Park", Status: "Passed"})
+	db.Create(&models.ReleaseStory{StageID: stage1.ID, Title: "API rate limiting", Assignee: "Eva Park", Status: "Passed"})
+	db.Create(&models.ReleaseSlackUpdate{StageID: stage1.ID, Channel: "#releases", Message: "QA Round 1 complete — all stories passed. Ready to promote to Round 2.", Author: "Eva Park", PostedAt: "Apr 16, 2:30 PM"})
+
+	db.Create(&models.ReleaseStory{StageID: stage2.ID, Title: "Implement OAuth2 provider", Assignee: "Eva Park", Status: "In QA"})
+	db.Create(&models.ReleaseStory{StageID: stage2.ID, Title: "Cache layer implementation", Assignee: "Eva Park", Status: "Pending"})
+	db.Create(&models.ReleaseSlackUpdate{StageID: stage2.ID, Channel: "#releases", Message: "Starting QA Round 2. OAuth2 story handed off to Eva. Cache layer to follow once OAuth2 passes.", Author: "Alice Chen", PostedAt: "Apr 17, 10:15 AM"})
+	db.Create(&models.ReleaseSlackUpdate{StageID: stage2.ID, Channel: "#qa-team", Message: "Eva — can you prioritise the OAuth2 flow today? Need it cleared before EOD.", Author: "EM", PostedAt: "Apr 17, 11:00 AM"})
+
+	rel2 := &models.Release{
+		Name:        "v2.2.1 – Security Hotfix",
+		Description: "TLS certificate rotation and auth session hardening",
+		Status:      "Released",
+		TargetDate:  "2026-04-18",
+	}
+	if err := db.Create(rel2).Error; err != nil {
+		return err
+	}
+	hotfixStage := &models.ReleaseStage{ReleaseID: rel2.ID, Name: "QA Verification", Status: "Done"}
+	prodStage := &models.ReleaseStage{ReleaseID: rel2.ID, Name: "Production Deploy", Status: "Done"}
+	db.Create(hotfixStage)
+	db.Create(prodStage)
+
+	db.Create(&models.ReleaseStory{StageID: hotfixStage.ID, Title: "TLS cert auto-rotation script", Assignee: "Dan Kim", Status: "Passed"})
+	db.Create(&models.ReleaseStory{StageID: hotfixStage.ID, Title: "Session token TTL enforcement", Assignee: "Alice Chen", Status: "Passed"})
+	db.Create(&models.ReleaseSlackUpdate{StageID: hotfixStage.ID, Channel: "#releases", Message: "Hotfix verified in staging. Both stories passed QA. Requesting prod deploy window.", Author: "Eva Park", PostedAt: "Apr 17, 4:00 PM"})
+	db.Create(&models.ReleaseSlackUpdate{StageID: prodStage.ID, Channel: "#incidents", Message: "v2.2.1 deployed to prod. TLS cert rotation confirmed working. Monitoring for 30 min.", Author: "Dan Kim", PostedAt: "Apr 17, 6:45 PM"})
+	db.Create(&models.ReleaseSlackUpdate{StageID: prodStage.ID, Channel: "#releases", Message: "v2.2.1 stable — no issues after 30 min. Release complete.", Author: "EM", PostedAt: "Apr 17, 7:20 PM"})
+
+	// ── Team Members & Projects ───────────────────────────────────
+	alice := &models.TeamMember{Name: "Alice Chen", Role: "Backend Engineer", Email: "alice@example.com"}
+	bob := &models.TeamMember{Name: "Bob Martinez", Role: "Frontend Engineer", Email: "bob@example.com"}
+	carol := &models.TeamMember{Name: "Carol Singh", Role: "Full Stack Engineer", Email: "carol@example.com"}
+	dan := &models.TeamMember{Name: "Dan Kim", Role: "DevOps Engineer", Email: "dan@example.com"}
+	eva := &models.TeamMember{Name: "Eva Park", Role: "QA Engineer", Email: "eva@example.com"}
+	for _, m := range []*models.TeamMember{alice, bob, carol, dan, eva} {
+		if err := db.Create(m).Error; err != nil {
+			return err
+		}
+	}
+
+	platform := &models.Project{Name: "Platform", Description: "Core API and infrastructure services"}
+	mobile := &models.Project{Name: "Mobile", Description: "iOS and Android applications"}
+	security := &models.Project{Name: "Security", Description: "Auth, compliance, and security hardening"}
+	for _, p := range []*models.Project{platform, mobile, security} {
+		if err := db.Create(p).Error; err != nil {
+			return err
+		}
+	}
+	db.Model(platform).Association("Members").Append(alice, bob, carol, dan, eva)
+	db.Model(mobile).Association("Members").Append(bob, carol, eva)
+	db.Model(security).Association("Members").Append(alice, dan)
+
+	return nil
 }

@@ -30,8 +30,9 @@ func (h *DevTaskHandler) List(c *gin.Context) {
 		return
 	}
 	counts, _ := h.svc.OpenCountsByType()
+	allProjects, activeProject := projectMeta(c)
 	render(c, "devtasks", DevTasksData{
-		Meta:     Meta{Title: "Dev Tasks & Improvements", CurrentPage: "devtasks"},
+		Meta:     Meta{Title: "Dev Tasks & Improvements", CurrentPage: "devtasks", AllProjects: allProjects, ActiveProject: activeProject},
 		DevTasks: tasks,
 		Counts:   counts,
 	})

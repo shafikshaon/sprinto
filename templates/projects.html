@@ -1,0 +1,84 @@
+{{define "content"}}
+
+<!-- ── Project Cards ───────────────────────────────────────────────── -->
+<div class="space-y-4 mb-5">
+  {{if not .Projects}}
+  <div class="bg-white rounded-xl border border-gray-200 px-5 py-8 text-center">
+    <p class="text-sm text-gray-400">No projects yet. Create your first one below.</p>
+  </div>
+  {{end}}
+  {{range .Projects}}
+  <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <!-- Project header -->
+    <div class="px-5 py-4 border-b border-gray-100 flex items-start justify-between">
+      <div>
+        <h3 class="text-sm font-semibold text-gray-900">{{.Name}}</h3>
+        {{if .Description}}<p class="text-xs text-gray-400 mt-0.5">{{.Description}}</p>{{end}}
+        <p class="text-[10px] text-gray-400 mt-1">{{len .Members}} member{{if ne (len .Members) 1}}s{{end}}</p>
+      </div>
+      <form method="POST" action="/projects/{{.ID}}/delete">
+        <button type="submit" class="text-[10px] text-gray-300 hover:text-red-500 transition-colors font-medium">✕</button>
+      </form>
+    </div>
+    <!-- Members -->
+    <div class="px-5 py-3.5">
+      <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2.5">Members</p>
+      <div class="flex flex-wrap gap-2 mb-3">
+        {{range .Members}}
+        <div class="flex items-center gap-1.5 bg-gray-50 border border-gray-200 rounded-full pl-1.5 pr-2 py-1">
+          <div class="w-4 h-4 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
+            <span class="text-indigo-700 font-bold text-[8px]">{{initials .Name}}</span>
+          </div>
+          <span class="text-[10px] font-medium text-gray-700">{{.Name}}</span>
+          <span class="text-[10px] text-gray-400">· {{.Role}}</span>
+          <form method="POST" action="/projects/members/{{.ID}}/remove" class="inline ml-1">
+            <input type="hidden" name="project_id" value="{{$.ID}}">
+            <button type="submit" class="text-[9px] text-gray-300 hover:text-red-500 transition-colors font-bold leading-none">✕</button>
+          </form>
+        </div>
+        {{else}}
+        <p class="text-xs text-gray-400 italic">No members yet.</p>
+        {{end}}
+      </div>
+      <!-- Add member -->
+      {{if $.AllMembers}}
+      <form method="POST" action="/projects/{{.ID}}/members" class="flex items-center gap-2">
+        <select name="member_id" class="text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-indigo-400 bg-white text-gray-700">
+          <option value="">— add member —</option>
+          {{range $.AllMembers}}
+          <option value="{{.ID}}">{{.Name}} ({{.Role}})</option>
+          {{end}}
+        </select>
+        <button type="submit" class="text-xs bg-gray-100 hover:bg-indigo-50 hover:text-indigo-700 text-gray-600 font-semibold px-3 py-1.5 rounded-lg transition-colors">Add</button>
+      </form>
+      {{end}}
+    </div>
+  </div>
+  {{end}}
+</div>
+
+<!-- ── New Project Form ────────────────────────────────────────────── -->
+<div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+  <div class="px-5 py-3.5 border-b border-gray-100">
+    <h3 class="text-sm font-semibold text-gray-800">New Project</h3>
+  </div>
+  <form method="POST" action="/projects" class="p-5">
+    <div class="grid grid-cols-2 gap-4 mb-4">
+      <div>
+        <label class="text-xs font-medium text-gray-600 block mb-1">Project Name <span class="text-red-400">*</span></label>
+        <input name="name" type="text" required placeholder="e.g. Platform, Mobile, Data Infra..."
+          class="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+      </div>
+      <div>
+        <label class="text-xs font-medium text-gray-600 block mb-1">Description</label>
+        <input name="description" type="text" placeholder="Short description..."
+          class="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+      </div>
+    </div>
+    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
+      Create Project
+    </button>
+  </form>
+</div>
+
+{{end}}

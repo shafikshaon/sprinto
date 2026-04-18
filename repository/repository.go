@@ -157,6 +157,186 @@ func (r *devTaskRepo) Delete(id uint) error {
 	return r.db.Delete(&models.DevTask{}, id).Error
 }
 
+// ─── Release ──────────────────────────────────────────────────────────────────
+
+type ReleaseRepository interface {
+	All() ([]models.Release, error)
+	ByID(id uint) (models.Release, error)
+	Create(r models.Release) error
+	Delete(id uint) error
+	CreateStage(s models.ReleaseStage) error
+	DeleteStage(id uint) error
+	UpdateStageStatus(id uint, status string) error
+	CreateStory(s models.ReleaseStory) error
+	DeleteStory(id uint) error
+	UpdateStoryStatus(id uint, status string) error
+	CreateSlackUpdate(u models.ReleaseSlackUpdate) error
+	DeleteSlackUpdate(id uint) error
+}
+
+type releaseRepo struct{ db *gorm.DB }
+
+func NewReleaseRepository(db *gorm.DB) ReleaseRepository { return &releaseRepo{db: db} }
+
+func (r *releaseRepo) All() ([]models.Release, error) {
+	var releases []models.Release
+	result := r.db.Preload("Stages").Order("created_at DESC").Find(&releases)
+	return releases, result.Error
+}
+
+func (r *releaseRepo) ByID(id uint) (models.Release, error) {
+	var rel models.Release
+	result := r.db.
+		Preload("Stages", func(db *gorm.DB) *gorm.DB { return db.Order("created_at ASC") }).
+		Preload("Stages.Stories", func(db *gorm.DB) *gorm.DB { return db.Order("created_at ASC") }).
+		Preload("Stages.SlackUpdates", func(db *gorm.DB) *gorm.DB { return db.Order("created_at ASC") }).
+		First(&rel, id)
+	return rel, result.Error
+}
+
+func (r *releaseRepo) Create(rel models.Release) error { return r.db.Create(&rel).Error }
+
+func (r *releaseRepo) Delete(id uint) error {
+	var stageIDs []uint
+	r.db.Model(&models.ReleaseStage{}).Where("release_id = ?", id).Pluck("id", &stageIDs)
+	for _, sid := range stageIDs {
+		r.db.Where("stage_id = ?", sid).Delete(&models.ReleaseStory{})
+		r.db.Where("stage_id = ?", sid).Delete(&models.ReleaseSlackUpdate{})
+	}
+	r.db.Where("release_id = ?", id).Delete(&models.ReleaseStage{})
+	return r.db.Delete(&models.Release{}, id).Error
+}
+
+func (r *releaseRepo) CreateStage(s models.ReleaseStage) error { return r.db.Create(&s).Error }
+
+func (r *releaseRepo) DeleteStage(id uint) error {
+	r.db.Where("stage_id = ?", id).Delete(&models.ReleaseStory{})
+	r.db.Where("stage_id = ?", id).Delete(&models.ReleaseSlackUpdate{})
+	return r.db.Delete(&models.ReleaseStage{}, id).Error
+}
+
+func (r *releaseRepo) UpdateStageStatus(id uint, status string) error {
+	return r.db.Model(&models.ReleaseStage{}).Where("id = ?", id).Update("status", status).Error
+}
+
+func (r *releaseRepo) CreateStory(s models.ReleaseStory) error { return r.db.Create(&s).Error }
+
+func (r *releaseRepo) DeleteStory(id uint) error {
+	return r.db.Delete(&models.ReleaseStory{}, id).Error
+}
+
+func (r *releaseRepo) UpdateStoryStatus(id uint, status string) error {
+	return r.db.Model(&models.ReleaseStory{}).Where("id = ?", id).Update("status", status).Error
+}
+
+func (r *releaseRepo) CreateSlackUpdate(u models.ReleaseSlackUpdate) error {
+	return r.db.Create(&u).Error
+}
+
+func (r *releaseRepo) DeleteSlackUpdate(id uint) error {
+	return r.db.Delete(&models.ReleaseSlackUpdate{}, id).Error
+}
+
+// ─── Project ──────────────────────────────────────────────────────────────────
+
+type ProjectRepository interface {
+	All() ([]models.Project, error)
+	AllWithMembers() ([]models.Project, error)
+	ByID(id uint) (models.Project, error)
+	Create(p models.Project) error
+	Delete(id uint) error
+	AddMember(projectID, memberID uint) error
+	RemoveMember(projectID, memberID uint) error
+}
+
+type projectRepo struct{ db *gorm.DB }
+
+func NewProjectRepository(db *gorm.DB) ProjectRepository { return &projectRepo{db: db} }
+
+func (r *projectRepo) All() ([]models.Project, error) {
+	var projects []models.Project
+	result := r.db.Order("created_at ASC").Find(&projects)
+	return projects, result.Error
+}
+
+func (r *projectRepo) AllWithMembers() ([]models.Project, error) {
+	var projects []models.Project
+	result := r.db.Preload("Members").Order("created_at ASC").Find(&projects)
+	return projects, result.Error
+}
+
+func (r *projectRepo) ByID(id uint) (models.Project, error) {
+	var p models.Project
+	result := r.db.Preload("Members").First(&p, id)
+	return p, result.Error
+}
+
+func (r *projectRepo) Create(p models.Project) error { return r.db.Create(&p).Error }
+
+func (r *projectRepo) Delete(id uint) error {
+	var p models.Project
+	if err := r.db.First(&p, id).Error; err != nil {
+		return err
+	}
+	r.db.Model(&p).Association("Members").Clear()
+	return r.db.Delete(&p).Error
+}
+
+func (r *projectRepo) AddMember(projectID, memberID uint) error {
+	var p models.Project
+	if err := r.db.First(&p, projectID).Error; err != nil {
+		return err
+	}
+	var m models.TeamMember
+	if err := r.db.First(&m, memberID).Error; err != nil {
+		return err
+	}
+	return r.db.Model(&p).Association("Members").Append(&m)
+}
+
+func (r *projectRepo) RemoveMember(projectID, memberID uint) error {
+	var p models.Project
+	if err := r.db.First(&p, projectID).Error; err != nil {
+		return err
+	}
+	var m models.TeamMember
+	if err := r.db.First(&m, memberID).Error; err != nil {
+		return err
+	}
+	return r.db.Model(&p).Association("Members").Delete(&m)
+}
+
+// ─── Team Member ──────────────────────────────────────────────────────────────
+
+type TeamMemberRepository interface {
+	All() ([]models.TeamMember, error)
+	Create(m models.TeamMember) error
+	Delete(id uint) error
+}
+
+type teamMemberRepo struct{ db *gorm.DB }
+
+func NewTeamMemberRepository(db *gorm.DB) TeamMemberRepository {
+	return &teamMemberRepo{db: db}
+}
+
+func (r *teamMemberRepo) All() ([]models.TeamMember, error) {
+	var members []models.TeamMember
+	result := r.db.Preload("Projects").Order("created_at ASC").Find(&members)
+	return members, result.Error
+}
+
+func (r *teamMemberRepo) Create(m models.TeamMember) error { return r.db.Create(&m).Error }
+
+func (r *teamMemberRepo) Delete(id uint) error {
+	var m models.TeamMember
+	if err := r.db.First(&m, id).Error; err != nil {
+		return err
+	}
+	r.db.Model(&m).Association("Projects").Clear()
+	return r.db.Delete(&m).Error
+}
+
 func (r *devTaskRepo) OpenCountsByType() (map[string]int, error) {
 	type row struct {
 		Type  string
