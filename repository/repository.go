@@ -102,16 +102,25 @@ func (r *sprintRepo) DeleteComment(id uint) error {
 // ─── Standup ──────────────────────────────────────────────────────────────────
 
 type StandupRepository interface {
+	All(projectID uint) ([]models.StandupEntry, error)
 	ByDate(date string, projectID uint) ([]models.StandupEntry, error)
 	Create(e models.StandupEntry) error
-	Update(id uint, member, role, yesterday, today, blockers, status string) error
+	Update(id uint, summary, dependencies, issues, actionItems string) error
 	Delete(id uint) error
-	RecentDates(limit int, projectID uint) ([]string, error)
 }
 
 type standupRepo struct{ db *gorm.DB }
 
 func NewStandupRepository(db *gorm.DB) StandupRepository { return &standupRepo{db: db} }
+
+func (r *standupRepo) All(projectID uint) ([]models.StandupEntry, error) {
+	var entries []models.StandupEntry
+	q := r.db.Order("date DESC, created_at DESC")
+	if projectID > 0 {
+		q = q.Where("project_id = ?", projectID)
+	}
+	return entries, q.Find(&entries).Error
+}
 
 func (r *standupRepo) ByDate(date string, projectID uint) ([]models.StandupEntry, error) {
 	var entries []models.StandupEntry
@@ -119,37 +128,24 @@ func (r *standupRepo) ByDate(date string, projectID uint) ([]models.StandupEntry
 	if projectID > 0 {
 		q = q.Where("project_id = ?", projectID)
 	}
-	result := q.Order("created_at ASC").Find(&entries)
-	return entries, result.Error
+	return entries, q.Order("created_at ASC").Find(&entries).Error
 }
 
 func (r *standupRepo) Create(e models.StandupEntry) error {
 	return r.db.Create(&e).Error
 }
 
-func (r *standupRepo) Update(id uint, member, role, yesterday, today, blockers, status string) error {
+func (r *standupRepo) Update(id uint, summary, dependencies, issues, actionItems string) error {
 	return r.db.Model(&models.StandupEntry{}).Where("id = ?", id).Updates(map[string]interface{}{
-		"member":    member,
-		"role":      role,
-		"yesterday": yesterday,
-		"today":     today,
-		"blockers":  blockers,
-		"status":    status,
+		"summary":      summary,
+		"dependencies": dependencies,
+		"issues":       issues,
+		"action_items": actionItems,
 	}).Error
 }
 
 func (r *standupRepo) Delete(id uint) error {
 	return r.db.Delete(&models.StandupEntry{}, id).Error
-}
-
-func (r *standupRepo) RecentDates(limit int, projectID uint) ([]string, error) {
-	var dates []string
-	q := r.db.Model(&models.StandupEntry{}).Select("DISTINCT date")
-	if projectID > 0 {
-		q = q.Where("project_id = ?", projectID)
-	}
-	result := q.Order("date DESC").Limit(limit).Pluck("date", &dates)
-	return dates, result.Error
 }
 
 // ─── Deadline ─────────────────────────────────────────────────────────────────
@@ -503,8 +499,8 @@ func (r *teamMemberRepo) Delete(id uint) error {
 // ─── Slack Thread ─────────────────────────────────────────────────────────────
 
 type SlackThreadRepository interface {
-	All(projectID uint, tag string) ([]models.SlackThread, error)
-	AllTags(projectID uint) ([]string, error)
+	All(tag string) ([]models.SlackThread, error)
+	AllTags() ([]string, error)
 	Create(t models.SlackThread) error
 	Update(id uint, messageLink, topic, summary, tags, author string) error
 	Delete(id uint) error
@@ -516,12 +512,9 @@ func NewSlackThreadRepository(db *gorm.DB) SlackThreadRepository {
 	return &slackThreadRepo{db: db}
 }
 
-func (r *slackThreadRepo) All(projectID uint, tag string) ([]models.SlackThread, error) {
+func (r *slackThreadRepo) All(tag string) ([]models.SlackThread, error) {
 	var threads []models.SlackThread
 	q := r.db.Order("created_at DESC")
-	if projectID > 0 {
-		q = q.Where("project_id = ?", projectID)
-	}
 	if tag != "" {
 		q = q.Where("tags LIKE ?", "%"+tag+"%")
 	}
@@ -529,12 +522,9 @@ func (r *slackThreadRepo) All(projectID uint, tag string) ([]models.SlackThread,
 	return threads, result.Error
 }
 
-func (r *slackThreadRepo) AllTags(projectID uint) ([]string, error) {
+func (r *slackThreadRepo) AllTags() ([]string, error) {
 	var threads []models.SlackThread
 	q := r.db.Select("tags")
-	if projectID > 0 {
-		q = q.Where("project_id = ?", projectID)
-	}
 	if err := q.Find(&threads).Error; err != nil {
 		return nil, err
 	}
@@ -572,7 +562,7 @@ func (r *slackThreadRepo) Delete(id uint) error {
 // ─── Sticky Note ──────────────────────────────────────────────────────────────
 
 type StickyNoteRepository interface {
-	All(projectID uint, filter string) ([]models.StickyNote, error)
+	All(filter string) ([]models.StickyNote, error)
 	GetByID(id uint) (models.StickyNote, error)
 	Create(n models.StickyNote) error
 	Update(id uint, title, content, color string) error
@@ -586,12 +576,9 @@ func NewStickyNoteRepository(db *gorm.DB) StickyNoteRepository {
 	return &stickyNoteRepo{db: db}
 }
 
-func (r *stickyNoteRepo) All(projectID uint, filter string) ([]models.StickyNote, error) {
+func (r *stickyNoteRepo) All(filter string) ([]models.StickyNote, error) {
 	var notes []models.StickyNote
 	q := r.db.Order("pinned DESC, updated_at DESC")
-	if projectID > 0 {
-		q = q.Where("project_id = ?", projectID)
-	}
 	if filter == "pinned" {
 		q = q.Where("pinned = ?", true)
 	}

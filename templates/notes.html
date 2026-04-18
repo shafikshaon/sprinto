@@ -103,6 +103,9 @@
         </button>
       </form>
       <div class="flex items-center gap-1.5">
+        <button type="button"
+          data-view-note-title="{{.Title}}"
+          class="text-xs text-white bg-gray-500 hover:bg-gray-600 px-2.5 py-1 rounded transition-colors font-medium">View</button>
         <a href="/notes/{{.ID}}/edit"
           class="text-xs text-white bg-indigo-600 hover:bg-indigo-700 px-2.5 py-1 rounded transition-colors font-medium">Edit</a>
         <button type="button"
@@ -116,11 +119,76 @@
 </div>
 {{end}}
 
+<!-- ── View Note Modal ─────────────────────────────────────────────── -->
+<dialog id="view-note-dialog" class="w-full max-w-2xl rounded-xl border border-gray-200 p-0 shadow-xl backdrop:bg-black/30">
+  <div class="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
+    <h3 id="view-note-title" class="text-sm font-semibold text-gray-900"></h3>
+    <div class="flex items-center gap-2">
+      <button type="button" id="copy-note-btn"
+        class="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-indigo-600 border border-gray-200 hover:border-indigo-300 px-2.5 py-1.5 rounded transition-colors">
+        <svg id="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3.5 h-3.5">
+          <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+        </svg>
+        <span id="copy-label">Copy</span>
+      </button>
+      <button type="button" onclick="document.getElementById('view-note-dialog').close()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+    </div>
+  </div>
+  <div id="view-note-body" class="preview-md px-6 py-5 overflow-auto max-h-[70vh]"></div>
+</dialog>
+
 <script>
 // Render all note cards
 document.querySelectorAll('.note-content[data-raw]').forEach(function(el) {
   var raw = el.getAttribute('data-raw');
   if (raw) el.innerHTML = marked.parse(raw);
+});
+
+// View modal
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest('[data-view-note-title]');
+  if (!btn) return;
+  var card = btn.closest('[data-note-id]');
+  var raw = card ? card.querySelector('.note-content').getAttribute('data-raw') : '';
+  var title = btn.dataset.viewNoteTitle;
+  document.getElementById('view-note-title').textContent = title || 'Note';
+  var body = document.getElementById('view-note-body');
+  body.innerHTML = raw ? marked.parse(raw) : '<p class="text-sm text-gray-400 italic">No content.</p>';
+  // store raw for copy
+  body.dataset.raw = raw || '';
+  // reset copy button
+  document.getElementById('copy-label').textContent = 'Copy Markdown';
+  document.getElementById('copy-icon').style.stroke = '';
+  document.getElementById('view-note-dialog').showModal();
+});
+
+// Copy button — writes both text/html (for Slack/Notion rich paste) and text/plain (fallback)
+document.getElementById('copy-note-btn').addEventListener('click', function() {
+  var body = document.getElementById('view-note-body');
+  var raw  = body.dataset.raw || '';
+  var html = body.innerHTML;
+
+  function flashCopied() {
+    document.getElementById('copy-label').textContent = 'Copied!';
+    document.getElementById('copy-icon').style.stroke = '#16a34a';
+    setTimeout(function() {
+      document.getElementById('copy-label').textContent = 'Copy';
+      document.getElementById('copy-icon').style.stroke = '';
+    }, 2000);
+  }
+
+  if (window.ClipboardItem) {
+    navigator.clipboard.write([
+      new ClipboardItem({
+        'text/html':  new Blob([html], { type: 'text/html' }),
+        'text/plain': new Blob([raw],  { type: 'text/plain' }),
+      })
+    ]).then(flashCopied).catch(function() {
+      navigator.clipboard.writeText(raw).then(flashCopied);
+    });
+  } else {
+    navigator.clipboard.writeText(raw).then(flashCopied);
+  }
 });
 </script>
 

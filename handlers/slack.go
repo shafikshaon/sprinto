@@ -34,15 +34,14 @@ func NewSlackHandler(svc service.SlackThreadService) *SlackHandler {
 }
 
 func (h *SlackHandler) List(c *gin.Context) {
-	projectID := activeProjectIDFromCtx(c)
 	tag := c.Query("tag")
 
-	threads, err := h.svc.All(projectID, tag)
+	threads, err := h.svc.All(tag)
 	if err != nil {
 		c.String(500, "DB error: %s", err.Error())
 		return
 	}
-	allTags, _ := h.svc.AllTags(projectID)
+	allTags, _ := h.svc.AllTags()
 
 	rows := make([]threadRow, len(threads))
 	for i, t := range threads {
@@ -67,14 +66,12 @@ func (h *SlackHandler) List(c *gin.Context) {
 }
 
 func (h *SlackHandler) Create(c *gin.Context) {
-	projectID := activeProjectIDFromCtx(c)
 	h.svc.Create(
 		c.PostForm("message_link"),
 		c.PostForm("topic"),
 		c.PostForm("summary"),
 		c.PostForm("tags"),
 		c.PostForm("author"),
-		projectID,
 	)
 	redirectTo(c, "/slack")
 }

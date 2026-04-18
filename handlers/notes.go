@@ -22,12 +22,11 @@ func NewStickyNoteHandler(svc service.StickyNoteService) *StickyNoteHandler {
 }
 
 func (h *StickyNoteHandler) List(c *gin.Context) {
-	projectID := activeProjectIDFromCtx(c)
 	filter := c.Query("filter")
 	if filter == "" {
 		filter = "all"
 	}
-	notes, err := h.svc.All(projectID, filter)
+	notes, err := h.svc.All(filter)
 	if err != nil {
 		c.String(500, "DB error: %s", err.Error())
 		return
@@ -62,12 +61,10 @@ func (h *StickyNoteHandler) EditPage(c *gin.Context) {
 }
 
 func (h *StickyNoteHandler) Create(c *gin.Context) {
-	projectID := activeProjectIDFromCtx(c)
 	h.svc.Create(
 		c.PostForm("title"),
 		c.PostForm("content"),
 		c.PostForm("color"),
-		projectID,
 	)
 	redirectTo(c, "/notes")
 }

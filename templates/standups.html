@@ -1,205 +1,168 @@
 {{define "content"}}
 
-<!-- ── Date Header ─────────────────────────────────────────────────── -->
-<div class="flex items-center justify-between mb-4">
-  <div>
-    <p class="text-xs font-semibold text-indigo-600 uppercase tracking-wider mb-0.5">Today</p>
-    <h2 class="text-base font-semibold text-gray-900">{{.Date}}</h2>
-  </div>
-  <div class="flex items-center gap-2">
-    <span class="text-xs text-gray-400">History:</span>
-    {{range .RecentDates}}
-    <a href="/standups?date={{.Raw}}"
-       class="text-xs border border-gray-200 bg-white px-3 py-1.5 rounded-md hover:bg-indigo-50 hover:border-indigo-200 hover:text-indigo-700 transition-colors font-medium">
-      {{.Display}}
-    </a>
-    {{end}}
-  </div>
+{{if not .Standups}}
+<div class="bg-white rounded-lg border border-gray-200 px-5 py-12 text-center">
+  <p class="text-sm font-medium text-gray-400">No standup notes yet</p>
+  <p class="text-xs text-gray-300 mt-1">Click "+ Add Standup" to log today's meeting</p>
 </div>
-
-<!-- ── Standup Table ───────────────────────────────────────────────── -->
-<div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
-  <table class="w-full">
-    <thead>
-      <tr class="bg-gray-50 border-b border-gray-100">
-        <th class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider px-5 py-3">Member</th>
-        <th class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Yesterday</th>
-        <th class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Today</th>
-        <th class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Blockers</th>
-        <th class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Status</th>
-        <th class="px-4 py-3"></th>
-      </tr>
-    </thead>
-    <tbody class="divide-y divide-gray-50">
-      {{range .Standups}}
-      <tr class="hover:bg-gray-50 transition-colors align-top">
-        <td class="px-5 py-3.5">
-          <div class="flex items-center gap-2.5">
-            <div class="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
-              <span class="text-indigo-700 font-bold text-xs">{{initials .Member}}</span>
-            </div>
-            <div>
-              <p class="text-sm font-semibold text-gray-800">{{.Member}}</p>
-              <p class="text-xs text-gray-400">{{.Role}}</p>
-            </div>
-          </div>
-        </td>
-        <td class="px-4 py-3.5 max-w-[160px]"><p class="text-sm text-gray-500 leading-relaxed">{{.Yesterday}}</p></td>
-        <td class="px-4 py-3.5 max-w-[160px]"><p class="text-sm text-gray-800 font-medium leading-relaxed">{{.Today}}</p></td>
-        <td class="px-4 py-3.5 max-w-[140px]">
-          {{if eq .Blockers "None"}}
-          <span class="text-sm text-gray-300 italic">None</span>
-          {{else}}
-          <p class="text-sm text-red-600 leading-relaxed">{{.Blockers}}</p>
-          {{end}}
-        </td>
-        <td class="px-4 py-3.5">
-          <span class="text-xs font-semibold px-2 py-1 rounded-full {{statusClass .Status}}">{{.Status}}</span>
-        </td>
-        <td class="px-4 py-3.5 text-right">
-          <div class="flex items-center justify-end gap-2">
-            <button type="button"
-              data-edit-standup-id="{{.ID}}"
-              data-edit-standup-member="{{.Member}}"
-              data-edit-standup-role="{{.Role}}"
-              data-edit-standup-yesterday="{{.Yesterday}}"
-              data-edit-standup-today="{{.Today}}"
-              data-edit-standup-blockers="{{.Blockers}}"
-              data-edit-standup-status="{{.Status}}"
-              data-edit-standup-date="{{$.DateRaw}}"
-              class="text-xs text-white bg-indigo-600 hover:bg-indigo-700 px-2.5 py-1 rounded transition-colors font-medium">Edit</button>
-            <button type="button"
-              data-delete-action="/standups/{{.ID}}/delete"
-              data-delete-name="{{.Member}}'s standup"
-              class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete</button>
-          </div>
-        </td>
-      </tr>
-      {{end}}
-      {{if not .Standups}}
-      <tr><td colspan="6" class="px-5 py-8 text-center text-sm text-gray-400 italic">No standup entries for this date yet.</td></tr>
-      {{end}}
-    </tbody>
-  </table>
-</div>
-
-<!-- ── Add Entry Modal ─────────────────────────────────────────────── -->
-<dialog id="add-dialog">
-  <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-    <h3 class="text-sm font-semibold text-gray-900">Add Standup Entry</h3>
-    <button type="button" onclick="document.getElementById('add-dialog').close()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
-  </div>
-  <form method="POST" action="/standups" class="p-5">
-    <div class="space-y-3 mb-5">
-      <div class="grid grid-cols-2 gap-3">
-        <div>
-          <label class="text-xs font-medium text-gray-600 block mb-1.5">Member Name <span class="text-red-400">*</span></label>
-          <input name="member" type="text" required value="{{if .Meta.CurrentUser}}{{.Meta.CurrentUser.FullName}}{{end}}" placeholder="e.g. Alice Chen"
-            class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
-        </div>
-        <div>
-          <label class="text-xs font-medium text-gray-600 block mb-1.5">Role</label>
-          <input name="role" type="text" placeholder="Backend, Frontend..."
-            class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
-        </div>
+{{else}}
+<div class="space-y-4">
+  {{range .Standups}}
+  <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+    <!-- Card header -->
+    <div class="flex items-center justify-between px-5 py-3 border-b border-gray-100 bg-gray-50">
+      <div class="flex items-center gap-2">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3.5 h-3.5 text-indigo-500"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span class="text-xs font-semibold text-gray-700">{{.Date}}</span>
+        {{if eq .Date $.Today}}<span class="ml-1.5 text-[10px] font-semibold bg-indigo-100 text-indigo-600 px-1.5 py-0.5 rounded-full uppercase tracking-wide">Today</span>{{end}}
       </div>
-      <div>
-        <label class="text-xs font-medium text-gray-600 block mb-1.5">Yesterday</label>
-        <input name="yesterday" type="text" placeholder="What did you work on?"
-          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
-      </div>
-      <div>
-        <label class="text-xs font-medium text-gray-600 block mb-1.5">Today <span class="text-red-400">*</span></label>
-        <input name="today" type="text" required placeholder="What will you work on?"
-          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
-      </div>
-      <div class="grid grid-cols-2 gap-3">
-        <div>
-          <label class="text-xs font-medium text-gray-600 block mb-1.5">Blockers</label>
-          <input name="blockers" type="text" placeholder="None"
-            class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
-        </div>
-        <div>
-          <label class="text-xs font-medium text-gray-600 block mb-1.5">Status</label>
-          <select name="status" class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400">
-            <option>On Track</option><option>At Risk</option><option>Blocked</option>
-          </select>
-        </div>
+      <div class="flex items-center gap-2">
+        <button type="button"
+          data-edit-standup-id="{{.ID}}"
+          data-edit-standup-date="{{.Date}}"
+          data-edit-standup-summary="{{.Summary}}"
+          data-edit-standup-dependencies="{{.Dependencies}}"
+          data-edit-standup-issues="{{.Issues}}"
+          data-edit-standup-action-items="{{.ActionItems}}"
+          class="text-xs text-white bg-indigo-600 hover:bg-indigo-700 px-2.5 py-1 rounded transition-colors font-medium">Edit</button>
+        <button type="button"
+          data-delete-action="/standups/{{.ID}}/delete"
+          data-delete-name="standup on {{.Date}}"
+          class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete</button>
       </div>
     </div>
-    <div class="flex items-center gap-2">
-      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-md transition-colors">Add Entry</button>
+    <!-- Card body -->
+    <div class="px-5 py-4 grid grid-cols-2 gap-x-8 gap-y-4">
+      {{if .Summary}}
+      <div class="col-span-2">
+        <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Discussion Summary</p>
+        <p class="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{{.Summary}}</p>
+      </div>
+      {{end}}
+      {{if .Dependencies}}
+      <div>
+        <p class="text-[10px] font-semibold text-amber-500 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3 h-3"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+          Dependencies
+        </p>
+        <p class="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{{.Dependencies}}</p>
+      </div>
+      {{end}}
+      {{if .Issues}}
+      <div>
+        <p class="text-[10px] font-semibold text-red-500 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3 h-3"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Issues / Blockers
+        </p>
+        <p class="text-sm text-red-700 whitespace-pre-wrap leading-relaxed">{{.Issues}}</p>
+      </div>
+      {{end}}
+      {{if .ActionItems}}
+      <div {{if and .Dependencies .Issues}}class="col-span-2"{{end}}>
+        <p class="text-[10px] font-semibold text-green-600 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3 h-3"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          Action Items
+        </p>
+        <p class="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{{.ActionItems}}</p>
+      </div>
+      {{end}}
+      {{if and (not .Summary) (not .Dependencies) (not .Issues) (not .ActionItems)}}
+      <p class="col-span-2 text-sm text-gray-400 italic">No details recorded.</p>
+      {{end}}
+    </div>
+  </div>
+  {{end}}
+</div>
+{{end}}
+
+<!-- ── Add Standup Dialog ───────────────────────────────────────────── -->
+<dialog id="add-dialog" class="w-full max-w-xl rounded-xl border border-gray-200 p-0 shadow-xl backdrop:bg-black/30">
+  <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+    <h3 class="text-sm font-semibold text-gray-900">Add Standup</h3>
+    <button type="button" onclick="document.getElementById('add-dialog').close()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+  </div>
+  <form method="POST" action="/standups" class="p-5 space-y-4">
+    <div>
+      <label class="text-xs font-medium text-gray-600 block mb-1.5">Date</label>
+      <input name="date" type="date" value="{{.Today}}" required
+        class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+    </div>
+    <div>
+      <label class="text-xs font-medium text-gray-600 block mb-1.5">Discussion Summary</label>
+      <textarea name="summary" rows="3" placeholder="What was discussed in today's standup?"
+        class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400 resize-none"></textarea>
+    </div>
+    <div>
+      <label class="text-xs font-medium text-amber-600 block mb-1.5">Dependencies</label>
+      <textarea name="dependencies" rows="2" placeholder="Waiting on external teams, APIs, approvals..."
+        class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400 resize-none"></textarea>
+    </div>
+    <div>
+      <label class="text-xs font-medium text-red-500 block mb-1.5">Issues / Blockers</label>
+      <textarea name="issues" rows="2" placeholder="Bugs, blockers, risks identified..."
+        class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400 resize-none"></textarea>
+    </div>
+    <div>
+      <label class="text-xs font-medium text-green-600 block mb-1.5">Action Items</label>
+      <textarea name="action_items" rows="2" placeholder="Decisions made, tasks assigned, follow-ups..."
+        class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400 resize-none"></textarea>
+    </div>
+    <div class="flex items-center gap-2 pt-1">
+      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-md transition-colors">Save</button>
       <button type="button" onclick="document.getElementById('add-dialog').close()" class="text-sm text-gray-500 hover:text-gray-700 px-4 py-2 rounded-md border border-gray-200 transition-colors">Cancel</button>
     </div>
   </form>
 </dialog>
 
 <!-- ── Edit Standup Dialog ─────────────────────────────────────────── -->
-<dialog id="edit-standup-dialog">
+<dialog id="edit-standup-dialog" class="w-full max-w-xl rounded-xl border border-gray-200 p-0 shadow-xl backdrop:bg-black/30">
   <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-    <h3 class="text-sm font-semibold text-gray-900">Edit Standup Entry</h3>
+    <h3 class="text-sm font-semibold text-gray-900">Edit Standup</h3>
     <button type="button" onclick="document.getElementById('edit-standup-dialog').close()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
   </div>
-  <form id="edit-standup-form" method="POST" action="" class="p-5">
-    <input type="hidden" id="edit-standup-redirect" name="redirect" value="">
-    <div class="space-y-3 mb-5">
-      <div class="grid grid-cols-2 gap-3">
-        <div>
-          <label class="text-xs font-medium text-gray-600 block mb-1.5">Member Name <span class="text-red-400">*</span></label>
-          <input id="edit-standup-member" name="member" type="text" required
-            class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
-        </div>
-        <div>
-          <label class="text-xs font-medium text-gray-600 block mb-1.5">Role</label>
-          <input id="edit-standup-role" name="role" type="text"
-            class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
-        </div>
-      </div>
-      <div>
-        <label class="text-xs font-medium text-gray-600 block mb-1.5">Yesterday</label>
-        <input id="edit-standup-yesterday" name="yesterday" type="text"
-          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
-      </div>
-      <div>
-        <label class="text-xs font-medium text-gray-600 block mb-1.5">Today <span class="text-red-400">*</span></label>
-        <input id="edit-standup-today" name="today" type="text" required
-          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
-      </div>
-      <div class="grid grid-cols-2 gap-3">
-        <div>
-          <label class="text-xs font-medium text-gray-600 block mb-1.5">Blockers</label>
-          <input id="edit-standup-blockers" name="blockers" type="text" placeholder="None"
-            class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
-        </div>
-        <div>
-          <label class="text-xs font-medium text-gray-600 block mb-1.5">Status</label>
-          <select id="edit-standup-status" name="status" class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400">
-            <option>On Track</option><option>At Risk</option><option>Blocked</option>
-          </select>
-        </div>
-      </div>
+  <form id="edit-standup-form" method="POST" action="" class="p-5 space-y-4">
+    <div>
+      <label class="text-xs font-medium text-gray-600 block mb-1.5">Date</label>
+      <input id="edit-standup-date" name="date" type="date" required
+        class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
     </div>
-    <div class="flex items-center gap-2">
+    <div>
+      <label class="text-xs font-medium text-gray-600 block mb-1.5">Discussion Summary</label>
+      <textarea id="edit-standup-summary" name="summary" rows="3"
+        class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400 resize-none"></textarea>
+    </div>
+    <div>
+      <label class="text-xs font-medium text-amber-600 block mb-1.5">Dependencies</label>
+      <textarea id="edit-standup-dependencies" name="dependencies" rows="2"
+        class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400 resize-none"></textarea>
+    </div>
+    <div>
+      <label class="text-xs font-medium text-red-500 block mb-1.5">Issues / Blockers</label>
+      <textarea id="edit-standup-issues" name="issues" rows="2"
+        class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400 resize-none"></textarea>
+    </div>
+    <div>
+      <label class="text-xs font-medium text-green-600 block mb-1.5">Action Items</label>
+      <textarea id="edit-standup-action-items" name="action_items" rows="2"
+        class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400 resize-none"></textarea>
+    </div>
+    <div class="flex items-center gap-2 pt-1">
       <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-md transition-colors">Save Changes</button>
       <button type="button" onclick="document.getElementById('edit-standup-dialog').close()" class="text-sm text-gray-500 hover:text-gray-700 px-4 py-2 rounded-md border border-gray-200 transition-colors">Cancel</button>
     </div>
   </form>
 </dialog>
+
 <script>
 document.addEventListener('click', function(e) {
   var btn = e.target.closest('[data-edit-standup-id]');
   if (!btn) return;
   document.getElementById('edit-standup-form').action = '/standups/' + btn.dataset.editStandupId + '/update';
-  document.getElementById('edit-standup-redirect').value = '/standups?date=' + btn.dataset.editStandupDate;
-  document.getElementById('edit-standup-member').value = btn.dataset.editStandupMember;
-  document.getElementById('edit-standup-role').value = btn.dataset.editStandupRole;
-  document.getElementById('edit-standup-yesterday').value = btn.dataset.editStandupYesterday;
-  document.getElementById('edit-standup-today').value = btn.dataset.editStandupToday;
-  document.getElementById('edit-standup-blockers').value = btn.dataset.editStandupBlockers === 'None' ? '' : btn.dataset.editStandupBlockers;
-  var sel = document.getElementById('edit-standup-status');
-  for (var i = 0; i < sel.options.length; i++) {
-    sel.options[i].selected = sel.options[i].value === btn.dataset.editStandupStatus;
-  }
+  document.getElementById('edit-standup-date').value           = btn.dataset.editStandupDate;
+  document.getElementById('edit-standup-summary').value        = btn.dataset.editStandupSummary;
+  document.getElementById('edit-standup-dependencies').value   = btn.dataset.editStandupDependencies;
+  document.getElementById('edit-standup-issues').value         = btn.dataset.editStandupIssues;
+  document.getElementById('edit-standup-action-items').value   = btn.dataset.editStandupActionItems;
   document.getElementById('edit-standup-dialog').showModal();
 });
 </script>

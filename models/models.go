@@ -76,14 +76,12 @@ func ComputeStats(tasks []SprintTask) SprintStats {
 
 type StandupEntry struct {
 	gorm.Model
-	ProjectID uint   `gorm:"index"`
-	Member    string `gorm:"not null"`
-	Role      string
-	Yesterday string
-	Today     string
-	Blockers  string `gorm:"default:'None'"`
-	Status    string `gorm:"default:'On Track'"`
-	Date      string `gorm:"not null;index"` // "YYYY-MM-DD"
+	ProjectID    uint   `gorm:"index"`
+	Date         string `gorm:"not null;index"` // "YYYY-MM-DD"
+	Summary      string `gorm:"type:text"`
+	Dependencies string `gorm:"type:text"`
+	Issues       string `gorm:"type:text"`
+	ActionItems  string `gorm:"type:text"`
 }
 
 func (StandupEntry) TableName() string { return "standups" }

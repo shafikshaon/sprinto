@@ -12,9 +12,7 @@ import (
 type DashboardData struct {
 	Meta              Meta
 	Sprint            models.Sprint
-	Standups          []models.StandupEntry
-	StandupBlocked    int
-	StandupAtRisk     int
+	TodayStandup      *models.StandupEntry
 	Deadlines         []models.Deadline
 	CriticalDeadlines int
 	OpenDevTasks      int
@@ -47,18 +45,10 @@ func (h *DashboardHandler) Get(c *gin.Context) {
 	allDeadlines, _ := h.deadlines.All(projectID)
 	allTasks, _ := h.devTasks.All(projectID)
 
-	open, blocked, atRisk, critical := 0, 0, 0, 0
+	open, critical := 0, 0
 	for _, t := range allTasks {
 		if t.Status != "Done" {
 			open++
-		}
-	}
-	for _, s := range todayStandups {
-		switch s.Status {
-		case "Blocked":
-			blocked++
-		case "At Risk":
-			atRisk++
 		}
 	}
 	for _, d := range allDeadlines {
@@ -70,6 +60,10 @@ func (h *DashboardHandler) Get(c *gin.Context) {
 	if len(allDeadlines) < cap {
 		cap = len(allDeadlines)
 	}
+	var todayStandup *models.StandupEntry
+	if len(todayStandups) > 0 {
+		todayStandup = &todayStandups[0]
+	}
 
 	sprintLabel := sprint.Name
 	if sprint.StartDate != "" && sprint.EndDate != "" {
@@ -80,9 +74,7 @@ func (h *DashboardHandler) Get(c *gin.Context) {
 	render(c, "dashboard", DashboardData{
 		Meta:              Meta{Title: "Dashboard", CurrentPage: "dashboard", SprintLabel: sprintLabel, AllProjects: allProjects, ActiveProject: activeProject, CurrentUser: currentUser},
 		Sprint:            sprint,
-		Standups:          todayStandups,
-		StandupBlocked:    blocked,
-		StandupAtRisk:     atRisk,
+		TodayStandup:      todayStandup,
 		Deadlines:         allDeadlines[:cap],
 		CriticalDeadlines: critical,
 		OpenDevTasks:      open,

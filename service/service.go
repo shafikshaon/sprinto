@@ -167,11 +167,11 @@ type DateNav struct {
 }
 
 type StandupService interface {
+	All(projectID uint) ([]models.StandupEntry, error)
 	ByDate(date string, projectID uint) ([]models.StandupEntry, error)
-	Add(member, role, yesterday, today, blockers, status string, projectID uint) error
-	Update(id uint, member, role, yesterday, today, blockers, status string) error
+	Add(date, summary, dependencies, issues, actionItems string, projectID uint) error
+	Update(id uint, summary, dependencies, issues, actionItems string) error
 	Remove(id uint) error
-	RecentDates(limit int, projectID uint) ([]DateNav, error)
 }
 
 type standupService struct{ repo repository.StandupRepository }
@@ -180,50 +180,36 @@ func NewStandupService(r repository.StandupRepository) StandupService {
 	return &standupService{repo: r}
 }
 
+func (s *standupService) All(projectID uint) ([]models.StandupEntry, error) {
+	return s.repo.All(projectID)
+}
+
 func (s *standupService) ByDate(date string, projectID uint) ([]models.StandupEntry, error) {
 	return s.repo.ByDate(date, projectID)
 }
 
-func (s *standupService) Add(member, role, yesterday, today, blockers, status string, projectID uint) error {
-	if strings.TrimSpace(member) == "" {
+func (s *standupService) Add(date, summary, dependencies, issues, actionItems string, projectID uint) error {
+	if strings.TrimSpace(summary) == "" && strings.TrimSpace(issues) == "" {
 		return nil
 	}
-	if strings.TrimSpace(blockers) == "" {
-		blockers = "None"
+	if date == "" {
+		date = time.Now().Format("2006-01-02")
 	}
 	return s.repo.Create(models.StandupEntry{
-		ProjectID: projectID,
-		Member:    strings.TrimSpace(member),
-		Role:      strings.TrimSpace(role),
-		Yesterday: strings.TrimSpace(yesterday),
-		Today:     strings.TrimSpace(today),
-		Blockers:  strings.TrimSpace(blockers),
-		Status:    status,
-		Date:      time.Now().Format("2006-01-02"),
+		ProjectID:    projectID,
+		Date:         date,
+		Summary:      strings.TrimSpace(summary),
+		Dependencies: strings.TrimSpace(dependencies),
+		Issues:       strings.TrimSpace(issues),
+		ActionItems:  strings.TrimSpace(actionItems),
 	})
 }
 
-func (s *standupService) Update(id uint, member, role, yesterday, today, blockers, status string) error {
-	if blockers == "" {
-		blockers = "None"
-	}
-	return s.repo.Update(id, strings.TrimSpace(member), strings.TrimSpace(role), yesterday, today, blockers, status)
+func (s *standupService) Update(id uint, summary, dependencies, issues, actionItems string) error {
+	return s.repo.Update(id, strings.TrimSpace(summary), strings.TrimSpace(dependencies), strings.TrimSpace(issues), strings.TrimSpace(actionItems))
 }
 
 func (s *standupService) Remove(id uint) error { return s.repo.Delete(id) }
-
-func (s *standupService) RecentDates(limit int, projectID uint) ([]DateNav, error) {
-	raw, err := s.repo.RecentDates(limit, projectID)
-	if err != nil {
-		return nil, err
-	}
-	nav := make([]DateNav, 0, len(raw))
-	for _, d := range raw {
-		t, _ := time.Parse("2006-01-02", d)
-		nav = append(nav, DateNav{Raw: d, Display: t.Format("Jan 2")})
-	}
-	return nav, nil
-}
 
 // ─── Deadline ─────────────────────────────────────────────────────────────────
 
@@ -613,9 +599,9 @@ func clamp(v, min, max int) int {
 // ─── Slack Thread ─────────────────────────────────────────────────────────────
 
 type SlackThreadService interface {
-	All(projectID uint, tag string) ([]models.SlackThread, error)
-	AllTags(projectID uint) ([]string, error)
-	Create(messageLink, topic, summary, tags, author string, projectID uint) error
+	All(tag string) ([]models.SlackThread, error)
+	AllTags() ([]string, error)
+	Create(messageLink, topic, summary, tags, author string) error
 	Update(id uint, messageLink, topic, summary, tags, author string) error
 	Delete(id uint) error
 }
@@ -626,8 +612,8 @@ func NewSlackThreadService(r repository.SlackThreadRepository) SlackThreadServic
 	return &slackThreadService{repo: r}
 }
 
-func (s *slackThreadService) All(projectID uint, tag string) ([]models.SlackThread, error) {
-	threads, err := s.repo.All(projectID, tag)
+func (s *slackThreadService) All(tag string) ([]models.SlackThread, error) {
+	threads, err := s.repo.All(tag)
 	if err != nil {
 		return nil, err
 	}
@@ -637,17 +623,16 @@ func (s *slackThreadService) All(projectID uint, tag string) ([]models.SlackThre
 	return threads, nil
 }
 
-func (s *slackThreadService) AllTags(projectID uint) ([]string, error) {
-	return s.repo.AllTags(projectID)
+func (s *slackThreadService) AllTags() ([]string, error) {
+	return s.repo.AllTags()
 }
 
-func (s *slackThreadService) Create(messageLink, topic, summary, tags, author string, projectID uint) error {
+func (s *slackThreadService) Create(messageLink, topic, summary, tags, author string) error {
 	topic = strings.TrimSpace(topic)
 	if topic == "" {
 		return nil
 	}
 	return s.repo.Create(models.SlackThread{
-		ProjectID:   projectID,
 		MessageLink: strings.TrimSpace(messageLink),
 		Topic:       topic,
 		Summary:     strings.TrimSpace(summary),
@@ -696,9 +681,9 @@ func splitTags(csv string) []string {
 // ─── Sticky Note ──────────────────────────────────────────────────────────────
 
 type StickyNoteService interface {
-	All(projectID uint, filter string) ([]models.StickyNote, error)
+	All(filter string) ([]models.StickyNote, error)
 	GetByID(id uint) (models.StickyNote, error)
-	Create(title, content, color string, projectID uint) error
+	Create(title, content, color string) error
 	Update(id uint, title, content, color string) error
 	TogglePin(id uint, pinned bool) error
 	Delete(id uint) error
@@ -710,15 +695,15 @@ func NewStickyNoteService(r repository.StickyNoteRepository) StickyNoteService {
 	return &stickyNoteService{repo: r}
 }
 
-func (s *stickyNoteService) All(projectID uint, filter string) ([]models.StickyNote, error) {
-	return s.repo.All(projectID, filter)
+func (s *stickyNoteService) All(filter string) ([]models.StickyNote, error) {
+	return s.repo.All(filter)
 }
 
 func (s *stickyNoteService) GetByID(id uint) (models.StickyNote, error) {
 	return s.repo.GetByID(id)
 }
 
-func (s *stickyNoteService) Create(title, content, color string, projectID uint) error {
+func (s *stickyNoteService) Create(title, content, color string) error {
 	if strings.TrimSpace(content) == "" {
 		return nil
 	}
@@ -726,10 +711,9 @@ func (s *stickyNoteService) Create(title, content, color string, projectID uint)
 		color = "yellow"
 	}
 	return s.repo.Create(models.StickyNote{
-		ProjectID: projectID,
-		Title:     strings.TrimSpace(title),
-		Content:   content,
-		Color:     color,
+		Title:   strings.TrimSpace(title),
+		Content: content,
+		Color:   color,
 	})
 }
 
