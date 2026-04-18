@@ -57,9 +57,10 @@
           <span class="text-xs font-semibold px-2 py-1 rounded-full {{statusClass .Status}}">{{.Status}}</span>
         </td>
         <td class="px-4 py-3.5 text-right">
-          <form method="POST" action="/standups/{{.ID}}/delete">
-            <button type="submit" class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete</button>
-          </form>
+          <button type="button"
+            data-delete-action="/standups/{{.ID}}/delete"
+            data-delete-name="{{.Member}}'s standup"
+            class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete</button>
         </td>
       </tr>
       {{end}}

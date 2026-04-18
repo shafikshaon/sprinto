@@ -24,9 +24,10 @@
     </div>
     <div class="flex items-center gap-3 flex-shrink-0 ml-6">
       <a href="/releases/{{.ID}}" class="text-sm font-semibold text-indigo-600 hover:underline">View →</a>
-      <form method="POST" action="/releases/{{.ID}}/delete">
-        <button type="submit" class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete</button>
-      </form>
+      <button type="button"
+        data-delete-action="/releases/{{.ID}}/delete"
+        data-delete-name="{{.Name}}"
+        class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete</button>
     </div>
   </div>
   {{end}}

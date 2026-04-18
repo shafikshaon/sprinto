@@ -17,9 +17,10 @@
         {{if .Description}}<p class="text-xs text-gray-400 mt-0.5">{{.Description}}</p>{{end}}
         <p class="text-xs text-gray-400 mt-0.5">{{len .Members}} member{{if ne (len .Members) 1}}s{{end}}</p>
       </div>
-      <form method="POST" action="/projects/{{.ID}}/delete">
-        <button type="submit" class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete</button>
-      </form>
+      <button type="button"
+        data-delete-action="/projects/{{.ID}}/delete"
+        data-delete-name="{{.Name}}"
+        class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete</button>
     </div>
     <div class="px-5 py-4">
       <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Members</p>
@@ -31,10 +32,12 @@
           </div>
           <span class="text-xs font-medium text-gray-700">{{.Name}}</span>
           <span class="text-xs text-gray-400">· {{.Role}}</span>
-          <form method="POST" action="/projects/members/{{.ID}}/remove" class="inline ml-0.5">
-            <input type="hidden" name="project_id" value="{{$.ID}}">
-            <button type="submit" class="text-[10px] text-gray-300 hover:text-red-500 transition-colors font-bold leading-none">✕</button>
-          </form>
+          <button type="button"
+            data-delete-action="/projects/members/{{.ID}}/remove"
+            data-delete-name="{{.Name}}"
+            data-delete-extra-name="project_id"
+            data-delete-extra-value="{{$.ID}}"
+            class="text-[10px] text-gray-300 hover:text-red-500 transition-colors font-bold leading-none ml-0.5">✕</button>
         </div>
         {{else}}
         <p class="text-sm text-gray-400 italic">No members yet.</p>

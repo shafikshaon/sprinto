@@ -3,9 +3,11 @@
 package handlers
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -91,6 +93,36 @@ var funcMap = template.FuncMap{
 			return "bg-purple-50 text-purple-700"
 		default:
 			return "bg-gray-100 text-gray-600"
+		}
+	},
+	"gregorianDate": func() string { return gregorianDate(time.Now()) },
+	"hijriDate":     func() string { return hijriDate(time.Now()) },
+	"bengaliDate":   func() string { return bengaliDate(time.Now()) },
+	"timeAgo": func(t time.Time) string {
+		d := time.Since(t)
+		switch {
+		case d < time.Minute:
+			return "just now"
+		case d < time.Hour:
+			m := int(d.Minutes())
+			if m == 1 {
+				return "1 minute ago"
+			}
+			return fmt.Sprintf("%d minutes ago", m)
+		case d < 24*time.Hour:
+			h := int(d.Hours())
+			if h == 1 {
+				return "1 hour ago"
+			}
+			return fmt.Sprintf("%d hours ago", h)
+		case d < 7*24*time.Hour:
+			days := int(d.Hours() / 24)
+			if days == 1 {
+				return "1 day ago"
+			}
+			return fmt.Sprintf("%d days ago", days)
+		default:
+			return t.Format("Jan 2, 2006")
 		}
 	},
 	"urgencyClass": func(days int) string {

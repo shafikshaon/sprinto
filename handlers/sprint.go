@@ -10,9 +10,15 @@ import (
 )
 
 type SprintsData struct {
-	Meta   Meta
-	Sprint models.Sprint
-	Stats  models.SprintStats
+	Meta    Meta
+	Sprint  models.Sprint
+	Stats   models.SprintStats
+	Members []models.TeamMember
+}
+
+type SprintTaskData struct {
+	Meta Meta
+	Task models.SprintTask
 }
 
 type SprintHandler struct {
@@ -35,10 +41,15 @@ func (h *SprintHandler) List(c *gin.Context) {
 		sprintLabel += " · " + sprint.StartDate + " – " + sprint.EndDate
 	}
 	allProjects, activeProject := projectMeta(c)
+	var members []models.TeamMember
+	if activeProject != nil {
+		members = activeProject.Members
+	}
 	render(c, "sprints", SprintsData{
-		Meta:   Meta{Title: "Sprint Board", CurrentPage: "sprints", ActionLabel: "Add Task", SprintLabel: sprintLabel, AllProjects: allProjects, ActiveProject: activeProject},
-		Sprint: sprint,
-		Stats:  models.ComputeStats(sprint.Tasks),
+		Meta:    Meta{Title: "Sprint Board", CurrentPage: "sprints", ActionLabel: "Add Task", SprintLabel: sprintLabel, AllProjects: allProjects, ActiveProject: activeProject},
+		Sprint:  sprint,
+		Stats:   models.ComputeStats(sprint.Tasks),
+		Members: members,
 	})
 }
 
@@ -47,7 +58,7 @@ func (h *SprintHandler) CreateTask(c *gin.Context) {
 	h.svc.AddTask(
 		uint(sprintID),
 		c.PostForm("title"),
-		c.PostForm("assignee"),
+		c.PostFormArray("assignees"),
 		c.PostForm("status"),
 		c.PostForm("priority"),
 	)
@@ -65,4 +76,31 @@ func (h *SprintHandler) UpdateProgress(c *gin.Context) {
 	progress, _ := strconv.Atoi(c.PostForm("progress"))
 	h.svc.UpdateProgress(uint(sprintID), progress)
 	redirectTo(c, "/sprints")
+}
+
+func (h *SprintHandler) TaskDetail(c *gin.Context) {
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	task, err := h.svc.TaskByID(uint(id))
+	if err != nil {
+		c.String(404, "Task not found")
+		return
+	}
+	allProjects, activeProject := projectMeta(c)
+	render(c, "sprint_task", SprintTaskData{
+		Meta: Meta{Title: task.Title, CurrentPage: "sprints", AllProjects: allProjects, ActiveProject: activeProject},
+		Task: task,
+	})
+}
+
+func (h *SprintHandler) AddComment(c *gin.Context) {
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	h.svc.AddComment(uint(id), c.PostForm("author"), c.PostForm("content"))
+	redirectTo(c, "/sprints/tasks/"+c.Param("id"))
+}
+
+func (h *SprintHandler) DeleteComment(c *gin.Context) {
+	commentID, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	taskID := c.PostForm("task_id")
+	h.svc.DeleteComment(uint(commentID))
+	redirectTo(c, "/sprints/tasks/"+taskID)
 }

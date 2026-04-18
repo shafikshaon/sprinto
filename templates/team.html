@@ -47,9 +47,10 @@
           </div>
         </td>
         <td class="px-4 py-3.5 text-right">
-          <form method="POST" action="/team/{{.ID}}/delete">
-            <button type="submit" class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete</button>
-          </form>
+          <button type="button"
+            data-delete-action="/team/{{.ID}}/delete"
+            data-delete-name="{{.Name}}"
+            class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete</button>
         </td>
       </tr>
       {{end}}

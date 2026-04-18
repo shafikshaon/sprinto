@@ -15,11 +15,13 @@ TRUNCATE TABLE
   release_stories,
   release_stages,
   releases,
+  dev_task_comments,
   dev_tasks,
   meeting_action_items,
   meetings,
   deadlines,
   standups,
+  sprint_task_comments,
   sprint_tasks,
   sprints,
   project_members,
@@ -75,7 +77,7 @@ INSERT INTO sprints (id, project_id, name, goal, progress, start_date, end_date,
 -- =============================================================================
 
 -- ── Platform — Sprint 12 ──────────────────────────────────────────────────────
-INSERT INTO sprint_tasks (sprint_id, title, assignee, status, priority, created_at, updated_at) VALUES
+INSERT INTO sprint_tasks (sprint_id, title, assignees, status, priority, created_at, updated_at) VALUES
   (1, 'Fix authentication token refresh',    'Alice Chen',   'In Progress', 'High',   NOW(), NOW()),
   (1, 'Implement OAuth2 provider',           'Bob Martinez', 'In Progress', 'High',   NOW(), NOW()),
   (1, 'Database migration script',           'Carol Singh',  'Done',        'Medium', NOW(), NOW()),
@@ -88,7 +90,7 @@ INSERT INTO sprint_tasks (sprint_id, title, assignee, status, priority, created_
   (1, 'Performance regression tests',        'Eva Park',     'In Progress', 'Medium', NOW(), NOW());
 
 -- ── Mobile — Sprint 8 ─────────────────────────────────────────────────────────
-INSERT INTO sprint_tasks (sprint_id, title, assignee, status, priority, created_at, updated_at) VALUES
+INSERT INTO sprint_tasks (sprint_id, title, assignees, status, priority, created_at, updated_at) VALUES
   (2, 'Push notification service integration',  'Frank Liu',    'In Progress', 'High',   NOW(), NOW()),
   (2, 'Offline data sync for home screen',      'Grace Obi',    'In Progress', 'High',   NOW(), NOW()),
   (2, 'iOS deep link handling',                 'Frank Liu',    'Todo',        'Medium', NOW(), NOW()),
@@ -99,7 +101,7 @@ INSERT INTO sprint_tasks (sprint_id, title, assignee, status, priority, created_
   (2, 'App Store release notes draft',          'Bob Martinez', 'Todo',        'Low',    NOW(), NOW());
 
 -- ── Security — Sprint 5 ───────────────────────────────────────────────────────
-INSERT INTO sprint_tasks (sprint_id, title, assignee, status, priority, created_at, updated_at) VALUES
+INSERT INTO sprint_tasks (sprint_id, title, assignees, status, priority, created_at, updated_at) VALUES
   (3, 'Remediate pen test finding: SQL injection in search',  'Henry Walsh', 'Done',        'Critical', NOW(), NOW()),
   (3, 'Remediate pen test finding: IDOR in user API',         'Alice Chen',  'In Progress', 'Critical', NOW(), NOW()),
   (3, 'Implement audit log for all admin actions',            'Henry Walsh', 'In Progress', 'High',     NOW(), NOW()),
@@ -290,7 +292,7 @@ INSERT INTO meeting_action_items (meeting_id, task, owner, due_date, done, creat
 -- =============================================================================
 
 -- ── Platform ──────────────────────────────────────────────────────────────────
-INSERT INTO dev_tasks (project_id, title, type, assignee, status, priority, created_at, updated_at) VALUES
+INSERT INTO dev_tasks (project_id, title, type, assignees, status, priority, created_at, updated_at) VALUES
   (1, 'Migrate REST endpoints to OpenAPI spec',      'Improvement', 'Alice Chen',   'In Progress', 'High',   NOW(), NOW()),
   (1, 'Upgrade Go version to 1.22',                  'Tech Debt',   'Dan Kim',      'In Progress', 'Medium', NOW(), NOW()),
   (1, 'Add Swagger UI for API documentation',        'Improvement', 'Bob Martinez', 'Todo',        'Medium', NOW(), NOW()),
@@ -301,7 +303,7 @@ INSERT INTO dev_tasks (project_id, title, type, assignee, status, priority, crea
   (1, 'Load testing with k6',                        'Research',    'Eva Park',     'Todo',        'Medium', NOW(), NOW());
 
 -- ── Mobile ────────────────────────────────────────────────────────────────────
-INSERT INTO dev_tasks (project_id, title, type, assignee, status, priority, created_at, updated_at) VALUES
+INSERT INTO dev_tasks (project_id, title, type, assignees, status, priority, created_at, updated_at) VALUES
   (2, 'Upgrade React Native to 0.74',                        'Tech Debt',   'Bob Martinez', 'Todo',        'High',   NOW(), NOW()),
   (2, 'Implement biometric auth (Face ID / fingerprint)',    'Improvement', 'Frank Liu',    'Todo',        'Medium', NOW(), NOW()),
   (2, 'Benchmark SQLite vs Realm for offline storage',       'Research',    'Carol Singh',  'In Progress', 'Medium', NOW(), NOW()),
@@ -309,7 +311,7 @@ INSERT INTO dev_tasks (project_id, title, type, assignee, status, priority, crea
   (2, 'Add crash analytics with Crashlytics',                'Improvement', 'Frank Liu',    'Todo',        'High',   NOW(), NOW());
 
 -- ── Security ──────────────────────────────────────────────────────────────────
-INSERT INTO dev_tasks (project_id, title, type, assignee, status, priority, created_at, updated_at) VALUES
+INSERT INTO dev_tasks (project_id, title, type, assignees, status, priority, created_at, updated_at) VALUES
   (3, 'Evaluate HashiCorp Vault vs AWS Secrets Manager', 'Research',    'Dan Kim',     'In Progress', 'High',     NOW(), NOW()),
   (3, 'Add rate limiting to authentication endpoints',   'Improvement', 'Henry Walsh', 'Todo',        'High',     NOW(), NOW()),
   (3, 'Remove hardcoded credentials from legacy config', 'Tech Debt',   'Dan Kim',     'Done',        'Critical', NOW(), NOW()),
@@ -414,11 +416,13 @@ SELECT setval('team_members_id_seq',           (SELECT MAX(id) FROM team_members
 SELECT setval('projects_id_seq',               (SELECT MAX(id) FROM projects));
 SELECT setval('sprints_id_seq',                (SELECT MAX(id) FROM sprints));
 SELECT setval('sprint_tasks_id_seq',           (SELECT MAX(id) FROM sprint_tasks));
+SELECT setval('sprint_task_comments_id_seq',   1, FALSE);
 SELECT setval('standups_id_seq',               (SELECT MAX(id) FROM standups));
 SELECT setval('deadlines_id_seq',              (SELECT MAX(id) FROM deadlines));
 SELECT setval('meetings_id_seq',               (SELECT MAX(id) FROM meetings));
 SELECT setval('meeting_action_items_id_seq',   (SELECT MAX(id) FROM meeting_action_items));
 SELECT setval('dev_tasks_id_seq',              (SELECT MAX(id) FROM dev_tasks));
+SELECT setval('dev_task_comments_id_seq',      1, FALSE);
 SELECT setval('releases_id_seq',               (SELECT MAX(id) FROM releases));
 SELECT setval('release_stages_id_seq',         (SELECT MAX(id) FROM release_stages));
 SELECT setval('release_stories_id_seq',        (SELECT MAX(id) FROM release_stories));

@@ -61,9 +61,10 @@
           <span class="text-xs font-semibold px-2 py-1 rounded-full {{priorityClass .Priority}}">{{.Priority}}</span>
         </td>
         <td class="px-4 py-3.5 text-right">
-          <form method="POST" action="/deadlines/{{.ID}}/delete">
-            <button type="submit" class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete</button>
-          </form>
+          <button type="button"
+            data-delete-action="/deadlines/{{.ID}}/delete"
+            data-delete-name="{{.Title}}"
+            class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete</button>
         </td>
       </tr>
       {{end}}

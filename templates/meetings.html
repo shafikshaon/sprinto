@@ -21,9 +21,10 @@
           <span class="text-xs font-medium bg-indigo-50 text-indigo-600 border border-indigo-100 px-2 py-0.5 rounded-full">{{.}}</span>
           {{end}}
         </div>
-        <form method="POST" action="/meetings/{{.ID}}/delete">
-          <button type="submit" class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium ml-1">Delete</button>
-        </form>
+        <button type="button"
+          data-delete-action="/meetings/{{.ID}}/delete"
+          data-delete-name="{{.Title}}"
+          class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium ml-1">Delete</button>
       </div>
     </div>
     <div class="px-5 py-3.5 border-b border-gray-50">

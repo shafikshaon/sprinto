@@ -38,16 +38,21 @@
     <tbody class="divide-y divide-gray-50">
       {{range .DevTasks}}
       <tr class="hover:bg-gray-50 transition-colors">
-        <td class="px-5 py-3.5"><span class="text-sm font-medium text-gray-800">{{.Title}}</span></td>
+        <td class="px-5 py-3.5">
+          <a href="/devtasks/{{.ID}}" class="text-sm font-medium text-gray-800 hover:text-indigo-600 hover:underline">{{.Title}}</a>
+          {{if .Comments}}<span class="ml-2 text-xs bg-indigo-50 text-indigo-500 font-semibold px-1.5 py-0.5 rounded-full">{{len .Comments}}</span>{{end}}
+        </td>
         <td class="px-4 py-3.5">
           <span class="text-xs font-semibold px-2 py-1 rounded-full {{typeClass .Type}}">{{.Type}}</span>
         </td>
         <td class="px-4 py-3.5">
-          <div class="flex items-center gap-2">
-            <div class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
-              <span class="text-indigo-700 font-bold text-[10px]">{{initials .Assignee}}</span>
+          <div class="flex items-center gap-1">
+            {{range .Assignees}}
+            <div class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0" title="{{.}}">
+              <span class="text-indigo-700 font-bold text-[10px]">{{initials .}}</span>
             </div>
-            <span class="text-sm text-gray-500">{{.Assignee}}</span>
+            {{end}}
+            {{if not .Assignees}}<span class="text-xs text-gray-300">—</span>{{end}}
           </div>
         </td>
         <td class="px-4 py-3.5">
@@ -57,9 +62,10 @@
           <span class="text-xs font-semibold px-2 py-1 rounded-full {{priorityClass .Priority}}">{{.Priority}}</span>
         </td>
         <td class="px-4 py-3.5 text-right">
-          <form method="POST" action="/devtasks/{{.ID}}/delete">
-            <button type="submit" class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete</button>
-          </form>
+          <button type="button"
+            data-delete-action="/devtasks/{{.ID}}/delete"
+            data-delete-name="{{.Title}}"
+            class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete</button>
         </td>
       </tr>
       {{end}}
@@ -89,9 +95,16 @@
           class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
       </div>
       <div>
-        <label class="text-xs font-medium text-gray-600 block mb-1.5">Assignee</label>
-        <input name="assignee" type="text" placeholder="Team member name"
+        <label class="text-xs font-medium text-gray-600 block mb-1.5">Assignees</label>
+        {{if .Members}}
+        <select name="assignees" multiple class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400 h-24">
+          {{range .Members}}<option value="{{.Name}}">{{.Name}}{{if .Role}} · {{.Role}}{{end}}</option>{{end}}
+        </select>
+        <p class="text-xs text-gray-400 mt-1">Hold Ctrl / Cmd to select multiple</p>
+        {{else}}
+        <input name="assignees" type="text" placeholder="Team member name"
           class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+        {{end}}
       </div>
       <div class="grid grid-cols-3 gap-3">
         <div>

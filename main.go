@@ -67,7 +67,10 @@ func main() {
 
 	r.GET("/sprints", sprintH.List)
 	r.POST("/sprints/tasks", sprintH.CreateTask)
+	r.GET("/sprints/tasks/:id", sprintH.TaskDetail)
 	r.POST("/sprints/tasks/:id/delete", sprintH.DeleteTask)
+	r.POST("/sprints/tasks/:id/comments", sprintH.AddComment)
+	r.POST("/sprints/comments/:id/delete", sprintH.DeleteComment)
 	r.POST("/sprints/progress", sprintH.UpdateProgress)
 
 	r.GET("/standups", standupH.List)
@@ -84,7 +87,10 @@ func main() {
 
 	r.GET("/devtasks", devTaskH.List)
 	r.POST("/devtasks", devTaskH.Create)
+	r.GET("/devtasks/:id", devTaskH.Detail)
 	r.POST("/devtasks/:id/delete", devTaskH.Delete)
+	r.POST("/devtasks/:id/comments", devTaskH.AddComment)
+	r.POST("/devtasks/comments/:id/delete", devTaskH.DeleteComment)
 
 	r.GET("/releases", releaseH.List)
 	r.POST("/releases", releaseH.Create)

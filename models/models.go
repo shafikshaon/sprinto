@@ -18,12 +18,24 @@ type Sprint struct {
 
 type SprintTask struct {
 	gorm.Model
-	SprintID uint   `gorm:"not null;index"`
-	Title    string `gorm:"not null"`
-	Assignee string
-	Status   string `gorm:"default:'Todo'"`
-	Priority string `gorm:"default:'Medium'"`
+	SprintID    uint                `gorm:"not null;index"`
+	Title       string              `gorm:"not null"`
+	AssigneeCSV string              `gorm:"column:assignees"`
+	Status      string              `gorm:"default:'Todo'"`
+	Priority    string              `gorm:"default:'Medium'"`
+	Comments    []SprintTaskComment `gorm:"foreignKey:TaskID"`
+	// Computed by service — not persisted
+	Assignees []string `gorm:"-"`
 }
+
+type SprintTaskComment struct {
+	gorm.Model
+	TaskID  uint   `gorm:"not null;index"`
+	Author  string `gorm:"not null"`
+	Content string `gorm:"not null"`
+}
+
+func (SprintTaskComment) TableName() string { return "sprint_task_comments" }
 
 type SprintStats struct {
 	Todo       int
@@ -108,15 +120,27 @@ type Meeting struct {
 
 type DevTask struct {
 	gorm.Model
-	ProjectID uint   `gorm:"index"`
-	Title     string `gorm:"not null"`
-	Type      string `gorm:"default:'Improvement'"`
-	Assignee  string
-	Status    string `gorm:"default:'Todo'"`
-	Priority  string `gorm:"default:'Medium'"`
+	ProjectID   uint             `gorm:"index"`
+	Title       string           `gorm:"not null"`
+	Type        string           `gorm:"default:'Improvement'"`
+	AssigneeCSV string           `gorm:"column:assignees"`
+	Status      string           `gorm:"default:'Todo'"`
+	Priority    string           `gorm:"default:'Medium'"`
+	Comments    []DevTaskComment `gorm:"foreignKey:TaskID"`
+	// Computed by service — not persisted
+	Assignees []string `gorm:"-"`
 }
 
 func (DevTask) TableName() string { return "dev_tasks" }
+
+type DevTaskComment struct {
+	gorm.Model
+	TaskID  uint   `gorm:"not null;index"`
+	Author  string `gorm:"not null"`
+	Content string `gorm:"not null"`
+}
+
+func (DevTaskComment) TableName() string { return "dev_task_comments" }
 
 // ─── Release ──────────────────────────────────────────────────────────────────
 

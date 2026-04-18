@@ -1,0 +1,92 @@
+{{define "content"}}
+
+<!-- ── Task Header ─────────────────────────────────────────────────── -->
+<div class="bg-white rounded-lg border border-gray-200 px-5 py-4 mb-4">
+  <a href="/devtasks" class="text-xs text-gray-400 hover:text-indigo-600 font-medium">← Dev Tasks</a>
+  <div class="flex items-start justify-between mt-2.5">
+    <div class="min-w-0">
+      <h2 class="text-sm font-semibold text-gray-900">{{.Task.Title}}</h2>
+      <div class="flex items-center gap-2.5 mt-2">
+        {{if .Task.Assignees}}
+        <div class="flex items-center gap-1.5">
+          {{range .Task.Assignees}}
+          <div class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0" title="{{.}}">
+            <span class="text-indigo-700 font-bold text-[10px]">{{initials .}}</span>
+          </div>
+          {{end}}
+          <span class="text-xs text-gray-500">{{range $i, $a := .Task.Assignees}}{{if $i}}, {{end}}{{$a}}{{end}}</span>
+        </div>
+        {{end}}
+        <span class="text-xs font-semibold px-2 py-0.5 rounded-full {{typeClass .Task.Type}}">{{.Task.Type}}</span>
+        <span class="text-xs font-semibold px-2 py-0.5 rounded-full {{statusClass .Task.Status}}">{{.Task.Status}}</span>
+        <span class="text-xs font-semibold px-2 py-0.5 rounded-full {{priorityClass .Task.Priority}}">{{.Task.Priority}}</span>
+      </div>
+    </div>
+    <button type="button"
+      data-delete-action="/devtasks/{{.Task.ID}}/delete"
+      data-delete-name="{{.Task.Title}}"
+      class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete Task</button>
+  </div>
+</div>
+
+<!-- ── Comments ────────────────────────────────────────────────────── -->
+<div class="bg-white rounded-lg border border-gray-200 overflow-hidden mb-4">
+  <div class="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
+    <h3 class="text-sm font-semibold text-gray-800">Comments</h3>
+    <span class="text-xs text-gray-400">{{len .Task.Comments}} comment{{if ne (len .Task.Comments) 1}}s{{end}}</span>
+  </div>
+
+  {{if not .Task.Comments}}
+  <div class="px-5 py-10 text-center">
+    <p class="text-sm font-medium text-gray-400">No comments yet</p>
+    <p class="text-xs text-gray-300 mt-1">Be the first to leave a comment on this task</p>
+  </div>
+  {{else}}
+  <div class="divide-y divide-gray-50">
+    {{range .Task.Comments}}
+    <div class="px-5 py-4 flex items-start gap-3 hover:bg-gray-50 transition-colors group">
+      <div class="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+        <span class="text-indigo-700 font-semibold text-xs">{{initials .Author}}</span>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-sm font-semibold text-gray-800">{{.Author}}</span>
+          <span class="text-xs text-gray-400">{{timeAgo .CreatedAt}}</span>
+        </div>
+        <p class="text-sm text-gray-600 leading-relaxed">{{.Content}}</p>
+      </div>
+      <button type="button"
+        data-delete-action="/devtasks/comments/{{.ID}}/delete"
+        data-delete-name="comment by {{.Author}}"
+        data-delete-extra-name="task_id"
+        data-delete-extra-value="{{$.Task.ID}}"
+        class="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 text-xs text-gray-300 hover:text-red-500 transition-colors font-bold">✕</button>
+    </div>
+    {{end}}
+  </div>
+  {{end}}
+</div>
+
+<!-- ── Add Comment ─────────────────────────────────────────────────── -->
+<div class="bg-white rounded-lg border border-gray-200 px-5 py-4">
+  <h3 class="text-sm font-semibold text-gray-800 mb-3">Add Comment</h3>
+  <form method="POST" action="/devtasks/{{.Task.ID}}/comments">
+    <div class="space-y-3">
+      <div>
+        <label class="text-xs font-medium text-gray-600 block mb-1.5">Your Name</label>
+        <input name="author" type="text" placeholder="e.g. Alice Chen"
+          class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+      </div>
+      <div>
+        <label class="text-xs font-medium text-gray-600 block mb-1.5">Comment <span class="text-red-400">*</span></label>
+        <textarea name="content" rows="3" required placeholder="Add a comment, update, or note..."
+          class="w-full text-sm border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:border-indigo-400 resize-none"></textarea>
+      </div>
+      <div>
+        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-md transition-colors">Post Comment</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+{{end}}

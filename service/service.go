@@ -18,9 +18,12 @@ import (
 
 type SprintService interface {
 	ActiveSprint(projectID uint) (models.Sprint, error)
-	AddTask(sprintID uint, title, assignee, status, priority string) error
+	TaskByID(id uint) (models.SprintTask, error)
+	AddTask(sprintID uint, title string, assignees []string, status, priority string) error
 	RemoveTask(id uint) error
 	UpdateProgress(sprintID uint, progress int) error
+	AddComment(taskID uint, author, content string) error
+	DeleteComment(id uint) error
 }
 
 type sprintService struct{ repo repository.SprintRepository }
@@ -34,26 +37,69 @@ func (s *sprintService) ActiveSprint(projectID uint) (models.Sprint, error) {
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return models.Sprint{}, nil
 	}
+	if err == nil {
+		for i := range sprint.Tasks {
+			sprint.Tasks[i].Assignees = splitAssignees(sprint.Tasks[i].AssigneeCSV)
+		}
+	}
 	return sprint, err
 }
 
-func (s *sprintService) AddTask(sprintID uint, title, assignee, status, priority string) error {
+func (s *sprintService) AddTask(sprintID uint, title string, assignees []string, status, priority string) error {
 	if strings.TrimSpace(title) == "" {
 		return nil
 	}
 	return s.repo.CreateTask(models.SprintTask{
-		SprintID: sprintID,
-		Title:    strings.TrimSpace(title),
-		Assignee: strings.TrimSpace(assignee),
-		Status:   status,
-		Priority: priority,
+		SprintID:    sprintID,
+		Title:       strings.TrimSpace(title),
+		AssigneeCSV: strings.Join(assignees, ","),
+		Status:      status,
+		Priority:    priority,
 	})
 }
 
+func (s *sprintService) TaskByID(id uint) (models.SprintTask, error) {
+	task, err := s.repo.TaskByID(id)
+	if err == nil {
+		task.Assignees = splitAssignees(task.AssigneeCSV)
+	}
+	return task, err
+}
+
+func splitAssignees(csv string) []string {
+	var out []string
+	for _, p := range strings.Split(csv, ",") {
+		p = strings.TrimSpace(p)
+		if p != "" {
+			out = append(out, p)
+		}
+	}
+	return out
+}
+
 func (s *sprintService) RemoveTask(id uint) error { return s.repo.DeleteTask(id) }
+
 func (s *sprintService) UpdateProgress(id uint, p int) error {
 	return s.repo.UpdateProgress(id, clamp(p, 0, 100))
 }
+
+func (s *sprintService) AddComment(taskID uint, author, content string) error {
+	author = strings.TrimSpace(author)
+	content = strings.TrimSpace(content)
+	if content == "" {
+		return nil
+	}
+	if author == "" {
+		author = "Anonymous"
+	}
+	return s.repo.AddComment(models.SprintTaskComment{
+		TaskID:  taskID,
+		Author:  author,
+		Content: content,
+	})
+}
+
+func (s *sprintService) DeleteComment(id uint) error { return s.repo.DeleteComment(id) }
 
 // ─── Standup ──────────────────────────────────────────────────────────────────
 
@@ -210,9 +256,12 @@ func (s *meetingService) Remove(id uint) error { return s.repo.Delete(id) }
 
 type DevTaskService interface {
 	All(projectID uint) ([]models.DevTask, error)
-	Add(title, typ, assignee, status, priority string, projectID uint) error
+	ByID(id uint) (models.DevTask, error)
+	Add(title, typ string, assignees []string, status, priority string, projectID uint) error
 	Remove(id uint) error
 	OpenCountsByType(projectID uint) (map[string]int, error)
+	AddComment(taskID uint, author, content string) error
+	DeleteComment(id uint) error
 }
 
 type devTaskService struct{ repo repository.DevTaskRepository }
@@ -222,27 +271,60 @@ func NewDevTaskService(r repository.DevTaskRepository) DevTaskService {
 }
 
 func (s *devTaskService) All(projectID uint) ([]models.DevTask, error) {
-	return s.repo.All(projectID)
+	tasks, err := s.repo.All(projectID)
+	if err == nil {
+		for i := range tasks {
+			tasks[i].Assignees = splitAssignees(tasks[i].AssigneeCSV)
+		}
+	}
+	return tasks, err
 }
 
-func (s *devTaskService) Add(title, typ, assignee, status, priority string, projectID uint) error {
+func (s *devTaskService) Add(title, typ string, assignees []string, status, priority string, projectID uint) error {
 	if strings.TrimSpace(title) == "" {
 		return nil
 	}
 	return s.repo.Create(models.DevTask{
-		ProjectID: projectID,
-		Title:     strings.TrimSpace(title),
-		Type:      typ,
-		Assignee:  strings.TrimSpace(assignee),
-		Status:    status,
-		Priority:  priority,
+		ProjectID:   projectID,
+		Title:       strings.TrimSpace(title),
+		Type:        typ,
+		AssigneeCSV: strings.Join(assignees, ","),
+		Status:      status,
+		Priority:    priority,
 	})
 }
 
+func (s *devTaskService) ByID(id uint) (models.DevTask, error) {
+	task, err := s.repo.ByID(id)
+	if err == nil {
+		task.Assignees = splitAssignees(task.AssigneeCSV)
+	}
+	return task, err
+}
+
 func (s *devTaskService) Remove(id uint) error { return s.repo.Delete(id) }
+
 func (s *devTaskService) OpenCountsByType(projectID uint) (map[string]int, error) {
 	return s.repo.OpenCountsByType(projectID)
 }
+
+func (s *devTaskService) AddComment(taskID uint, author, content string) error {
+	author = strings.TrimSpace(author)
+	content = strings.TrimSpace(content)
+	if content == "" {
+		return nil
+	}
+	if author == "" {
+		author = "Anonymous"
+	}
+	return s.repo.AddComment(models.DevTaskComment{
+		TaskID:  taskID,
+		Author:  author,
+		Content: content,
+	})
+}
+
+func (s *devTaskService) DeleteComment(id uint) error { return s.repo.DeleteComment(id) }
 
 // ─── Release ──────────────────────────────────────────────────────────────────
 

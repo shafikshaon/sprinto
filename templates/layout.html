@@ -170,16 +170,19 @@
         <span class="text-xs text-gray-400 bg-gray-50 border border-gray-200 px-2.5 py-1 rounded-md">{{.Meta.SprintLabel}}</span>
         {{end}}
       </div>
-      <div class="flex items-center gap-2.5">
+      <div class="flex items-center gap-2">
         {{if .Meta.ActiveProject}}
         <span class="text-xs font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-1 rounded-md">{{.Meta.ActiveProject.Name}}</span>
+        <span class="text-gray-200">|</span>
         {{end}}
-        <div class="flex items-center gap-2 pl-2 border-l border-gray-200">
-          <div class="w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center flex-shrink-0">
-            <span class="text-white font-bold text-[10px]">EM</span>
-          </div>
-          <span class="text-xs font-medium text-gray-700">Engineering Manager</span>
-        </div>
+        <!-- Gregorian date -->
+        <span class="text-xs text-gray-600 font-medium">{{gregorianDate}}</span>
+        <span class="text-gray-200">·</span>
+        <!-- Hijri / Arabic date -->
+        <span class="text-xs text-gray-500" dir="rtl" lang="ar">{{hijriDate}}</span>
+        <span class="text-gray-200">·</span>
+        <!-- Bengali date -->
+        <span class="text-xs text-gray-500" lang="bn">{{bengaliDate}}</span>
       </div>
     </header>
 
@@ -205,6 +208,56 @@
 
   </div>
 </div>
+<!-- ── Delete Confirmation Dialog ─────────────────────────────────── -->
+<dialog id="confirm-delete-dialog">
+  <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+    <div class="flex items-center gap-2.5">
+      <div class="w-7 h-7 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+        <svg class="w-3.5 h-3.5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+        </svg>
+      </div>
+      <h3 class="text-sm font-semibold text-gray-900">Delete</h3>
+    </div>
+    <button type="button" onclick="document.getElementById('confirm-delete-dialog').close()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+  </div>
+  <div class="px-5 py-4">
+    <p class="text-sm text-gray-600 leading-relaxed">Are you sure you want to delete <span id="delete-item-name" class="font-semibold text-gray-900"></span>?</p>
+    <p class="text-xs text-gray-400 mt-1">This action cannot be undone.</p>
+  </div>
+  <form id="delete-form" method="POST" class="px-5 pb-5">
+    <input type="hidden" id="delete-extra-input" name="" value="">
+    <div class="flex items-center gap-2">
+      <button type="submit" class="bg-red-500 hover:bg-red-600 text-white text-sm font-semibold px-4 py-2 rounded-md transition-colors">Yes, Delete</button>
+      <button type="button" onclick="document.getElementById('confirm-delete-dialog').close()" class="text-sm text-gray-500 hover:text-gray-700 px-4 py-2 rounded-md border border-gray-200 transition-colors">Cancel</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+(function () {
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-delete-action]');
+    if (!btn) return;
+
+    var action     = btn.dataset.deleteAction;
+    var name       = btn.dataset.deleteName || 'this item';
+    var extraName  = btn.dataset.deleteExtraName  || '';
+    var extraValue = btn.dataset.deleteExtraValue || '';
+
+    document.getElementById('delete-form').action = action;
+    document.getElementById('delete-item-name').textContent = '\u201c' + name + '\u201d';
+
+    var extra = document.getElementById('delete-extra-input');
+    extra.name     = extraName;
+    extra.value    = extraValue;
+    extra.disabled = !extraName;
+
+    document.getElementById('confirm-delete-dialog').showModal();
+  });
+})();
+</script>
+
 </body>
 </html>
 {{end}}

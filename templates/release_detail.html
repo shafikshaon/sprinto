@@ -46,10 +46,12 @@
           </select>
           <button type="submit" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-3 py-1.5 rounded-md transition-colors">Save</button>
         </form>
-        <form method="POST" action="/releases/stages/{{.ID}}/delete">
-          <input type="hidden" name="release_id" value="{{$.Release.ID}}">
-          <button type="submit" class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete</button>
-        </form>
+        <button type="button"
+          data-delete-action="/releases/stages/{{.ID}}/delete"
+          data-delete-name="{{.Name}}"
+          data-delete-extra-name="release_id"
+          data-delete-extra-value="{{$.Release.ID}}"
+          class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete</button>
       </div>
     </div>
 
@@ -100,10 +102,12 @@
                   <input type="hidden" name="status" value="Failed">
                   <button type="submit" class="text-xs text-white bg-red-500 hover:bg-red-600 px-2 py-1 rounded transition-colors font-medium">Fail</button>
                 </form>
-                <form method="POST" action="/releases/stories/{{.ID}}/delete" class="inline">
-                  <input type="hidden" name="release_id" value="{{$.Release.ID}}">
-                  <button type="submit" class="text-xs text-gray-300 hover:text-red-500 transition-colors font-bold ml-1">✕</button>
-                </form>
+                <button type="button"
+                  data-delete-action="/releases/stories/{{.ID}}/delete"
+                  data-delete-name="{{.Title}}"
+                  data-delete-extra-name="release_id"
+                  data-delete-extra-value="{{$.Release.ID}}"
+                  class="text-xs text-gray-300 hover:text-red-500 transition-colors font-bold ml-1">✕</button>
               </div>
             </td>
           </tr>
@@ -145,10 +149,12 @@
               </p>
             </div>
           </div>
-          <form method="POST" action="/releases/slack/{{.ID}}/delete" class="flex-shrink-0">
-            <input type="hidden" name="release_id" value="{{$.Release.ID}}">
-            <button type="submit" class="text-xs text-gray-300 hover:text-red-500 transition-colors font-bold">✕</button>
-          </form>
+          <button type="button"
+            data-delete-action="/releases/slack/{{.ID}}/delete"
+            data-delete-name="Slack update"
+            data-delete-extra-name="release_id"
+            data-delete-extra-value="{{$.Release.ID}}"
+            class="text-xs text-gray-300 hover:text-red-500 transition-colors font-bold flex-shrink-0">✕</button>
         </div>
         {{end}}
       </div>

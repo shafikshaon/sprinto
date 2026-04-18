@@ -16,7 +16,7 @@ import (
 // handler can call projectMeta(c) without needing its own ProjectService.
 func ProjectMiddleware(svc service.ProjectService) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		projects, _ := svc.All()
+		projects, _ := svc.AllWithMembers()
 		var active *models.Project
 		if cookie, err := c.Cookie("active_project"); err == nil && cookie != "" {
 			id, _ := strconv.ParseUint(cookie, 10, 64)

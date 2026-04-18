@@ -22,21 +22,29 @@ func Connect(dsn string) *gorm.DB {
 }
 
 func Migrate(db *gorm.DB) error {
-	return db.AutoMigrate(
+	if err := db.AutoMigrate(
 		&models.Sprint{},
 		&models.SprintTask{},
+		&models.SprintTaskComment{},
 		&models.StandupEntry{},
 		&models.Deadline{},
 		&models.Meeting{},
 		&models.ActionItem{},
 		&models.DevTask{},
+		&models.DevTaskComment{},
 		&models.Release{},
 		&models.ReleaseStage{},
 		&models.ReleaseStory{},
 		&models.ReleaseSlackUpdate{},
 		&models.Project{},
 		&models.TeamMember{},
-	)
+	); err != nil {
+		return err
+	}
+	// Copy old single-assignee column into new multi-assignee CSV column (idempotent)
+	db.Exec("UPDATE sprint_tasks SET assignees = assignee WHERE (assignees IS NULL OR assignees = '') AND assignee IS NOT NULL AND assignee != ''")
+	db.Exec("UPDATE dev_tasks SET assignees = assignee WHERE (assignees IS NULL OR assignees = '') AND assignee IS NOT NULL AND assignee != ''")
+	return nil
 }
 
 func IsEmpty(db *gorm.DB) bool {
@@ -97,16 +105,16 @@ func Seed(db *gorm.DB) error {
 		return err
 	}
 	db.Create(&[]models.SprintTask{
-		{SprintID: platformSprint.ID, Title: "Fix authentication token refresh", Assignee: "Alice Chen", Status: "In Progress", Priority: "High"},
-		{SprintID: platformSprint.ID, Title: "Implement OAuth2 provider", Assignee: "Bob Martinez", Status: "In Progress", Priority: "High"},
-		{SprintID: platformSprint.ID, Title: "Database migration script", Assignee: "Carol Singh", Status: "Done", Priority: "Medium"},
-		{SprintID: platformSprint.ID, Title: "CI/CD pipeline optimisation", Assignee: "Dan Kim", Status: "Todo", Priority: "Medium"},
-		{SprintID: platformSprint.ID, Title: "Write E2E test suite", Assignee: "Eva Park", Status: "Todo", Priority: "High"},
-		{SprintID: platformSprint.ID, Title: "API rate limiting", Assignee: "Alice Chen", Status: "Done", Priority: "Medium"},
-		{SprintID: platformSprint.ID, Title: "Mobile responsive fixes", Assignee: "Bob Martinez", Status: "Todo", Priority: "Low"},
-		{SprintID: platformSprint.ID, Title: "Cache layer implementation", Assignee: "Carol Singh", Status: "In Progress", Priority: "High"},
-		{SprintID: platformSprint.ID, Title: "Docker Compose setup", Assignee: "Dan Kim", Status: "Done", Priority: "Low"},
-		{SprintID: platformSprint.ID, Title: "Performance regression tests", Assignee: "Eva Park", Status: "In Progress", Priority: "Medium"},
+		{SprintID: platformSprint.ID, Title: "Fix authentication token refresh", AssigneeCSV: "Alice Chen", Status: "In Progress", Priority: "High"},
+		{SprintID: platformSprint.ID, Title: "Implement OAuth2 provider", AssigneeCSV: "Bob Martinez", Status: "In Progress", Priority: "High"},
+		{SprintID: platformSprint.ID, Title: "Database migration script", AssigneeCSV: "Carol Singh", Status: "Done", Priority: "Medium"},
+		{SprintID: platformSprint.ID, Title: "CI/CD pipeline optimisation", AssigneeCSV: "Dan Kim", Status: "Todo", Priority: "Medium"},
+		{SprintID: platformSprint.ID, Title: "Write E2E test suite", AssigneeCSV: "Eva Park", Status: "Todo", Priority: "High"},
+		{SprintID: platformSprint.ID, Title: "API rate limiting", AssigneeCSV: "Alice Chen", Status: "Done", Priority: "Medium"},
+		{SprintID: platformSprint.ID, Title: "Mobile responsive fixes", AssigneeCSV: "Bob Martinez", Status: "Todo", Priority: "Low"},
+		{SprintID: platformSprint.ID, Title: "Cache layer implementation", AssigneeCSV: "Carol Singh", Status: "In Progress", Priority: "High"},
+		{SprintID: platformSprint.ID, Title: "Docker Compose setup", AssigneeCSV: "Dan Kim", Status: "Done", Priority: "Low"},
+		{SprintID: platformSprint.ID, Title: "Performance regression tests", AssigneeCSV: "Eva Park", Status: "In Progress", Priority: "Medium"},
 	})
 
 	// ── Platform Standups ─────────────────────────────────────────────────────
@@ -149,14 +157,14 @@ func Seed(db *gorm.DB) error {
 
 	// ── Platform Dev Tasks ────────────────────────────────────────────────────
 	db.Create(&[]models.DevTask{
-		{ProjectID: platform.ID, Title: "Migrate REST endpoints to OpenAPI spec", Type: "Improvement", Assignee: "Alice Chen", Status: "In Progress", Priority: "High"},
-		{ProjectID: platform.ID, Title: "Upgrade Go version to 1.22", Type: "Tech Debt", Assignee: "Dan Kim", Status: "In Progress", Priority: "Medium"},
-		{ProjectID: platform.ID, Title: "Add Swagger UI for API documentation", Type: "Improvement", Assignee: "Bob Martinez", Status: "Todo", Priority: "Medium"},
-		{ProjectID: platform.ID, Title: "Remove deprecated auth middleware", Type: "Tech Debt", Assignee: "Carol Singh", Status: "Done", Priority: "High"},
-		{ProjectID: platform.ID, Title: "Benchmark critical database queries", Type: "Research", Assignee: "Alice Chen", Status: "Todo", Priority: "Low"},
-		{ProjectID: platform.ID, Title: "Setup Sentry error monitoring", Type: "Improvement", Assignee: "Dan Kim", Status: "Todo", Priority: "High"},
-		{ProjectID: platform.ID, Title: "Consolidate app config management", Type: "Tech Debt", Assignee: "Carol Singh", Status: "Todo", Priority: "Medium"},
-		{ProjectID: platform.ID, Title: "Load testing with k6", Type: "Research", Assignee: "Eva Park", Status: "Todo", Priority: "Medium"},
+		{ProjectID: platform.ID, Title: "Migrate REST endpoints to OpenAPI spec", Type: "Improvement", AssigneeCSV: "Alice Chen", Status: "In Progress", Priority: "High"},
+		{ProjectID: platform.ID, Title: "Upgrade Go version to 1.22", Type: "Tech Debt", AssigneeCSV: "Dan Kim", Status: "In Progress", Priority: "Medium"},
+		{ProjectID: platform.ID, Title: "Add Swagger UI for API documentation", Type: "Improvement", AssigneeCSV: "Bob Martinez", Status: "Todo", Priority: "Medium"},
+		{ProjectID: platform.ID, Title: "Remove deprecated auth middleware", Type: "Tech Debt", AssigneeCSV: "Carol Singh", Status: "Done", Priority: "High"},
+		{ProjectID: platform.ID, Title: "Benchmark critical database queries", Type: "Research", AssigneeCSV: "Alice Chen", Status: "Todo", Priority: "Low"},
+		{ProjectID: platform.ID, Title: "Setup Sentry error monitoring", Type: "Improvement", AssigneeCSV: "Dan Kim", Status: "Todo", Priority: "High"},
+		{ProjectID: platform.ID, Title: "Consolidate app config management", Type: "Tech Debt", AssigneeCSV: "Carol Singh", Status: "Todo", Priority: "Medium"},
+		{ProjectID: platform.ID, Title: "Load testing with k6", Type: "Research", AssigneeCSV: "Eva Park", Status: "Todo", Priority: "Medium"},
 	})
 
 	// ── Platform Releases ─────────────────────────────────────────────────────
@@ -201,14 +209,14 @@ func Seed(db *gorm.DB) error {
 		return err
 	}
 	db.Create(&[]models.SprintTask{
-		{SprintID: mobileSprint.ID, Title: "Push notification service integration", Assignee: "Frank Liu", Status: "In Progress", Priority: "High"},
-		{SprintID: mobileSprint.ID, Title: "Offline data sync for home screen", Assignee: "Grace Obi", Status: "In Progress", Priority: "High"},
-		{SprintID: mobileSprint.ID, Title: "iOS deep link handling", Assignee: "Frank Liu", Status: "Todo", Priority: "Medium"},
-		{SprintID: mobileSprint.ID, Title: "Android background fetch", Assignee: "Grace Obi", Status: "Todo", Priority: "Medium"},
-		{SprintID: mobileSprint.ID, Title: "Notification permission flow UI", Assignee: "Bob Martinez", Status: "Done", Priority: "High"},
-		{SprintID: mobileSprint.ID, Title: "SQLite offline schema migration", Assignee: "Carol Singh", Status: "In Progress", Priority: "High"},
-		{SprintID: mobileSprint.ID, Title: "E2E tests for notification scenarios", Assignee: "Eva Park", Status: "Todo", Priority: "Medium"},
-		{SprintID: mobileSprint.ID, Title: "App Store release notes draft", Assignee: "Bob Martinez", Status: "Todo", Priority: "Low"},
+		{SprintID: mobileSprint.ID, Title: "Push notification service integration", AssigneeCSV: "Frank Liu", Status: "In Progress", Priority: "High"},
+		{SprintID: mobileSprint.ID, Title: "Offline data sync for home screen", AssigneeCSV: "Grace Obi", Status: "In Progress", Priority: "High"},
+		{SprintID: mobileSprint.ID, Title: "iOS deep link handling", AssigneeCSV: "Frank Liu", Status: "Todo", Priority: "Medium"},
+		{SprintID: mobileSprint.ID, Title: "Android background fetch", AssigneeCSV: "Grace Obi", Status: "Todo", Priority: "Medium"},
+		{SprintID: mobileSprint.ID, Title: "Notification permission flow UI", AssigneeCSV: "Bob Martinez", Status: "Done", Priority: "High"},
+		{SprintID: mobileSprint.ID, Title: "SQLite offline schema migration", AssigneeCSV: "Carol Singh", Status: "In Progress", Priority: "High"},
+		{SprintID: mobileSprint.ID, Title: "E2E tests for notification scenarios", AssigneeCSV: "Eva Park", Status: "Todo", Priority: "Medium"},
+		{SprintID: mobileSprint.ID, Title: "App Store release notes draft", AssigneeCSV: "Bob Martinez", Status: "Todo", Priority: "Low"},
 	})
 
 	// ── Mobile Standups ───────────────────────────────────────────────────────
@@ -244,11 +252,11 @@ func Seed(db *gorm.DB) error {
 
 	// ── Mobile Dev Tasks ──────────────────────────────────────────────────────
 	db.Create(&[]models.DevTask{
-		{ProjectID: mobile.ID, Title: "Upgrade React Native to 0.74", Type: "Tech Debt", Assignee: "Bob Martinez", Status: "Todo", Priority: "High"},
-		{ProjectID: mobile.ID, Title: "Implement biometric auth (Face ID / fingerprint)", Type: "Improvement", Assignee: "Frank Liu", Status: "Todo", Priority: "Medium"},
-		{ProjectID: mobile.ID, Title: "Benchmark SQLite vs Realm for offline storage", Type: "Research", Assignee: "Carol Singh", Status: "In Progress", Priority: "Medium"},
-		{ProjectID: mobile.ID, Title: "Remove legacy Bluetooth module", Type: "Tech Debt", Assignee: "Grace Obi", Status: "Done", Priority: "Low"},
-		{ProjectID: mobile.ID, Title: "Add crash analytics with Crashlytics", Type: "Improvement", Assignee: "Frank Liu", Status: "Todo", Priority: "High"},
+		{ProjectID: mobile.ID, Title: "Upgrade React Native to 0.74", Type: "Tech Debt", AssigneeCSV: "Bob Martinez", Status: "Todo", Priority: "High"},
+		{ProjectID: mobile.ID, Title: "Implement biometric auth (Face ID / fingerprint)", Type: "Improvement", AssigneeCSV: "Frank Liu", Status: "Todo", Priority: "Medium"},
+		{ProjectID: mobile.ID, Title: "Benchmark SQLite vs Realm for offline storage", Type: "Research", AssigneeCSV: "Carol Singh", Status: "In Progress", Priority: "Medium"},
+		{ProjectID: mobile.ID, Title: "Remove legacy Bluetooth module", Type: "Tech Debt", AssigneeCSV: "Grace Obi", Status: "Done", Priority: "Low"},
+		{ProjectID: mobile.ID, Title: "Add crash analytics with Crashlytics", Type: "Improvement", AssigneeCSV: "Frank Liu", Status: "Todo", Priority: "High"},
 	})
 
 	// ── Mobile Releases ───────────────────────────────────────────────────────
@@ -280,13 +288,13 @@ func Seed(db *gorm.DB) error {
 		return err
 	}
 	db.Create(&[]models.SprintTask{
-		{SprintID: securitySprint.ID, Title: "Remediate pen test finding: SQL injection in search", Assignee: "Henry Walsh", Status: "Done", Priority: "Critical"},
-		{SprintID: securitySprint.ID, Title: "Remediate pen test finding: IDOR in user API", Assignee: "Alice Chen", Status: "In Progress", Priority: "Critical"},
-		{SprintID: securitySprint.ID, Title: "Implement audit log for all admin actions", Assignee: "Henry Walsh", Status: "In Progress", Priority: "High"},
-		{SprintID: securitySprint.ID, Title: "Enable MFA enforcement for admin accounts", Assignee: "Dan Kim", Status: "Done", Priority: "High"},
-		{SprintID: securitySprint.ID, Title: "Review and rotate all production secrets", Assignee: "Dan Kim", Status: "Todo", Priority: "High"},
-		{SprintID: securitySprint.ID, Title: "Document access control matrix for SOC 2", Assignee: "Iris Novak", Status: "In Progress", Priority: "Medium"},
-		{SprintID: securitySprint.ID, Title: "Set up SIEM alert for suspicious login patterns", Assignee: "Henry Walsh", Status: "Todo", Priority: "Medium"},
+		{SprintID: securitySprint.ID, Title: "Remediate pen test finding: SQL injection in search", AssigneeCSV: "Henry Walsh", Status: "Done", Priority: "Critical"},
+		{SprintID: securitySprint.ID, Title: "Remediate pen test finding: IDOR in user API", AssigneeCSV: "Alice Chen", Status: "In Progress", Priority: "Critical"},
+		{SprintID: securitySprint.ID, Title: "Implement audit log for all admin actions", AssigneeCSV: "Henry Walsh", Status: "In Progress", Priority: "High"},
+		{SprintID: securitySprint.ID, Title: "Enable MFA enforcement for admin accounts", AssigneeCSV: "Dan Kim", Status: "Done", Priority: "High"},
+		{SprintID: securitySprint.ID, Title: "Review and rotate all production secrets", AssigneeCSV: "Dan Kim", Status: "Todo", Priority: "High"},
+		{SprintID: securitySprint.ID, Title: "Document access control matrix for SOC 2", AssigneeCSV: "Iris Novak", Status: "In Progress", Priority: "Medium"},
+		{SprintID: securitySprint.ID, Title: "Set up SIEM alert for suspicious login patterns", AssigneeCSV: "Henry Walsh", Status: "Todo", Priority: "Medium"},
 	})
 
 	// ── Security Standups ─────────────────────────────────────────────────────
@@ -321,10 +329,10 @@ func Seed(db *gorm.DB) error {
 
 	// ── Security Dev Tasks ────────────────────────────────────────────────────
 	db.Create(&[]models.DevTask{
-		{ProjectID: security.ID, Title: "Evaluate HashiCorp Vault vs AWS Secrets Manager", Type: "Research", Assignee: "Dan Kim", Status: "In Progress", Priority: "High"},
-		{ProjectID: security.ID, Title: "Add rate limiting to authentication endpoints", Type: "Improvement", Assignee: "Henry Walsh", Status: "Todo", Priority: "High"},
-		{ProjectID: security.ID, Title: "Remove hardcoded credentials from legacy config files", Type: "Tech Debt", Assignee: "Dan Kim", Status: "Done", Priority: "Critical"},
-		{ProjectID: security.ID, Title: "Implement RBAC for API gateway", Type: "Improvement", Assignee: "Alice Chen", Status: "In Progress", Priority: "High"},
+		{ProjectID: security.ID, Title: "Evaluate HashiCorp Vault vs AWS Secrets Manager", Type: "Research", AssigneeCSV: "Dan Kim", Status: "In Progress", Priority: "High"},
+		{ProjectID: security.ID, Title: "Add rate limiting to authentication endpoints", Type: "Improvement", AssigneeCSV: "Henry Walsh", Status: "Todo", Priority: "High"},
+		{ProjectID: security.ID, Title: "Remove hardcoded credentials from legacy config files", Type: "Tech Debt", AssigneeCSV: "Dan Kim", Status: "Done", Priority: "Critical"},
+		{ProjectID: security.ID, Title: "Implement RBAC for API gateway", Type: "Improvement", AssigneeCSV: "Alice Chen", Status: "In Progress", Priority: "High"},
 	})
 
 	// ── Security Releases ─────────────────────────────────────────────────────

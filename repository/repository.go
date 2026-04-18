@@ -12,9 +12,12 @@ import (
 
 type SprintRepository interface {
 	ActiveSprint(projectID uint) (models.Sprint, error)
+	TaskByID(id uint) (models.SprintTask, error)
 	CreateTask(t models.SprintTask) error
 	DeleteTask(id uint) error
 	UpdateProgress(sprintID uint, progress int) error
+	AddComment(c models.SprintTaskComment) error
+	DeleteComment(id uint) error
 }
 
 type sprintRepo struct{ db *gorm.DB }
@@ -25,12 +28,20 @@ func (r *sprintRepo) ActiveSprint(projectID uint) (models.Sprint, error) {
 	var s models.Sprint
 	q := r.db.Preload("Tasks", func(db *gorm.DB) *gorm.DB {
 		return db.Order("created_at ASC")
-	}).Where("active = ?", true)
+	}).Preload("Tasks.Comments").Where("active = ?", true)
 	if projectID > 0 {
 		q = q.Where("project_id = ?", projectID)
 	}
 	result := q.Order("id DESC").First(&s)
 	return s, result.Error
+}
+
+func (r *sprintRepo) TaskByID(id uint) (models.SprintTask, error) {
+	var t models.SprintTask
+	result := r.db.Preload("Comments", func(db *gorm.DB) *gorm.DB {
+		return db.Order("created_at ASC")
+	}).First(&t, id)
+	return t, result.Error
 }
 
 func (r *sprintRepo) CreateTask(t models.SprintTask) error {
@@ -43,6 +54,14 @@ func (r *sprintRepo) DeleteTask(id uint) error {
 
 func (r *sprintRepo) UpdateProgress(sprintID uint, progress int) error {
 	return r.db.Model(&models.Sprint{}).Where("id = ?", sprintID).Update("progress", progress).Error
+}
+
+func (r *sprintRepo) AddComment(c models.SprintTaskComment) error {
+	return r.db.Create(&c).Error
+}
+
+func (r *sprintRepo) DeleteComment(id uint) error {
+	return r.db.Delete(&models.SprintTaskComment{}, id).Error
 }
 
 // ─── Standup ──────────────────────────────────────────────────────────────────
@@ -151,9 +170,12 @@ func (r *meetingRepo) Delete(id uint) error {
 
 type DevTaskRepository interface {
 	All(projectID uint) ([]models.DevTask, error)
+	ByID(id uint) (models.DevTask, error)
 	Create(t models.DevTask) error
 	Delete(id uint) error
 	OpenCountsByType(projectID uint) (map[string]int, error)
+	AddComment(c models.DevTaskComment) error
+	DeleteComment(id uint) error
 }
 
 type devTaskRepo struct{ db *gorm.DB }
@@ -162,12 +184,20 @@ func NewDevTaskRepository(db *gorm.DB) DevTaskRepository { return &devTaskRepo{d
 
 func (r *devTaskRepo) All(projectID uint) ([]models.DevTask, error) {
 	var tasks []models.DevTask
-	q := r.db.Order("created_at DESC")
+	q := r.db.Preload("Comments").Order("created_at DESC")
 	if projectID > 0 {
 		q = q.Where("project_id = ?", projectID)
 	}
 	result := q.Find(&tasks)
 	return tasks, result.Error
+}
+
+func (r *devTaskRepo) ByID(id uint) (models.DevTask, error) {
+	var t models.DevTask
+	result := r.db.Preload("Comments", func(db *gorm.DB) *gorm.DB {
+		return db.Order("created_at ASC")
+	}).First(&t, id)
+	return t, result.Error
 }
 
 func (r *devTaskRepo) Create(t models.DevTask) error {
@@ -176,6 +206,14 @@ func (r *devTaskRepo) Create(t models.DevTask) error {
 
 func (r *devTaskRepo) Delete(id uint) error {
 	return r.db.Delete(&models.DevTask{}, id).Error
+}
+
+func (r *devTaskRepo) AddComment(c models.DevTaskComment) error {
+	return r.db.Create(&c).Error
+}
+
+func (r *devTaskRepo) DeleteComment(id uint) error {
+	return r.db.Delete(&models.DevTaskComment{}, id).Error
 }
 
 func (r *devTaskRepo) OpenCountsByType(projectID uint) (map[string]int, error) {
