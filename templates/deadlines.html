@@ -1,0 +1,114 @@
+{{define "content"}}
+
+<!-- ── Summary Cards ──────────────────────────────────────────────── -->
+<div class="grid grid-cols-4 gap-4 mb-5">
+  <div class="bg-white border border-red-200 rounded-xl px-4 py-3.5">
+    <p class="text-[10px] font-semibold text-red-500 uppercase tracking-wider mb-1">Critical</p>
+    <p class="text-xl font-bold text-red-600">{{.Urgency.Critical}}</p>
+    <p class="text-[10px] text-gray-400 mt-0.5">≤ 3 days</p>
+  </div>
+  <div class="bg-white border border-orange-200 rounded-xl px-4 py-3.5">
+    <p class="text-[10px] font-semibold text-orange-500 uppercase tracking-wider mb-1">High</p>
+    <p class="text-xl font-bold text-orange-500">{{.Urgency.High}}</p>
+    <p class="text-[10px] text-gray-400 mt-0.5">≤ 14 days</p>
+  </div>
+  <div class="bg-white border border-yellow-200 rounded-xl px-4 py-3.5">
+    <p class="text-[10px] font-semibold text-yellow-600 uppercase tracking-wider mb-1">Medium</p>
+    <p class="text-xl font-bold text-yellow-600">{{.Urgency.Medium}}</p>
+    <p class="text-[10px] text-gray-400 mt-0.5">≤ 30 days</p>
+  </div>
+  <div class="bg-white border border-gray-200 rounded-xl px-4 py-3.5">
+    <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Low</p>
+    <p class="text-xl font-bold text-gray-500">{{.Urgency.Low}}</p>
+    <p class="text-[10px] text-gray-400 mt-0.5">30+ days</p>
+  </div>
+</div>
+
+<!-- ── Deadline Table ──────────────────────────────────────────────── -->
+<div class="bg-white rounded-xl border border-gray-200 overflow-hidden mb-5">
+  <div class="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
+    <h2 class="text-sm font-semibold text-gray-800">All Deadlines</h2>
+    <span class="text-xs text-gray-400">{{len .Deadlines}} total</span>
+  </div>
+  <table class="w-full text-sm">
+    <thead>
+      <tr class="bg-gray-50 border-b border-gray-100">
+        <th class="text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-5 py-2.5">Deadline</th>
+        <th class="text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-2.5">Project</th>
+        <th class="text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-2.5">Due Date</th>
+        <th class="text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-2.5">Days Left</th>
+        <th class="text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-2.5">Priority</th>
+        <th class="px-4 py-2.5"></th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-50">
+      {{range .Deadlines}}
+      <tr class="hover:bg-gray-50 transition-colors">
+        <td class="px-5 py-3.5">
+          <div class="flex items-center gap-2.5">
+            {{if le .DaysLeft 3}}<div class="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0"></div>
+            {{else if le .DaysLeft 7}}<div class="w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0"></div>
+            {{else}}<div class="w-1.5 h-1.5 rounded-full bg-green-400 flex-shrink-0"></div>{{end}}
+            <span class="text-xs font-semibold text-gray-800">{{.Title}}</span>
+          </div>
+        </td>
+        <td class="px-4 py-3.5">
+          <span class="text-xs text-gray-500 bg-gray-50 border border-gray-100 px-2 py-0.5 rounded-md">{{.Project}}</span>
+        </td>
+        <td class="px-4 py-3.5"><span class="text-xs text-gray-600">{{.DueDate}}</span></td>
+        <td class="px-4 py-3.5"><span class="text-xs {{urgencyClass .DaysLeft}}">{{.DaysLeft}} days</span></td>
+        <td class="px-4 py-3.5">
+          <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full {{priorityClass .Priority}}">{{.Priority}}</span>
+        </td>
+        <td class="px-4 py-3.5 text-right">
+          <form method="POST" action="/deadlines/{{.ID}}/delete">
+            <button type="submit" class="text-[10px] text-gray-300 hover:text-red-500 transition-colors font-medium">✕</button>
+          </form>
+        </td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+
+<!-- ── Add Deadline Form ───────────────────────────────────────────── -->
+<div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+  <div class="px-5 py-3.5 border-b border-gray-100">
+    <h3 class="text-sm font-semibold text-gray-800">Add Deadline</h3>
+  </div>
+  <form method="POST" action="/deadlines" class="p-5">
+    <div class="grid grid-cols-4 gap-4 mb-4">
+      <div class="col-span-2">
+        <label class="text-xs font-medium text-gray-600 block mb-1">Deadline Name <span class="text-red-400">*</span></label>
+        <input name="title" type="text" required placeholder="e.g. API v2 Launch"
+          class="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+      </div>
+      <div>
+        <label class="text-xs font-medium text-gray-600 block mb-1">Project</label>
+        <input name="project" type="text" placeholder="Platform, Mobile..."
+          class="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+      </div>
+      <div>
+        <label class="text-xs font-medium text-gray-600 block mb-1">Due Date <span class="text-red-400">*</span></label>
+        <input name="due_date" type="date" required
+          class="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+      </div>
+    </div>
+    <div class="flex items-center gap-4">
+      <div>
+        <label class="text-xs font-medium text-gray-600 block mb-1">Priority</label>
+        <select name="priority" class="text-xs border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-400">
+          <option>Medium</option>
+          <option>High</option>
+          <option>Critical</option>
+          <option>Low</option>
+        </select>
+      </div>
+      <button type="submit" class="mt-5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
+        Add Deadline
+      </button>
+    </div>
+  </form>
+</div>
+
+{{end}}
