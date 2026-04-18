@@ -37,6 +37,7 @@ func main() {
 	releaseRepo := repository.NewReleaseRepository(db)
 	projectRepo := repository.NewProjectRepository(db)
 	teamMemberRepo := repository.NewTeamMemberRepository(db)
+	slackThreadRepo := repository.NewSlackThreadRepository(db)
 
 	// ── Services ──────────────────────────────────────────────────
 	authSvc := service.NewAuthService(userRepo)
@@ -48,6 +49,7 @@ func main() {
 	releaseSvc := service.NewReleaseService(releaseRepo)
 	projectSvc := service.NewProjectService(projectRepo)
 	teamMemberSvc := service.NewTeamMemberService(teamMemberRepo)
+	slackThreadSvc := service.NewSlackThreadService(slackThreadRepo)
 
 	// ── Handlers ──────────────────────────────────────────────────
 	authH := handlers.NewAuthHandler(authSvc)
@@ -60,6 +62,7 @@ func main() {
 	releaseH := handlers.NewReleaseHandler(releaseSvc)
 	projectH := handlers.NewProjectHandler(projectSvc, teamMemberSvc)
 	teamH := handlers.NewTeamHandler(teamMemberSvc)
+	slackH := handlers.NewSlackHandler(slackThreadSvc)
 
 	// ── Router ────────────────────────────────────────────────────
 	gin.SetMode(gin.ReleaseMode)
@@ -136,6 +139,11 @@ func main() {
 	protected.GET("/team", teamH.List)
 	protected.POST("/team", teamH.Create)
 	protected.POST("/team/:id/delete", teamH.Delete)
+
+	protected.GET("/slack", slackH.List)
+	protected.POST("/slack", slackH.Create)
+	protected.POST("/slack/:id/update", slackH.Update)
+	protected.POST("/slack/:id/delete", slackH.Delete)
 
 	log.Printf("Sprinto running → http://localhost:%s", cfg.Port)
 	r.Run(":" + cfg.Port)

@@ -39,6 +39,7 @@ func Migrate(db *gorm.DB) error {
 		&models.ReleaseSlackUpdate{},
 		&models.Project{},
 		&models.TeamMember{},
+		&models.SlackThread{},
 	); err != nil {
 		return err
 	}
@@ -347,6 +348,19 @@ func Seed(db *gorm.DB) error {
 	db.Create(&models.ReleaseStory{StageID: ss1.ID, Title: "Session fixation fix — regenerate session on login", Assignee: "Alice Chen", Status: "Passed"})
 	db.Create(&models.ReleaseStory{StageID: ss1.ID, Title: "IDOR fix — object-level authorisation on user API", Assignee: "Alice Chen", Status: "In QA"})
 	db.Create(&models.ReleaseSlackUpdate{StageID: ss1.ID, Channel: "#security-releases", Message: "SQL injection and session fixation fixes verified by Henry. IDOR fix in review.", Author: "Henry Walsh", PostedAt: "Apr 17, 3:00 PM"})
+
+	// ── Slack Threads ─────────────────────────────────────────────────────────
+	db.Create(&[]models.SlackThread{
+		{ProjectID: platform.ID, Channel: "#backend", Topic: "Redis cache eviction strategy", Summary: "Discussed TTL vs LRU for the new cache layer. Agreed to start with TTL=5min for hot paths and revisit after load testing.", TagCSV: "architecture,backend,performance", Author: "Alice Chen"},
+		{ProjectID: platform.ID, Channel: "#incidents", Topic: "Auth service outage post-mortem follow-up", Summary: "Dan flagged that cert expiry alerts are still not wired up after the Apr 16 incident. Needs priority.", TagCSV: "incident,infra", Author: "Dan Kim"},
+		{ProjectID: platform.ID, Channel: "#api-v2", Topic: "Versioning strategy for deprecating v1 endpoints", Summary: "Team leaning toward 6-month deprecation window with header-based version negotiation. No breaking changes in v2 initially.", TagCSV: "architecture,api", Author: "Alice Chen"},
+		{ProjectID: platform.ID, Channel: "#general", Topic: "On-call rotation schedule for Q2", Summary: "Proposed rotating weekly between Alice, Bob, Carol, Dan. Eva on standby for QA-related pages.", TagCSV: "process,oncall", Author: "EM"},
+		{ProjectID: mobile.ID, Channel: "#mobile-ios", Topic: "APNs token refresh edge case", Summary: "Frank found that token refresh fails silently when app is backgrounded during refresh. Needs a retry queue.", TagCSV: "bug,ios,push", Author: "Frank Liu"},
+		{ProjectID: mobile.ID, Channel: "#mobile-android", Topic: "FCM quota limit hit in dev environment", Summary: "Grace flagged the FCM quota issue from standup. Agreed to use a shared test account with higher limits. Dan to provision.", TagCSV: "infra,android,push", Author: "Grace Obi"},
+		{ProjectID: mobile.ID, Channel: "#mobile-releases", Topic: "App Store privacy manifest requirements", Summary: "Apple now requires PrivacyInfo.xcprivacy for notification entitlements. Frank to update before submission deadline Apr 25.", TagCSV: "compliance,ios,release", Author: "Frank Liu"},
+		{ProjectID: security.ID, Channel: "#security", Topic: "Vault upgrade blocking secret rotation", Summary: "Dan can't rotate production secrets until Vault is upgraded from 1.12 to 1.15. Needs infra approval. Blocking the sprint.", TagCSV: "infra,blocker,secrets", Author: "Dan Kim"},
+		{ProjectID: security.ID, Channel: "#soc2", Topic: "Evidence collection window kickoff", Summary: "Auditor confirmed May 1 start for SOC 2 Type II evidence collection. Iris to share the control checklist by Apr 22.", TagCSV: "compliance,soc2", Author: "Iris Novak"},
+	})
 
 	// ── Global (cross-project) meeting ────────────────────────────────────────
 	gm := &models.Meeting{ProjectID: 0, Title: "All-Hands Engineering Sync", Date: "Apr 15, 2026", AttendeeCSV: "Alice Chen,Bob Martinez,Carol Singh,Dan Kim,Eva Park,Frank Liu,Grace Obi,Henry Walsh,Iris Novak", Notes: "Quarterly engineering all-hands. Discussed Q2 roadmap, hiring plan (3 backend, 1 security), and office days policy update."}

@@ -3,6 +3,9 @@
 package repository
 
 import (
+	"sort"
+	"strings"
+
 	"gorm.io/gorm"
 
 	"sprinto/models"
@@ -495,4 +498,73 @@ func (r *teamMemberRepo) Delete(id uint) error {
 	}
 	r.db.Model(&m).Association("Projects").Clear()
 	return r.db.Delete(&m).Error
+}
+
+// ─── Slack Thread ─────────────────────────────────────────────────────────────
+
+type SlackThreadRepository interface {
+	All(projectID uint, tag string) ([]models.SlackThread, error)
+	AllTags(projectID uint) ([]string, error)
+	Create(t models.SlackThread) error
+	Update(id uint, channel, topic, summary, tags, author string) error
+	Delete(id uint) error
+}
+
+type slackThreadRepo struct{ db *gorm.DB }
+
+func NewSlackThreadRepository(db *gorm.DB) SlackThreadRepository {
+	return &slackThreadRepo{db: db}
+}
+
+func (r *slackThreadRepo) All(projectID uint, tag string) ([]models.SlackThread, error) {
+	var threads []models.SlackThread
+	q := r.db.Order("created_at DESC")
+	if projectID > 0 {
+		q = q.Where("project_id = ?", projectID)
+	}
+	if tag != "" {
+		q = q.Where("tags LIKE ?", "%"+tag+"%")
+	}
+	result := q.Find(&threads)
+	return threads, result.Error
+}
+
+func (r *slackThreadRepo) AllTags(projectID uint) ([]string, error) {
+	var threads []models.SlackThread
+	q := r.db.Select("tags")
+	if projectID > 0 {
+		q = q.Where("project_id = ?", projectID)
+	}
+	if err := q.Find(&threads).Error; err != nil {
+		return nil, err
+	}
+	seen := map[string]bool{}
+	var tags []string
+	for _, t := range threads {
+		for _, tag := range strings.Split(t.TagCSV, ",") {
+			tag = strings.TrimSpace(tag)
+			if tag != "" && !seen[tag] {
+				seen[tag] = true
+				tags = append(tags, tag)
+			}
+		}
+	}
+	sort.Strings(tags)
+	return tags, nil
+}
+
+func (r *slackThreadRepo) Create(t models.SlackThread) error { return r.db.Create(&t).Error }
+
+func (r *slackThreadRepo) Update(id uint, channel, topic, summary, tags, author string) error {
+	return r.db.Model(&models.SlackThread{}).Where("id = ?", id).Updates(map[string]interface{}{
+		"channel": channel,
+		"topic":   topic,
+		"summary": summary,
+		"tags":    tags,
+		"author":  author,
+	}).Error
+}
+
+func (r *slackThreadRepo) Delete(id uint) error {
+	return r.db.Delete(&models.SlackThread{}, id).Error
 }
