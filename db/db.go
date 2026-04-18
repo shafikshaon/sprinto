@@ -39,6 +39,7 @@ func Migrate(db *gorm.DB) error {
 		&models.Project{},
 		&models.TeamMember{},
 		&models.SlackThread{},
+		&models.StickyNote{},
 	); err != nil {
 		return err
 	}

@@ -197,6 +197,19 @@ type ReleaseSlackUpdate struct {
 
 func (ReleaseSlackUpdate) TableName() string { return "release_slack_updates" }
 
+// ─── Sticky Note ──────────────────────────────────────────────────────────────
+
+type StickyNote struct {
+	gorm.Model
+	ProjectID uint   `gorm:"index"`
+	Title     string
+	Content   string `gorm:"type:text"`
+	Color     string `gorm:"default:'yellow'"` // yellow, green, blue, pink, purple
+	Pinned    bool   `gorm:"default:false"`
+}
+
+func (StickyNote) TableName() string { return "sticky_notes" }
+
 // ─── Slack Thread ─────────────────────────────────────────────────────────────
 
 type SlackThread struct {

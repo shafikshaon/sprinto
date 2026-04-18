@@ -1,0 +1,127 @@
+{{define "content"}}
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<style>
+  .note-yellow { background:#fefce8; border-color:#fde047; }
+  .note-green  { background:#f0fdf4; border-color:#86efac; }
+  .note-blue   { background:#eff6ff; border-color:#93c5fd; }
+  .note-pink   { background:#fdf2f8; border-color:#f9a8d4; }
+  .note-purple { background:#faf5ff; border-color:#d8b4fe; }
+  .note-yellow .note-title { color:#854d0e; }
+  .note-green  .note-title { color:#166534; }
+  .note-blue   .note-title { color:#1e40af; }
+  .note-pink   .note-title { color:#9d174d; }
+  .note-purple .note-title { color:#6b21a8; }
+  .md h1,.md h2,.md h3 { font-weight:700; margin-bottom:.3rem; }
+  .md h1 { font-size:1rem; }
+  .md h2 { font-size:.9rem; }
+  .md h3 { font-size:.85rem; }
+  .md p  { margin-bottom:.4rem; font-size:.78rem; color:#374151; line-height:1.55; }
+  .md ul,.md ol { padding-left:1.1rem; margin-bottom:.4rem; font-size:.78rem; color:#374151; }
+  .md li { margin-bottom:.1rem; }
+  .md ul { list-style:disc; }
+  .md ol { list-style:decimal; }
+  .md code { background:#e5e7eb; border-radius:3px; padding:.1rem .25rem; font-size:.72rem; font-family:monospace; }
+  .md pre  { background:#1f2937; color:#f9fafb; border-radius:.35rem; padding:.6rem; overflow-x:auto; margin-bottom:.4rem; }
+  .md pre code { background:none; padding:0; color:inherit; font-size:.72rem; }
+  .md blockquote { border-left:3px solid #d1d5db; padding-left:.6rem; color:#6b7280; font-style:italic; margin-bottom:.4rem; }
+  .md strong { font-weight:700; }
+  .md em { font-style:italic; }
+  .md a { color:#4f46e5; text-decoration:underline; }
+  .md hr { border:none; border-top:1px solid #e5e7eb; margin:.5rem 0; }
+  .note-card { height:270px; overflow:hidden; position:relative; }
+  .note-card::after { content:''; position:absolute; bottom:0; left:0; right:0; height:48px; background:linear-gradient(transparent, var(--note-fade)); pointer-events:none; }
+  .note-yellow { --note-fade:#fefce8; }
+  .note-green  { --note-fade:#f0fdf4; }
+  .note-blue   { --note-fade:#eff6ff; }
+  .note-pink   { --note-fade:#fdf2f8; }
+  .note-purple { --note-fade:#faf5ff; }
+  .preview-md h1,.preview-md h2,.preview-md h3 { font-weight:700; margin-bottom:.35rem; }
+  .preview-md h1 { font-size:1rem; }
+  .preview-md h2 { font-size:.9rem; }
+  .preview-md h3 { font-size:.85rem; }
+  .preview-md p  { margin-bottom:.4rem; font-size:.8rem; color:#374151; line-height:1.55; }
+  .preview-md ul,.preview-md ol { padding-left:1.1rem; margin-bottom:.4rem; font-size:.8rem; color:#374151; }
+  .preview-md li { margin-bottom:.1rem; }
+  .preview-md ul { list-style:disc; }
+  .preview-md ol { list-style:decimal; }
+  .preview-md code { background:#e5e7eb; border-radius:3px; padding:.1rem .25rem; font-size:.73rem; font-family:monospace; }
+  .preview-md pre  { background:#1f2937; color:#f9fafb; border-radius:.35rem; padding:.6rem; overflow-x:auto; margin-bottom:.4rem; }
+  .preview-md pre code { background:none; padding:0; color:inherit; font-size:.73rem; }
+  .preview-md blockquote { border-left:3px solid #d1d5db; padding-left:.6rem; color:#6b7280; font-style:italic; margin-bottom:.4rem; }
+  .preview-md strong { font-weight:700; }
+  .preview-md em { font-style:italic; }
+  .preview-md a { color:#4f46e5; text-decoration:underline; }
+  .md-toolbar button { display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:4px; color:#6b7280; transition:background .15s,color .15s; flex-shrink:0; }
+  .md-toolbar button:hover { background:#f3f4f6; color:#111827; }
+  .md-toolbar .sep { width:1px; height:16px; background:#e5e7eb; margin:0 2px; flex-shrink:0; }
+</style>
+
+<!-- Intercept layout's "+ New Note" button → navigate to full-page editor -->
+<dialog id="add-dialog" class="hidden"></dialog>
+<script>document.getElementById('add-dialog').showModal = function() { window.location.href = '/notes/new'; };</script>
+
+<!-- Tab filter -->
+<div class="flex items-center gap-2 mb-4">
+  <a href="/notes?filter=all"
+     class="text-xs font-semibold px-3 py-1.5 rounded-md transition-colors {{if eq .Filter "all"}}bg-indigo-600 text-white{{else}}bg-white border border-gray-200 text-gray-500 hover:text-indigo-600{{end}}">All</a>
+  <a href="/notes?filter=pinned"
+     class="text-xs font-semibold px-3 py-1.5 rounded-md transition-colors {{if eq .Filter "pinned"}}bg-indigo-600 text-white{{else}}bg-white border border-gray-200 text-gray-500 hover:text-indigo-600{{end}}">
+    <svg viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3 inline-block mr-0.5 -mt-px"><path d="M16 3a1 1 0 00-1 1v1H9V4a1 1 0 00-2 0v1H5a1 1 0 000 2h1v3.586l-2.707 2.707A1 1 0 004 14h7v5a1 1 0 002 0v-5h7a1 1 0 00.707-1.707L18 9.586V6h1a1 1 0 000-2h-2V4a1 1 0 00-1-1z"/></svg>
+    Pinned</a>
+</div>
+
+{{if not .Notes}}
+<div class="bg-white rounded-lg border border-gray-200 px-5 py-12 text-center">
+  <p class="text-sm font-medium text-gray-400">{{if eq .Filter "pinned"}}No pinned notes{{else}}No notes yet{{end}}</p>
+  <p class="text-xs text-gray-300 mt-1">{{if eq .Filter "pinned"}}Pin a note to find it here quickly{{else}}Click "+ New Note" to jot something down{{end}}</p>
+</div>
+{{else}}
+<div class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
+  {{range .Notes}}
+  <div class="break-inside-avoid rounded-lg border-2 px-4 py-3 note-{{.Color}} note-card group relative"
+       data-note-id="{{.ID}}">
+    <!-- Pin badge -->
+    {{if .Pinned}}
+    <span class="absolute top-2 right-2 z-10">
+      <svg viewBox="0 0 24 24" fill="#6366f1" class="w-3.5 h-3.5"><path d="M16 3a1 1 0 00-1 1v1H9V4a1 1 0 00-2 0v1H5a1 1 0 000 2h1v3.586l-2.707 2.707A1 1 0 004 14h7v5a1 1 0 002 0v-5h7a1 1 0 00.707-1.707L18 9.586V6h1a1 1 0 000-2h-2V4a1 1 0 00-1-1z"/></svg>
+    </span>
+    {{end}}
+    {{if .Title}}
+    <p class="note-title text-xs font-bold uppercase tracking-wider mb-2 pr-5">{{.Title}}</p>
+    {{end}}
+    <div class="md text-sm text-gray-700 note-content" data-raw="{{.Content}}"></div>
+    <!-- Action bar (hover reveal, above fade) -->
+    <div class="absolute bottom-0 left-0 right-0 px-3 py-2 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity z-10">
+      <form method="POST" action="/notes/{{.ID}}/pin">
+        <input type="hidden" name="pinned" value="{{if .Pinned}}false{{else}}true{{end}}">
+        <input type="hidden" name="redirect" value="/notes?filter={{$.Filter}}">
+        <button type="submit" class="text-xs text-gray-500 hover:text-indigo-600 transition-colors font-medium flex items-center gap-1" title="{{if .Pinned}}Unpin{{else}}Pin{{end}}">
+          <svg viewBox="0 0 24 24" fill="{{if .Pinned}}#6366f1{{else}}none{{end}}" stroke="{{if .Pinned}}#6366f1{{else}}currentColor{{end}}" stroke-width="2" class="w-3.5 h-3.5"><path d="M16 3a1 1 0 00-1 1v1H9V4a1 1 0 00-2 0v1H5a1 1 0 000 2h1v3.586l-2.707 2.707A1 1 0 004 14h7v5a1 1 0 002 0v-5h7a1 1 0 00.707-1.707L18 9.586V6h1a1 1 0 000-2h-2V4a1 1 0 00-1-1z"/></svg>
+          {{if .Pinned}}Unpin{{else}}Pin{{end}}
+        </button>
+      </form>
+      <div class="flex items-center gap-1.5">
+        <a href="/notes/{{.ID}}/edit"
+          class="text-xs text-white bg-indigo-600 hover:bg-indigo-700 px-2.5 py-1 rounded transition-colors font-medium">Edit</a>
+        <button type="button"
+          data-delete-action="/notes/{{.ID}}/delete"
+          data-delete-name="{{if .Title}}{{.Title}}{{else}}this note{{end}}"
+          class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete</button>
+      </div>
+    </div>
+  </div>
+  {{end}}
+</div>
+{{end}}
+
+<script>
+// Render all note cards
+document.querySelectorAll('.note-content[data-raw]').forEach(function(el) {
+  var raw = el.getAttribute('data-raw');
+  if (raw) el.innerHTML = marked.parse(raw);
+});
+</script>
+
+{{end}}

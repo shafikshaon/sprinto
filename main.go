@@ -31,6 +31,7 @@ func main() {
 	projectRepo := repository.NewProjectRepository(db)
 	teamMemberRepo := repository.NewTeamMemberRepository(db)
 	slackThreadRepo := repository.NewSlackThreadRepository(db)
+	stickyNoteRepo := repository.NewStickyNoteRepository(db)
 
 	// ── Services ──────────────────────────────────────────────────
 	authSvc := service.NewAuthService(userRepo)
@@ -43,6 +44,7 @@ func main() {
 	projectSvc := service.NewProjectService(projectRepo)
 	teamMemberSvc := service.NewTeamMemberService(teamMemberRepo)
 	slackThreadSvc := service.NewSlackThreadService(slackThreadRepo)
+	stickyNoteSvc := service.NewStickyNoteService(stickyNoteRepo)
 
 	// ── Handlers ──────────────────────────────────────────────────
 	authH := handlers.NewAuthHandler(authSvc)
@@ -56,6 +58,7 @@ func main() {
 	projectH := handlers.NewProjectHandler(projectSvc, teamMemberSvc)
 	teamH := handlers.NewTeamHandler(teamMemberSvc)
 	slackH := handlers.NewSlackHandler(slackThreadSvc)
+	notesH := handlers.NewStickyNoteHandler(stickyNoteSvc)
 
 	// ── Router ────────────────────────────────────────────────────
 	gin.SetMode(gin.ReleaseMode)
@@ -132,6 +135,14 @@ func main() {
 	protected.GET("/team", teamH.List)
 	protected.POST("/team", teamH.Create)
 	protected.POST("/team/:id/delete", teamH.Delete)
+
+	protected.GET("/notes", notesH.List)
+	protected.GET("/notes/new", notesH.New)
+	protected.GET("/notes/:id/edit", notesH.EditPage)
+	protected.POST("/notes", notesH.Create)
+	protected.POST("/notes/:id/update", notesH.Update)
+	protected.POST("/notes/:id/pin", notesH.TogglePin)
+	protected.POST("/notes/:id/delete", notesH.Delete)
 
 	protected.GET("/slack", slackH.List)
 	protected.POST("/slack", slackH.Create)
