@@ -89,6 +89,7 @@ func main() {
 	protected.POST("/sprints/progress", sprintH.UpdateProgress)
 
 	protected.GET("/standups", standupH.List)
+	protected.GET("/standups/pdf", standupH.PDF)
 	protected.POST("/standups", standupH.Create)
 	protected.POST("/standups/:id/update", standupH.Update)
 	protected.POST("/standups/:id/delete", standupH.Delete)
