@@ -11,11 +11,12 @@ import (
 )
 
 type AuthHandler struct {
-	svc service.AuthService
+	svc     service.AuthService
+	teamSvc service.TeamMemberService
 }
 
-func NewAuthHandler(svc service.AuthService) *AuthHandler {
-	return &AuthHandler{svc: svc}
+func NewAuthHandler(svc service.AuthService, teamSvc service.TeamMemberService) *AuthHandler {
+	return &AuthHandler{svc: svc, teamSvc: teamSvc}
 }
 
 // renderAuth renders a standalone page (no layout).
@@ -61,6 +62,8 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 	user, _ := h.svc.Login(email, password)
+	// Auto-add registered user as a team member
+	h.teamSvc.CreateForUser(fullName, "", email, user.ID)
 	setSession(c, user.ID)
 	redirectTo(c, "/")
 }

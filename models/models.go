@@ -236,6 +236,8 @@ type Project struct {
 
 type TeamMember struct {
 	gorm.Model
+	UserID   *uint     `gorm:"index"`
+	User     *User     `gorm:"foreignKey:UserID"`
 	Name     string    `gorm:"not null"`
 	Role     string
 	Email    string

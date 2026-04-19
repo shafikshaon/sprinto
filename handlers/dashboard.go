@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"sprinto/models"
+	"sprinto/repository"
 	"sprinto/service"
 )
 
@@ -43,7 +44,7 @@ func (h *DashboardHandler) Get(c *gin.Context) {
 	}
 	todayStandups, _ := h.standups.ByDate(time.Now().Format("2006-01-02"), projectID)
 	allDeadlines, _ := h.deadlines.All(projectID)
-	allTasks, _ := h.devTasks.All(projectID)
+	allTasks, _, _ := h.devTasks.All(projectID, repository.DevTaskFilter{}, 1, 1000)
 
 	open, critical := 0, 0
 	for _, t := range allTasks {

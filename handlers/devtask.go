@@ -1,13 +1,17 @@
 package handlers
 
 import (
+	"math"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 
 	"sprinto/models"
+	"sprinto/repository"
 	"sprinto/service"
 )
+
+const devTaskPerPage = 15
 
 type DevTasksData struct {
 	Meta     Meta
@@ -32,22 +36,49 @@ func NewDevTaskHandler(svc service.DevTaskService) *DevTaskHandler {
 
 func (h *DevTaskHandler) List(c *gin.Context) {
 	projectID := activeProjectIDFromCtx(c)
-	tasks, err := h.svc.All(projectID)
+
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	if page < 1 {
+		page = 1
+	}
+	f := repository.DevTaskFilter{
+		Search:   c.Query("search"),
+		Type:     c.Query("type"),
+		Status:   c.Query("status"),
+		Priority: c.Query("priority"),
+	}
+
+	tasks, total, err := h.svc.All(projectID, f, page, devTaskPerPage)
 	if err != nil {
 		c.String(500, "DB error: %s", err.Error())
 		return
 	}
 	counts, _ := h.svc.OpenCountsByType(projectID)
+
+	totalPages := int(math.Ceil(float64(total) / float64(devTaskPerPage)))
+	if totalPages < 1 {
+		totalPages = 1
+	}
+	pages := make([]int, totalPages)
+	for i := range pages {
+		pages[i] = i + 1
+	}
+
 	allProjects, activeProject, currentUser := projectMeta(c)
 	var members []models.TeamMember
 	if activeProject != nil {
 		members = activeProject.Members
 	}
-	render(c, "devtasks", DevTasksData{
-		Meta:     Meta{Title: "Dev Tasks & Improvements", CurrentPage: "devtasks", ActionLabel: "Add Task", AllProjects: allProjects, ActiveProject: activeProject, CurrentUser: currentUser},
-		DevTasks: tasks,
-		Counts:   counts,
-		Members:  members,
+	render(c, "devtasks", map[string]interface{}{
+		"Meta":       Meta{Title: "Dev Tasks & Improvements", CurrentPage: "devtasks", ActionLabel: "Add Task", AllProjects: allProjects, ActiveProject: activeProject, CurrentUser: currentUser},
+		"DevTasks":   tasks,
+		"Counts":     counts,
+		"Members":    members,
+		"Filter":     f,
+		"Page":       page,
+		"TotalPages": totalPages,
+		"Total":      total,
+		"Pages":      pages,
 	})
 }
 

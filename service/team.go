@@ -10,6 +10,7 @@ import (
 type TeamMemberService interface {
 	All() ([]models.TeamMember, error)
 	Create(name, role, email string) error
+	CreateForUser(name, role, email string, userID uint) error
 	Delete(id uint) error
 }
 
@@ -29,6 +30,18 @@ func (s *teamMemberService) Create(name, role, email string) error {
 		Name:  strings.TrimSpace(name),
 		Role:  strings.TrimSpace(role),
 		Email: strings.TrimSpace(email),
+	})
+}
+
+func (s *teamMemberService) CreateForUser(name, role, email string, userID uint) error {
+	if strings.TrimSpace(name) == "" {
+		return nil
+	}
+	return s.repo.Create(models.TeamMember{
+		UserID: &userID,
+		Name:   strings.TrimSpace(name),
+		Role:   strings.TrimSpace(role),
+		Email:  strings.TrimSpace(email),
 	})
 }
 

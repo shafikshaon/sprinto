@@ -5,8 +5,15 @@ import (
 	"sprinto/models"
 )
 
+type DevTaskFilter struct {
+	Search   string
+	Type     string
+	Status   string
+	Priority string
+}
+
 type DevTaskRepository interface {
-	All(projectID uint) ([]models.DevTask, error)
+	All(projectID uint, f DevTaskFilter, page, perPage int) ([]models.DevTask, int64, error)
 	ByID(id uint) (models.DevTask, error)
 	Create(t models.DevTask) error
 	Update(id uint, title, typ, assignees, status, priority string) error
@@ -20,13 +27,39 @@ type devTaskRepo struct{ db *gorm.DB }
 
 func NewDevTaskRepository(db *gorm.DB) DevTaskRepository { return &devTaskRepo{db: db} }
 
-func (r *devTaskRepo) All(projectID uint) ([]models.DevTask, error) {
-	var tasks []models.DevTask
-	q := r.db.Preload("Comments").Order("created_at DESC")
+func (r *devTaskRepo) filtered(projectID uint, f DevTaskFilter) *gorm.DB {
+	q := r.db.Model(&models.DevTask{})
 	if projectID > 0 {
 		q = q.Where("project_id = ?", projectID)
 	}
-	return tasks, q.Find(&tasks).Error
+	if f.Search != "" {
+		q = q.Where("title LIKE ?", "%"+f.Search+"%")
+	}
+	if f.Type != "" {
+		q = q.Where("type = ?", f.Type)
+	}
+	if f.Status != "" {
+		q = q.Where("status = ?", f.Status)
+	}
+	if f.Priority != "" {
+		q = q.Where("priority = ?", f.Priority)
+	}
+	return q
+}
+
+func (r *devTaskRepo) All(projectID uint, f DevTaskFilter, page, perPage int) ([]models.DevTask, int64, error) {
+	var tasks []models.DevTask
+	var total int64
+	if err := r.filtered(projectID, f).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+	offset := (page - 1) * perPage
+	err := r.filtered(projectID, f).
+		Preload("Comments").
+		Order("created_at DESC").
+		Offset(offset).Limit(perPage).
+		Find(&tasks).Error
+	return tasks, total, err
 }
 
 func (r *devTaskRepo) ByID(id uint) (models.DevTask, error) {

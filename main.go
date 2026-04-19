@@ -47,7 +47,7 @@ func main() {
 	stickyNoteSvc := service.NewStickyNoteService(stickyNoteRepo)
 
 	// ── Handlers ──────────────────────────────────────────────────
-	authH := handlers.NewAuthHandler(authSvc)
+	authH := handlers.NewAuthHandler(authSvc, teamMemberSvc)
 	dashH := handlers.NewDashboardHandler(sprintSvc, standupSvc, deadlineSvc, devTaskSvc)
 	sprintH := handlers.NewSprintHandler(sprintSvc)
 	standupH := handlers.NewStandupHandler(standupSvc)

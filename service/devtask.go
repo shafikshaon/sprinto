@@ -8,7 +8,7 @@ import (
 )
 
 type DevTaskService interface {
-	All(projectID uint) ([]models.DevTask, error)
+	All(projectID uint, f repository.DevTaskFilter, page, perPage int) ([]models.DevTask, int64, error)
 	ByID(id uint) (models.DevTask, error)
 	Add(title, typ string, assignees []string, status, priority string, projectID uint) error
 	Update(id uint, title, typ string, assignees []string, status, priority string) error
@@ -24,14 +24,14 @@ func NewDevTaskService(r repository.DevTaskRepository) DevTaskService {
 	return &devTaskService{repo: r}
 }
 
-func (s *devTaskService) All(projectID uint) ([]models.DevTask, error) {
-	tasks, err := s.repo.All(projectID)
+func (s *devTaskService) All(projectID uint, f repository.DevTaskFilter, page, perPage int) ([]models.DevTask, int64, error) {
+	tasks, total, err := s.repo.All(projectID, f, page, perPage)
 	if err == nil {
 		for i := range tasks {
 			tasks[i].Assignees = splitAssignees(tasks[i].AssigneeCSV)
 		}
 	}
-	return tasks, err
+	return tasks, total, err
 }
 
 func (s *devTaskService) ByID(id uint) (models.DevTask, error) {
