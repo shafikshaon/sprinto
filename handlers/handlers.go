@@ -136,8 +136,11 @@ var funcMap = template.FuncMap{
 		}
 		return "text-gray-400"
 	},
-	"add": func(a, b int) int { return a + b },
-	"sub": func(a, b int) int { return a - b },
+	"add":     func(a, b int) int { return a + b },
+	"sub":     func(a, b int) int { return a - b },
+	"wasEdited": func(created, updated time.Time) bool {
+		return updated.Unix()-created.Unix() > 1
+	},
 }
 
 // render parses layout + page template and writes the response.
