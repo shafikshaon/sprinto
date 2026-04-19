@@ -136,6 +136,8 @@ var funcMap = template.FuncMap{
 		}
 		return "text-gray-400"
 	},
+	"add": func(a, b int) int { return a + b },
+	"sub": func(a, b int) int { return a - b },
 }
 
 // render parses layout + page template and writes the response.

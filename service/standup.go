@@ -9,10 +9,10 @@ import (
 )
 
 type StandupService interface {
-	All(projectID uint) ([]models.StandupEntry, error)
+	All(projectID uint, f repository.StandupFilter, page, perPage int) ([]models.StandupEntry, int64, error)
 	ByDate(date string, projectID uint) ([]models.StandupEntry, error)
 	Add(date, summary, dependencies, issues, actionItems string, projectID uint) error
-	Update(id uint, summary, dependencies, issues, actionItems string) error
+	Update(id uint, summary, dependencies, issues, actionItems string, projectID uint) error
 	Remove(id uint) error
 }
 
@@ -22,8 +22,8 @@ func NewStandupService(r repository.StandupRepository) StandupService {
 	return &standupService{repo: r}
 }
 
-func (s *standupService) All(projectID uint) ([]models.StandupEntry, error) {
-	return s.repo.All(projectID)
+func (s *standupService) All(projectID uint, f repository.StandupFilter, page, perPage int) ([]models.StandupEntry, int64, error) {
+	return s.repo.All(projectID, f, page, perPage)
 }
 
 func (s *standupService) ByDate(date string, projectID uint) ([]models.StandupEntry, error) {
@@ -47,12 +47,13 @@ func (s *standupService) Add(date, summary, dependencies, issues, actionItems st
 	})
 }
 
-func (s *standupService) Update(id uint, summary, dependencies, issues, actionItems string) error {
+func (s *standupService) Update(id uint, summary, dependencies, issues, actionItems string, projectID uint) error {
 	return s.repo.Update(id,
 		strings.TrimSpace(summary),
 		strings.TrimSpace(dependencies),
 		strings.TrimSpace(issues),
 		strings.TrimSpace(actionItems),
+		projectID,
 	)
 }
 
