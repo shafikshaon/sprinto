@@ -8,8 +8,9 @@ import (
 )
 
 type MeetingService interface {
-	All(projectID uint) ([]models.Meeting, error)
+	All(f repository.MeetingFilter, page, perPage int) ([]models.Meeting, int64, error)
 	Add(title, date, attendeesCSV, notes string, projectID uint) error
+	Update(id uint, projectID uint, title, date, attendeesCSV, notes string) error
 	Remove(id uint) error
 }
 
@@ -19,10 +20,10 @@ func NewMeetingService(r repository.MeetingRepository) MeetingService {
 	return &meetingService{repo: r}
 }
 
-func (s *meetingService) All(projectID uint) ([]models.Meeting, error) {
-	meetings, err := s.repo.All(projectID)
+func (s *meetingService) All(f repository.MeetingFilter, page, perPage int) ([]models.Meeting, int64, error) {
+	meetings, total, err := s.repo.All(f, page, perPage)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	for i := range meetings {
 		if meetings[i].AttendeeCSV != "" {
@@ -33,7 +34,7 @@ func (s *meetingService) All(projectID uint) ([]models.Meeting, error) {
 			}
 		}
 	}
-	return meetings, nil
+	return meetings, total, nil
 }
 
 func (s *meetingService) Add(title, date, attendeesCSV, notes string, projectID uint) error {
@@ -53,6 +54,19 @@ func (s *meetingService) Add(title, date, attendeesCSV, notes string, projectID 
 		AttendeeCSV: strings.Join(attendees, ","),
 		Notes:       strings.TrimSpace(notes),
 	})
+}
+
+func (s *meetingService) Update(id uint, projectID uint, title, date, attendeesCSV, notes string) error {
+	if strings.TrimSpace(title) == "" || strings.TrimSpace(date) == "" {
+		return nil
+	}
+	var attendees []string
+	for _, a := range strings.Split(attendeesCSV, ",") {
+		if t := strings.TrimSpace(a); t != "" {
+			attendees = append(attendees, t)
+		}
+	}
+	return s.repo.Update(id, projectID, strings.TrimSpace(title), strings.TrimSpace(date), strings.Join(attendees, ","), strings.TrimSpace(notes))
 }
 
 func (s *meetingService) Remove(id uint) error { return s.repo.Delete(id) }

@@ -40,6 +40,12 @@ func (h *TeamHandler) Create(c *gin.Context) {
 	redirectTo(c, "/team")
 }
 
+func (h *TeamHandler) Update(c *gin.Context) {
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	h.svc.Update(uint(id), c.PostForm("name"), c.PostForm("role"), c.PostForm("email"))
+	redirectTo(c, "/team")
+}
+
 func (h *TeamHandler) Delete(c *gin.Context) {
 	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
 	h.svc.Delete(uint(id))

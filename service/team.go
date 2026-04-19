@@ -11,6 +11,7 @@ type TeamMemberService interface {
 	All() ([]models.TeamMember, error)
 	Create(name, role, email string) error
 	CreateForUser(name, role, email string, userID uint) error
+	Update(id uint, name, role, email string) error
 	Delete(id uint) error
 }
 
@@ -43,6 +44,13 @@ func (s *teamMemberService) CreateForUser(name, role, email string, userID uint)
 		Role:   strings.TrimSpace(role),
 		Email:  strings.TrimSpace(email),
 	})
+}
+
+func (s *teamMemberService) Update(id uint, name, role, email string) error {
+	if strings.TrimSpace(name) == "" {
+		return nil
+	}
+	return s.repo.Update(id, strings.TrimSpace(name), strings.TrimSpace(role), strings.TrimSpace(email))
 }
 
 func (s *teamMemberService) Delete(id uint) error { return s.repo.Delete(id) }

@@ -101,6 +101,7 @@ func main() {
 
 	protected.GET("/meetings", meetingH.List)
 	protected.POST("/meetings", meetingH.Create)
+	protected.POST("/meetings/:id/update", meetingH.Update)
 	protected.POST("/meetings/:id/delete", meetingH.Delete)
 
 	protected.GET("/devtasks", devTaskH.List)
@@ -135,6 +136,7 @@ func main() {
 
 	protected.GET("/team", teamH.List)
 	protected.POST("/team", teamH.Create)
+	protected.POST("/team/:id/update", teamH.Update)
 	protected.POST("/team/:id/delete", teamH.Delete)
 
 	protected.GET("/notes", notesH.List)

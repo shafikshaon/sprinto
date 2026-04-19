@@ -555,3 +555,138 @@ BEGIN
 
   RAISE NOTICE 'Done — comments inserted for % dev task(s).', v_ntasks;
 END $$;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Seed: Meeting Minutes
+-- ─────────────────────────────────────────────────────────────────────────────
+
+DO $$
+DECLARE
+  v_project_ids  integer[];
+  v_member_names text[];
+  v_nproj        integer;
+  v_nmem         integer;
+  v_pid          integer;
+  v_att          text;
+
+BEGIN
+  SELECT ARRAY(SELECT id FROM projects WHERE deleted_at IS NULL ORDER BY id) INTO v_project_ids;
+  v_nproj := array_length(v_project_ids, 1);
+  IF v_nproj IS NULL THEN RAISE EXCEPTION 'No projects found.'; END IF;
+
+  SELECT ARRAY(SELECT name FROM team_members WHERE deleted_at IS NULL ORDER BY id) INTO v_member_names;
+  v_nmem := coalesce(array_length(v_member_names, 1), 0);
+  IF v_nmem = 0 THEN v_member_names := ARRAY['Unassigned']; v_nmem := 1; END IF;
+
+  RAISE NOTICE 'Seeding meeting minutes across % project(s)…', v_nproj;
+
+  -- Helper: build an attendee CSV from the first few members
+  v_att := array_to_string(v_member_names[1:least(4,v_nmem)], ',');
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO meetings (created_at, updated_at, project_id, title, date, attendees, notes) VALUES
+  (NOW()-interval'38 days', NOW()-interval'38 days', v_pid,
+   'Sprint 12 Kick-off Planning',
+   'Apr 20, 2026', v_att,
+   'Reviewed Sprint 11 retrospective outcomes. Agreed on 54 story points for Sprint 12 focussed on auth module and dashboard scaffold. Story assignment completed. Definition of Done re-confirmed with the team.');
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO meetings (created_at, updated_at, project_id, title, date, attendees, notes) VALUES
+  (NOW()-interval'36 days', NOW()-interval'36 days', v_pid,
+   'Auth Module Design Review',
+   'Apr 22, 2026', v_att,
+   'Reviewed JWT refresh-token approach vs session cookies. Decided on httpOnly cookie for security. Discussed role-based middleware scope. Agreed to use Redis for session store on staging. Action: Karim to provision Redis by EOD.');
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO meetings (created_at, updated_at, project_id, title, date, attendees, notes) VALUES
+  (NOW()-interval'34 days', NOW()-interval'34 days', v_pid,
+   'Dashboard API Contract Sign-off',
+   'Apr 27, 2026', v_att,
+   'Product walked through widget requirements. Agreed on 7 endpoints. Pagination strategy confirmed (cursor-based for activity feed, offset for others). Breaking changes policy discussed — versioning via URL prefix.');
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO meetings (created_at, updated_at, project_id, title, date, attendees, notes) VALUES
+  (NOW()-interval'31 days', NOW()-interval'31 days', v_pid,
+   'Notification Service Architecture',
+   'Apr 30, 2026', v_att,
+   'Decided on polling (30s interval) for v1 notification badge. WebSocket deferred to Sprint 13. Discussed fanout approach for multi-project users. Action: Arif to prototype polling endpoint and benchmark latency.');
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO meetings (created_at, updated_at, project_id, title, date, attendees, notes) VALUES
+  (NOW()-interval'29 days', NOW()-interval'29 days', v_pid,
+   'Sprint 12 Mid-Sprint Check-in',
+   'May 01, 2026', v_att,
+   'Sprint at 67% — on track. Dashboard widgets all rendering on staging. Chart.js timezone bug mitigated with UTC workaround. Risk flagged: notification badge count may need WebSocket for real-time feel. Decision deferred to end of sprint.');
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO meetings (created_at, updated_at, project_id, title, date, attendees, notes) VALUES
+  (NOW()-interval'26 days', NOW()-interval'26 days', v_pid,
+   'Sprint 12 Retrospective',
+   'May 04, 2026', v_att,
+   'Went well: async PR reviews, clear API contracts, fast Redis provisioning. Improve: standup timebox felt long — agreed to cap at 10 minutes from Sprint 13. Action: update standup format doc and communicate to team.');
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO meetings (created_at, updated_at, project_id, title, date, attendees, notes) VALUES
+  (NOW()-interval'24 days', NOW()-interval'24 days', v_pid,
+   'Sprint 13 Planning',
+   'May 08, 2026', v_att,
+   '54 points committed across 3 epics: release pipeline, CI/CD improvements, user settings page. Dependency mapping done. Arif owns CI/CD, Nadia owns settings schema, Rina owns frontend pages. Sprint goal: deploy pipeline live on staging by May 15.');
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO meetings (created_at, updated_at, project_id, title, date, attendees, notes) VALUES
+  (NOW()-interval'21 days', NOW()-interval'21 days', v_pid,
+   'CI/CD Pipeline Design',
+   'May 11, 2026', v_att,
+   'Reviewed GitHub Actions vs CircleCI — chose GitHub Actions for tighter repo integration. Agreed on two pipelines: PR check (lint + test) and merge-to-main (build + staging deploy). Manual approval gate required for prod. IAM role request filed with DevOps.');
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO meetings (created_at, updated_at, project_id, title, date, attendees, notes) VALUES
+  (NOW()-interval'18 days', NOW()-interval'18 days', v_pid,
+   'User Settings Page UX Review',
+   'May 13, 2026', v_att,
+   'Walked through Figma mockups for profile, password change, notification prefs, and timezone. Minor feedback: timezone selector should show offset preview. Agreed not to build avatar crop in this sprint. Rina to update mockups and share final by EOD.');
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO meetings (created_at, updated_at, project_id, title, date, attendees, notes) VALUES
+  (NOW()-interval'15 days', NOW()-interval'15 days', v_pid,
+   'Sprint 13 Mid-Sprint Check-in',
+   'May 14, 2026', v_att,
+   'Sprint at 52%. Timezone refactor flagged as larger than estimated — may slip to Sprint 14. Docker layer caching done, deploy time cut from 4 min to 90s. Settings page on track. No blockers.');
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO meetings (created_at, updated_at, project_id, title, date, attendees, notes) VALUES
+  (NOW()-interval'12 days', NOW()-interval'12 days', v_pid,
+   'v1.4 Release Go/No-Go Meeting',
+   'May 21, 2026', v_att,
+   'All checks green: regression suite passing (312 tests), staging verified, rollback plan documented, on-call rotation set. One known flaky test in notification suite — agreed to ship and fix post-release. Decision: GO for release on May 22 at 10 AM.');
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO meetings (created_at, updated_at, project_id, title, date, attendees, notes) VALUES
+  (NOW()-interval'10 days', NOW()-interval'10 days', v_pid,
+   'v1.4.1 Hotfix Post-Mortem',
+   'May 23, 2026', v_att,
+   'Root cause: notification badge not initialising on first login due to missing seeding call in the login handler. Fix was trivial (2 lines). Timeline: reported 11 AM, root cause by 1 PM, deployed 4 PM — 5h total. Action: add login-path integration test to prevent regression.');
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO meetings (created_at, updated_at, project_id, title, date, attendees, notes) VALUES
+  (NOW()-interval'8 days', NOW()-interval'8 days', v_pid,
+   'Sprint 14 Planning',
+   'May 25, 2026', v_att,
+   '48 points committed: timezone refactor (11 templates), audit log (model + UI), performance profiling. Nadia leads timezone, Arif leads audit log, Rina leads profiling setup. Sprint goal: audit log live and queryable in admin panel by end of sprint.');
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO meetings (created_at, updated_at, project_id, title, date, attendees, notes) VALUES
+  (NOW()-interval'5 days', NOW()-interval'5 days', v_pid,
+   'Audit Log Schema Design',
+   'May 26, 2026', v_att,
+   'Agreed on schema: id, user_id, action (enum), entity_type, entity_id, metadata (JSONB), created_at. Discussed JSONB vs relational for metadata — chose JSONB for flexibility. Index on (user_id, created_at) confirmed. Arif to write migration and service layer by May 28.');
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO meetings (created_at, updated_at, project_id, title, date, attendees, notes) VALUES
+  (NOW()-interval'3 days', NOW()-interval'3 days', v_pid,
+   'Sprint 14 Mid-Sprint Check-in',
+   'May 28, 2026', v_att,
+   'Sprint at 61%. Timezone refactor fully merged. Audit log query optimised to 18ms after composite index. Rina profiling 3 more endpoints this week. No blockers. On track for audit log UI by end of sprint.');
+
+  RAISE NOTICE 'Done — 15 meeting entries inserted.';
+END $$;

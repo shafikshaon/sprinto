@@ -116,10 +116,11 @@ func (ActionItem) TableName() string { return "meeting_action_items" }
 
 type Meeting struct {
 	gorm.Model
-	ProjectID   uint   `gorm:"index"`
-	Title       string `gorm:"not null"`
-	Date        string `gorm:"not null"`
-	AttendeeCSV string `gorm:"column:attendees"`
+	ProjectID   uint    `gorm:"index"`
+	Project     Project `gorm:"foreignKey:ProjectID"`
+	Title       string  `gorm:"not null"`
+	Date        string  `gorm:"not null"`
+	AttendeeCSV string  `gorm:"column:attendees"`
 	Notes       string
 	ActionItems []ActionItem `gorm:"foreignKey:MeetingID"`
 	// Computed by service — not persisted
