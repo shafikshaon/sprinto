@@ -52,14 +52,14 @@ func (h *DevTaskHandler) List(c *gin.Context) {
 }
 
 func (h *DevTaskHandler) Create(c *gin.Context) {
-	projectID := activeProjectIDFromCtx(c)
+	pid, _ := strconv.ParseUint(c.PostForm("project_id"), 10, 64)
 	h.svc.Add(
 		c.PostForm("title"),
 		c.PostForm("type"),
 		c.PostFormArray("assignees"),
 		c.PostForm("status"),
 		c.PostForm("priority"),
-		projectID,
+		uint(pid),
 	)
 	redirectTo(c, "/devtasks")
 }

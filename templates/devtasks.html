@@ -100,6 +100,13 @@
   <form method="POST" action="/devtasks" class="p-5">
     <div class="space-y-3 mb-5">
       <div>
+        <label class="text-xs font-medium text-gray-600 block mb-1.5">Project <span class="text-red-400">*</span></label>
+        <select name="project_id" required class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400 bg-white">
+          <option value="">— Select a project —</option>
+          {{range .Meta.AllProjects}}<option value="{{.ID}}">{{.Name}}</option>{{end}}
+        </select>
+      </div>
+      <div>
         <label class="text-xs font-medium text-gray-600 block mb-1.5">Task Title <span class="text-red-400">*</span></label>
         <input name="title" type="text" required placeholder="e.g. Migrate REST to GraphQL"
           class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
