@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 
@@ -162,4 +163,15 @@ func render(c *gin.Context, page string, data interface{}) {
 
 func redirectTo(c *gin.Context, path string) {
 	c.Redirect(303, path)
+}
+
+// parseUintArray converts a slice of string IDs to []uint, skipping invalid/zero values.
+func parseUintArray(strs []string) []uint {
+	var result []uint
+	for _, s := range strs {
+		if v, err := strconv.ParseUint(s, 10, 64); err == nil && v > 0 {
+			result = append(result, uint(v))
+		}
+	}
+	return result
 }

@@ -54,7 +54,7 @@
             {{range .Tags}}
             <a href="/slack?tag={{.}}" class="text-[11px] font-medium px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-100 hover:bg-indigo-100 transition-colors">{{.}}</a>
             {{end}}
-            {{if .Author}}<span class="text-xs text-gray-400 ml-1">— {{.Author}}</span>{{end}}
+            {{if .AuthorName}}<span class="text-xs text-gray-400 ml-1">— {{.AuthorName}}</span>{{end}}
           </div>
         </div>
       </div>
@@ -65,7 +65,7 @@
           data-edit-slack-topic="{{.Topic}}"
           data-edit-slack-summary="{{.Summary}}"
           data-edit-slack-tags="{{.TagCSV}}"
-          data-edit-slack-author="{{.Author}}"
+          data-edit-slack-author="{{if .AuthorID}}{{.AuthorID}}{{end}}"
           class="text-xs text-white bg-indigo-600 hover:bg-indigo-700 px-2.5 py-1 rounded transition-colors font-medium">Edit</button>
         <button type="button"
           data-delete-action="/slack/{{.ID}}/delete"
@@ -109,8 +109,17 @@
         </div>
         <div>
           <label class="text-xs font-medium text-gray-600 block mb-1.5">Posted by</label>
+          {{if .Members}}
+          <select name="author" class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400">
+            <option value="">Select team member…</option>
+            {{range .Members}}
+            <option value="{{.ID}}" {{if $.Meta.CurrentUser}}{{if eq $.Meta.CurrentUser.FullName .Name}}selected{{end}}{{end}}>{{.Name}}{{if .Role}} · {{.Role}}{{end}}</option>
+            {{end}}
+          </select>
+          {{else}}
           <input name="author" type="text" value="{{if .Meta.CurrentUser}}{{.Meta.CurrentUser.FullName}}{{end}}" placeholder="Your name"
             class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+          {{end}}
         </div>
       </div>
     </div>
@@ -152,8 +161,17 @@
         </div>
         <div>
           <label class="text-xs font-medium text-gray-600 block mb-1.5">Posted by</label>
+          {{if .Members}}
+          <select id="edit-slack-author" name="author" class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400">
+            <option value="">Select team member…</option>
+            {{range .Members}}
+            <option value="{{.ID}}">{{.Name}}{{if .Role}} · {{.Role}}{{end}}</option>
+            {{end}}
+          </select>
+          {{else}}
           <input id="edit-slack-author" name="author" type="text"
             class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+          {{end}}
         </div>
       </div>
     </div>
@@ -172,7 +190,8 @@ document.addEventListener('click', function(e) {
   document.getElementById('edit-slack-summary').value = btn.dataset.editSlackSummary;
   document.getElementById('edit-slack-tags').value = btn.dataset.editSlackTags;
   document.getElementById('edit-slack-message-link').value = btn.dataset.editSlackMessageLink;
-  document.getElementById('edit-slack-author').value = btn.dataset.editSlackAuthor;
+  var authorEl = document.getElementById('edit-slack-author');
+  if (authorEl) authorEl.value = btn.dataset.editSlackAuthor || '';
   document.getElementById('edit-slack-dialog').showModal();
 });
 </script>

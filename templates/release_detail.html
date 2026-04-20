@@ -76,9 +76,9 @@
               {{if .Assignee}}
               <div class="flex items-center gap-2">
                 <div class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
-                  <span class="text-indigo-700 font-bold text-[10px]">{{initials .Assignee}}</span>
+                  <span class="text-indigo-700 font-bold text-[10px]">{{initials .Assignee.Name}}</span>
                 </div>
-                <span class="text-sm text-gray-500">{{.Assignee}}</span>
+                <span class="text-sm text-gray-500">{{.Assignee.Name}}</span>
               </div>
               {{else}}<span class="text-sm text-gray-300">—</span>{{end}}
             </td>
@@ -105,7 +105,7 @@
                 <button type="button"
                   data-edit-story-id="{{.ID}}"
                   data-edit-story-title="{{.Title}}"
-                  data-edit-story-assignee="{{.Assignee}}"
+                  data-edit-story-assignee="{{if .Assignee}}{{.Assignee.ID}}{{end}}"
                   data-edit-story-release="{{$.Release.ID}}"
                   class="text-xs text-white bg-indigo-600 hover:bg-indigo-700 px-2.5 py-1 rounded transition-colors font-medium">Edit</button>
                 <button type="button"
@@ -126,8 +126,12 @@
         <input type="hidden" name="release_id" value="{{$.Release.ID}}">
         <input name="title" type="text" required placeholder="Story / ticket title..."
           class="flex-1 text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
-        <input name="assignee" type="text" placeholder="Assignee"
-          class="w-36 text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+        {{if $.Members}}
+        <select name="assignee" class="w-40 text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400 bg-white">
+          <option value="">— Assignee —</option>
+          {{range $.Members}}<option value="{{.ID}}">{{.Name}}</option>{{end}}
+        </select>
+        {{end}}
         <button type="submit" class="text-sm bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-md transition-colors whitespace-nowrap">+ Story</button>
       </form>
     </div>
@@ -197,8 +201,15 @@
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1.5">Assignee</label>
+        {{if .Members}}
+        <select id="edit-story-assignee" name="assignee" class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400 bg-white">
+          <option value="">— No assignee —</option>
+          {{range .Members}}<option value="{{.ID}}">{{.Name}}{{if .Role}} · {{.Role}}{{end}}</option>{{end}}
+        </select>
+        {{else}}
         <input id="edit-story-assignee" name="assignee" type="text" placeholder="e.g. Eva Park"
           class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+        {{end}}
       </div>
     </div>
     <div class="flex items-center gap-2">
@@ -214,7 +225,8 @@ document.addEventListener('click', function(e) {
   document.getElementById('edit-story-form').action = '/releases/stories/' + btn.dataset.editStoryId + '/update';
   document.getElementById('edit-story-release-id').value = btn.dataset.editStoryRelease;
   document.getElementById('edit-story-title').value = btn.dataset.editStoryTitle;
-  document.getElementById('edit-story-assignee').value = btn.dataset.editStoryAssignee;
+  var assigneeEl = document.getElementById('edit-story-assignee');
+  if (assigneeEl) assigneeEl.value = btn.dataset.editStoryAssignee || '';
   document.getElementById('edit-story-dialog').showModal();
 });
 </script>

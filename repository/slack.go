@@ -12,7 +12,7 @@ type SlackThreadRepository interface {
 	All(tag string) ([]models.SlackThread, error)
 	AllTags() ([]string, error)
 	Create(t models.SlackThread) error
-	Update(id uint, messageLink, topic, summary, tags, author string) error
+	Update(id uint, messageLink, topic, summary, tags string, authorID *uint) error
 	Delete(id uint) error
 }
 
@@ -24,7 +24,7 @@ func NewSlackThreadRepository(db *gorm.DB) SlackThreadRepository {
 
 func (r *slackThreadRepo) All(tag string) ([]models.SlackThread, error) {
 	var threads []models.SlackThread
-	q := r.db.Order("created_at DESC")
+	q := r.db.Preload("Author").Order("created_at DESC")
 	if tag != "" {
 		q = q.Where("tags LIKE ?", "%"+tag+"%")
 	}
@@ -53,13 +53,13 @@ func (r *slackThreadRepo) AllTags() ([]string, error) {
 
 func (r *slackThreadRepo) Create(t models.SlackThread) error { return r.db.Create(&t).Error }
 
-func (r *slackThreadRepo) Update(id uint, messageLink, topic, summary, tags, author string) error {
+func (r *slackThreadRepo) Update(id uint, messageLink, topic, summary, tags string, authorID *uint) error {
 	return r.db.Model(&models.SlackThread{}).Where("id = ?", id).Updates(map[string]interface{}{
 		"message_link": messageLink,
 		"topic":        topic,
 		"summary":      summary,
 		"tags":         tags,
-		"author":       author,
+		"author_id":    authorID,
 	}).Error
 }
 

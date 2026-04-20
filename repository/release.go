@@ -16,7 +16,7 @@ type ReleaseRepository interface {
 	CreateStory(s models.ReleaseStory) error
 	DeleteStory(id uint) error
 	UpdateStoryStatus(id uint, status string) error
-	UpdateStory(id uint, title, assignee string) error
+	UpdateStory(id uint, title string, assigneeID *uint) error
 	CreateSlackUpdate(u models.ReleaseSlackUpdate) error
 	DeleteSlackUpdate(id uint) error
 }
@@ -39,6 +39,7 @@ func (r *releaseRepo) ByID(id uint) (models.Release, error) {
 	result := r.db.
 		Preload("Stages", func(db *gorm.DB) *gorm.DB { return db.Order("created_at ASC") }).
 		Preload("Stages.Stories", func(db *gorm.DB) *gorm.DB { return db.Order("created_at ASC") }).
+		Preload("Stages.Stories.Assignee").
 		Preload("Stages.SlackUpdates", func(db *gorm.DB) *gorm.DB { return db.Order("created_at ASC") }).
 		First(&rel, id)
 	return rel, result.Error
@@ -79,9 +80,9 @@ func (r *releaseRepo) UpdateStoryStatus(id uint, status string) error {
 	return r.db.Model(&models.ReleaseStory{}).Where("id = ?", id).Update("status", status).Error
 }
 
-func (r *releaseRepo) UpdateStory(id uint, title, assignee string) error {
+func (r *releaseRepo) UpdateStory(id uint, title string, assigneeID *uint) error {
 	return r.db.Model(&models.ReleaseStory{}).Where("id = ?", id).
-		Updates(map[string]interface{}{"title": title, "assignee": assignee}).Error
+		Updates(map[string]interface{}{"title": title, "assignee_id": assigneeID}).Error
 }
 
 func (r *releaseRepo) CreateSlackUpdate(u models.ReleaseSlackUpdate) error {

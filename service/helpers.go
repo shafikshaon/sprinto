@@ -2,7 +2,6 @@ package service
 
 import (
 	"math"
-	"strings"
 	"time"
 )
 
@@ -36,13 +35,3 @@ func formatDate(raw string) string {
 	return t.Format("Jan 2, 2006")
 }
 
-func splitAssignees(csv string) []string {
-	var out []string
-	for _, p := range strings.Split(csv, ",") {
-		p = strings.TrimSpace(p)
-		if p != "" {
-			out = append(out, p)
-		}
-	}
-	return out
-}

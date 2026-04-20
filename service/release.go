@@ -16,10 +16,10 @@ type ReleaseService interface {
 	AddStage(releaseID uint, name, status string) error
 	DeleteStage(id uint) error
 	UpdateStageStatus(id uint, status string) error
-	AddStory(stageID uint, title, assignee string) error
+	AddStory(stageID uint, title string, assigneeID *uint) error
 	DeleteStory(id uint) error
 	UpdateStoryStatus(id uint, status string) error
-	UpdateStory(id uint, title, assignee string) error
+	UpdateStory(id uint, title string, assigneeID *uint) error
 	AddSlackUpdate(stageID uint, channel, message, author string) error
 	DeleteSlackUpdate(id uint) error
 }
@@ -67,15 +67,15 @@ func (s *releaseService) UpdateStageStatus(id uint, status string) error {
 	return s.repo.UpdateStageStatus(id, status)
 }
 
-func (s *releaseService) AddStory(stageID uint, title, assignee string) error {
+func (s *releaseService) AddStory(stageID uint, title string, assigneeID *uint) error {
 	if strings.TrimSpace(title) == "" {
 		return nil
 	}
 	return s.repo.CreateStory(models.ReleaseStory{
-		StageID:  stageID,
-		Title:    strings.TrimSpace(title),
-		Assignee: strings.TrimSpace(assignee),
-		Status:   "Pending",
+		StageID:    stageID,
+		Title:      strings.TrimSpace(title),
+		AssigneeID: assigneeID,
+		Status:     "Pending",
 	})
 }
 
@@ -84,11 +84,11 @@ func (s *releaseService) UpdateStoryStatus(id uint, status string) error {
 	return s.repo.UpdateStoryStatus(id, status)
 }
 
-func (s *releaseService) UpdateStory(id uint, title, assignee string) error {
+func (s *releaseService) UpdateStory(id uint, title string, assigneeID *uint) error {
 	if strings.TrimSpace(title) == "" {
 		return nil
 	}
-	return s.repo.UpdateStory(id, strings.TrimSpace(title), strings.TrimSpace(assignee))
+	return s.repo.UpdateStory(id, strings.TrimSpace(title), assigneeID)
 }
 
 func (s *releaseService) AddSlackUpdate(stageID uint, channel, message, author string) error {

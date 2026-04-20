@@ -291,169 +291,215 @@ END $$;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Seed: Dev Tasks
--- Randomly assigned to existing projects; assignees pulled from team_members.
+-- Assignees stored via FK in dev_task_assignees junction table.
 -- ─────────────────────────────────────────────────────────────────────────────
 
 DO $$
 DECLARE
   v_project_ids  integer[];
-  v_member_names text[];
+  v_member_ids   integer[];
   v_nproj        integer;
   v_nmem         integer;
   v_pid          integer;
-  v_m1           text;
-  v_m2           text;
+  v_m1           integer;
+  v_m2           integer;
+  v_dt_id        integer;
 
 BEGIN
-  -- ── Projects ──────────────────────────────────────────────────────────────
   SELECT ARRAY(SELECT id FROM projects WHERE deleted_at IS NULL ORDER BY id)
     INTO v_project_ids;
   v_nproj := array_length(v_project_ids, 1);
+  IF v_nproj IS NULL THEN RAISE EXCEPTION 'No projects found.'; END IF;
 
-  IF v_nproj IS NULL THEN
-    RAISE EXCEPTION 'No projects found.';
-  END IF;
-
-  -- ── Team members (names only) ─────────────────────────────────────────────
-  SELECT ARRAY(SELECT name FROM team_members WHERE deleted_at IS NULL ORDER BY id)
-    INTO v_member_names;
-  v_nmem := array_length(v_member_names, 1);
-
-  IF v_nmem IS NULL THEN
-    v_member_names := ARRAY['Unassigned'];
-    v_nmem := 1;
-  END IF;
+  SELECT ARRAY(SELECT id FROM team_members WHERE deleted_at IS NULL ORDER BY id)
+    INTO v_member_ids;
+  v_nmem := coalesce(array_length(v_member_ids, 1), 0);
+  IF v_nmem = 0 THEN RAISE EXCEPTION 'No team members found — add team members before seeding dev tasks.'; END IF;
 
   RAISE NOTICE 'Seeding dev tasks across % project(s) with % member(s)…', v_nproj, v_nmem;
 
   -- ── Improvement tasks ─────────────────────────────────────────────────────
-  v_m1 := v_member_names[1+floor(random()*v_nmem)::int]; v_m2 := v_member_names[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW()-interval'38 days', NOW()-interval'10 days', v_pid, 'Migrate REST endpoints to GraphQL', 'Improvement', v_m1||','||v_m2, 'In Progress', 'High');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_m2 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'38 days', NOW()-interval'10 days', v_pid, 'Migrate REST endpoints to GraphQL', 'Improvement', 'In Progress', 'High')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1), (v_dt_id, v_m2) ON CONFLICT DO NOTHING;
 
-  v_m1 := v_member_names[1+floor(random()*v_nmem)::int]; v_m2 := v_member_names[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW()-interval'35 days', NOW()-interval'35 days', v_pid, 'Upgrade dashboard charts to Chart.js v4', 'Improvement', v_m1, 'Todo', 'Medium');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'35 days', NOW()-interval'35 days', v_pid, 'Upgrade dashboard charts to Chart.js v4', 'Improvement', 'Todo', 'Medium')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1) ON CONFLICT DO NOTHING;
 
-  v_m1 := v_member_names[1+floor(random()*v_nmem)::int]; v_m2 := v_member_names[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW()-interval'33 days', NOW()-interval'2 days', v_pid, 'Add dark mode support across all pages', 'Improvement', v_m1||','||v_m2, 'In Progress', 'Medium');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_m2 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'33 days', NOW()-interval'2 days', v_pid, 'Add dark mode support across all pages', 'Improvement', 'In Progress', 'Medium')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1), (v_dt_id, v_m2) ON CONFLICT DO NOTHING;
 
-  v_m1 := v_member_names[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW()-interval'30 days', NOW()-interval'30 days', v_pid, 'Implement keyboard shortcut navigation', 'Improvement', v_m1, 'Todo', 'Low');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'30 days', NOW()-interval'30 days', v_pid, 'Implement keyboard shortcut navigation', 'Improvement', 'Todo', 'Low')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1) ON CONFLICT DO NOTHING;
 
-  v_m1 := v_member_names[1+floor(random()*v_nmem)::int]; v_m2 := v_member_names[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW()-interval'28 days', NOW()-interval'5 days', v_pid, 'Optimise sprint board rendering performance', 'Improvement', v_m1||','||v_m2, 'Done', 'High');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_m2 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'28 days', NOW()-interval'5 days', v_pid, 'Optimise sprint board rendering performance', 'Improvement', 'Done', 'High')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1), (v_dt_id, v_m2) ON CONFLICT DO NOTHING;
 
-  v_m1 := v_member_names[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW()-interval'25 days', NOW()-interval'25 days', v_pid, 'Add CSV export for deadline reports', 'Improvement', v_m1, 'Todo', 'Medium');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'25 days', NOW()-interval'25 days', v_pid, 'Add CSV export for deadline reports', 'Improvement', 'Todo', 'Medium')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1) ON CONFLICT DO NOTHING;
 
-  v_m1 := v_member_names[1+floor(random()*v_nmem)::int]; v_m2 := v_member_names[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW()-interval'22 days', NOW()-interval'8 days', v_pid, 'Redesign onboarding flow for new users', 'Improvement', v_m1||','||v_m2, 'In Progress', 'High');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_m2 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'22 days', NOW()-interval'8 days', v_pid, 'Redesign onboarding flow for new users', 'Improvement', 'In Progress', 'High')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1), (v_dt_id, v_m2) ON CONFLICT DO NOTHING;
 
-  v_m1 := v_member_names[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW()-interval'20 days', NOW()-interval'20 days', v_pid, 'Add real-time notification badge via WebSocket', 'Improvement', v_m1, 'Todo', 'High');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'20 days', NOW()-interval'20 days', v_pid, 'Add real-time notification badge via WebSocket', 'Improvement', 'Todo', 'High')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1) ON CONFLICT DO NOTHING;
 
-  v_m1 := v_member_names[1+floor(random()*v_nmem)::int]; v_m2 := v_member_names[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW()-interval'18 days', NOW()-interval'3 days', v_pid, 'Improve pagination UX with infinite scroll option', 'Improvement', v_m1||','||v_m2, 'Done', 'Medium');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_m2 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'18 days', NOW()-interval'3 days', v_pid, 'Improve pagination UX with infinite scroll option', 'Improvement', 'Done', 'Medium')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1), (v_dt_id, v_m2) ON CONFLICT DO NOTHING;
 
-  v_m1 := v_member_names[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW()-interval'15 days', NOW()-interval'15 days', v_pid, 'Add multi-language (i18n) support skeleton', 'Improvement', v_m1, 'Todo', 'Low');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'15 days', NOW()-interval'15 days', v_pid, 'Add multi-language (i18n) support skeleton', 'Improvement', 'Todo', 'Low')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1) ON CONFLICT DO NOTHING;
 
   -- ── Tech Debt tasks ───────────────────────────────────────────────────────
-  v_m1 := v_member_names[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW()-interval'40 days', NOW()-interval'40 days', v_pid, 'Remove deprecated jQuery dependency from legacy pages', 'Tech Debt', v_m1, 'Todo', 'High');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'40 days', NOW()-interval'40 days', v_pid, 'Remove deprecated jQuery dependency from legacy pages', 'Tech Debt', 'Todo', 'High')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1) ON CONFLICT DO NOTHING;
 
-  v_m1 := v_member_names[1+floor(random()*v_nmem)::int]; v_m2 := v_member_names[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW()-interval'37 days', NOW()-interval'12 days', v_pid, 'Consolidate duplicate date-formatting helpers across templates', 'Tech Debt', v_m1||','||v_m2, 'In Progress', 'Medium');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_m2 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'37 days', NOW()-interval'12 days', v_pid, 'Consolidate duplicate date-formatting helpers across templates', 'Tech Debt', 'In Progress', 'Medium')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1), (v_dt_id, v_m2) ON CONFLICT DO NOTHING;
 
-  v_m1 := v_member_names[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW()-interval'34 days', NOW()-interval'4 days', v_pid, 'Replace raw SQL queries in reporting module with GORM', 'Tech Debt', v_m1, 'Done', 'Critical');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'34 days', NOW()-interval'4 days', v_pid, 'Replace raw SQL queries in reporting module with GORM', 'Tech Debt', 'Done', 'Critical')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1) ON CONFLICT DO NOTHING;
 
-  v_m1 := v_member_names[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW()-interval'31 days', NOW()-interval'31 days', v_pid, 'Fix N+1 query on team members listing page', 'Tech Debt', v_m1, 'Todo', 'High');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'31 days', NOW()-interval'31 days', v_pid, 'Fix N+1 query on team members listing page', 'Tech Debt', 'Todo', 'High')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1) ON CONFLICT DO NOTHING;
 
-  v_m1 := v_member_names[1+floor(random()*v_nmem)::int]; v_m2 := v_member_names[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW()-interval'27 days', NOW()-interval'9 days', v_pid, 'Add missing database indexes on foreign key columns', 'Tech Debt', v_m1||','||v_m2, 'Done', 'Critical');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_m2 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'27 days', NOW()-interval'9 days', v_pid, 'Add missing database indexes on foreign key columns', 'Tech Debt', 'Done', 'Critical')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1), (v_dt_id, v_m2) ON CONFLICT DO NOTHING;
 
-  v_m1 := v_member_names[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW()-interval'24 days', NOW()-interval'24 days', v_pid, 'Migrate hardcoded config values to environment variables', 'Tech Debt', v_m1, 'Todo', 'Medium');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'24 days', NOW()-interval'24 days', v_pid, 'Migrate hardcoded config values to environment variables', 'Tech Debt', 'Todo', 'Medium')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1) ON CONFLICT DO NOTHING;
 
-  v_m1 := v_member_names[1+floor(random()*v_nmem)::int]; v_m2 := v_member_names[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW()-interval'21 days', NOW()-interval'6 days', v_pid, 'Standardise HTTP error response format across all handlers', 'Tech Debt', v_m1||','||v_m2, 'In Progress', 'Medium');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_m2 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'21 days', NOW()-interval'6 days', v_pid, 'Standardise HTTP error response format across all handlers', 'Tech Debt', 'In Progress', 'Medium')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1), (v_dt_id, v_m2) ON CONFLICT DO NOTHING;
 
-  v_m1 := v_member_names[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW()-interval'17 days', NOW()-interval'17 days', v_pid, 'Remove unused feature-flag code from Sprint 9', 'Tech Debt', v_m1, 'Todo', 'Low');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'17 days', NOW()-interval'17 days', v_pid, 'Remove unused feature-flag code from Sprint 9', 'Tech Debt', 'Todo', 'Low')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1) ON CONFLICT DO NOTHING;
 
-  v_m1 := v_member_names[1+floor(random()*v_nmem)::int]; v_m2 := v_member_names[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW()-interval'14 days', NOW()-interval'14 days', v_pid, 'Increase unit test coverage for auth service to 80%', 'Tech Debt', v_m1||','||v_m2, 'Todo', 'High');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_m2 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'14 days', NOW()-interval'14 days', v_pid, 'Increase unit test coverage for auth service to 80%', 'Tech Debt', 'Todo', 'High')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1), (v_dt_id, v_m2) ON CONFLICT DO NOTHING;
 
-  v_m1 := v_member_names[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW()-interval'10 days', NOW()-interval'2 days', v_pid, 'Upgrade Go module dependencies to latest stable versions', 'Tech Debt', v_m1, 'In Progress', 'Medium');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'10 days', NOW()-interval'2 days', v_pid, 'Upgrade Go module dependencies to latest stable versions', 'Tech Debt', 'In Progress', 'Medium')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1) ON CONFLICT DO NOTHING;
 
   -- ── Research tasks ────────────────────────────────────────────────────────
-  v_m1 := v_member_names[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW()-interval'36 days', NOW()-interval'36 days', v_pid, 'Evaluate OpenTelemetry for distributed tracing', 'Research', v_m1, 'Todo', 'Medium');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'36 days', NOW()-interval'36 days', v_pid, 'Evaluate OpenTelemetry for distributed tracing', 'Research', 'Todo', 'Medium')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1) ON CONFLICT DO NOTHING;
 
-  v_m1 := v_member_names[1+floor(random()*v_nmem)::int]; v_m2 := v_member_names[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW()-interval'32 days', NOW()-interval'7 days', v_pid, 'Proof of concept: edge caching with Cloudflare Workers', 'Research', v_m1||','||v_m2, 'In Progress', 'High');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_m2 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'32 days', NOW()-interval'7 days', v_pid, 'Proof of concept: edge caching with Cloudflare Workers', 'Research', 'In Progress', 'High')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1), (v_dt_id, v_m2) ON CONFLICT DO NOTHING;
 
-  v_m1 := v_member_names[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW()-interval'29 days', NOW()-interval'29 days', v_pid, 'Assess feasibility of WASM for client-side report rendering', 'Research', v_m1, 'Todo', 'Low');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'29 days', NOW()-interval'29 days', v_pid, 'Assess feasibility of WASM for client-side report rendering', 'Research', 'Todo', 'Low')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1) ON CONFLICT DO NOTHING;
 
-  v_m1 := v_member_names[1+floor(random()*v_nmem)::int]; v_m2 := v_member_names[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW()-interval'26 days', NOW()-interval'11 days', v_pid, 'Benchmark PostgreSQL JSONB vs relational for audit log', 'Research', v_m1||','||v_m2, 'Done', 'Medium');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_m2 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'26 days', NOW()-interval'11 days', v_pid, 'Benchmark PostgreSQL JSONB vs relational for audit log', 'Research', 'Done', 'Medium')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1), (v_dt_id, v_m2) ON CONFLICT DO NOTHING;
 
-  v_m1 := v_member_names[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW()-interval'23 days', NOW()-interval'23 days', v_pid, 'Investigate AI-assisted sprint velocity prediction', 'Research', v_m1, 'Todo', 'Low');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'23 days', NOW()-interval'23 days', v_pid, 'Investigate AI-assisted sprint velocity prediction', 'Research', 'Todo', 'Low')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1) ON CONFLICT DO NOTHING;
 
-  v_m1 := v_member_names[1+floor(random()*v_nmem)::int]; v_m2 := v_member_names[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW()-interval'19 days', NOW()-interval'5 days', v_pid, 'Research headless CMS options for documentation portal', 'Research', v_m1||','||v_m2, 'In Progress', 'Medium');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_m2 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'19 days', NOW()-interval'5 days', v_pid, 'Research headless CMS options for documentation portal', 'Research', 'In Progress', 'Medium')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1), (v_dt_id, v_m2) ON CONFLICT DO NOTHING;
 
-  v_m1 := v_member_names[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW()-interval'16 days', NOW()-interval'16 days', v_pid, 'Explore event-driven architecture with NATS for notifications', 'Research', v_m1, 'Todo', 'High');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'16 days', NOW()-interval'16 days', v_pid, 'Explore event-driven architecture with NATS for notifications', 'Research', 'Todo', 'High')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1) ON CONFLICT DO NOTHING;
 
-  v_pid := v_project_ids[1 + floor(random() * v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW() - interval '12 days', NOW() - interval '12 days', v_pid,
-   'Compare ClickHouse vs TimescaleDB for analytics pipeline',
-   'Research', v_m1||','||v_m2, 'Todo', 'Medium');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_m2 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'12 days', NOW()-interval'12 days', v_pid, 'Compare ClickHouse vs TimescaleDB for analytics pipeline', 'Research', 'Todo', 'Medium')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1), (v_dt_id, v_m2) ON CONFLICT DO NOTHING;
 
-  v_pid := v_project_ids[1 + floor(random() * v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW() - interval '8 days', NOW() - interval '1 day', v_pid,
-   'Evaluate Playwright vs Cypress for end-to-end test suite',
-   'Research', v_m1, 'In Progress', 'Medium');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'8 days', NOW()-interval'1 day', v_pid, 'Evaluate Playwright vs Cypress for end-to-end test suite', 'Research', 'In Progress', 'Medium')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1) ON CONFLICT DO NOTHING;
 
-  v_pid := v_project_ids[1 + floor(random() * v_nproj)::int];
-  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, assignees, status, priority) VALUES
-  (NOW() - interval '5 days', NOW() - interval '5 days', v_pid,
-   'Spike: feature flags service (LaunchDarkly vs homegrown)',
-   'Research', v_m1||','||v_m2, 'Todo', 'Low');
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_m2 := v_member_ids[1+floor(random()*v_nmem)::int]; v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO dev_tasks (created_at, updated_at, project_id, title, type, status, priority)
+  VALUES (NOW()-interval'5 days', NOW()-interval'5 days', v_pid, 'Spike: feature flags service (LaunchDarkly vs homegrown)', 'Research', 'Todo', 'Low')
+  RETURNING id INTO v_dt_id;
+  INSERT INTO dev_task_assignees (dev_task_id, team_member_id) VALUES (v_dt_id, v_m1), (v_dt_id, v_m2) ON CONFLICT DO NOTHING;
 
   RAISE NOTICE 'Done — 30 dev task entries inserted.';
 END $$;
@@ -689,4 +735,744 @@ BEGIN
    'Sprint at 61%. Timezone refactor fully merged. Audit log query optimised to 18ms after composite index. Rina profiling 3 more endpoints this week. No blockers. On track for audit log UI by end of sprint.');
 
   RAISE NOTICE 'Done — 15 meeting entries inserted.';
+END $$;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Seed: Slack Threads
+-- ─────────────────────────────────────────────────────────────────────────────
+
+DO $$
+DECLARE
+  v_project_ids  integer[];
+  v_member_ids   integer[];
+  v_nproj        integer;
+  v_nmem         integer;
+  v_pid          integer;
+  v_author_id    integer;
+
+BEGIN
+  SELECT ARRAY(SELECT id FROM projects WHERE deleted_at IS NULL ORDER BY id) INTO v_project_ids;
+  v_nproj := array_length(v_project_ids, 1);
+  IF v_nproj IS NULL THEN RAISE EXCEPTION 'No projects found.'; END IF;
+
+  SELECT ARRAY(SELECT id FROM team_members WHERE deleted_at IS NULL ORDER BY id) INTO v_member_ids;
+  v_nmem := coalesce(array_length(v_member_ids, 1), 0);
+  IF v_nmem = 0 THEN RAISE EXCEPTION 'No team members found.'; END IF;
+
+  RAISE NOTICE 'Seeding slack threads…';
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int]; v_author_id := v_member_ids[1+floor(random()*v_nmem)::int];
+  INSERT INTO slack_threads (created_at, updated_at, project_id, message_link, topic, summary, tags, author_id) VALUES
+  (NOW()-interval'35 days', NOW()-interval'35 days', v_pid,
+   'https://slack.com/archives/C01/p1714000001',
+   'JWT refresh token expiry strategy',
+   'Discussed whether to use sliding window or fixed expiry for refresh tokens. Team aligned on 7-day fixed expiry with silent renewal on activity. Rolling tokens ruled out due to complexity with multi-device sessions.',
+   'auth,security,backend', v_author_id);
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int]; v_author_id := v_member_ids[1+floor(random()*v_nmem)::int];
+  INSERT INTO slack_threads (created_at, updated_at, project_id, message_link, topic, summary, tags, author_id) VALUES
+  (NOW()-interval'33 days', NOW()-interval'33 days', v_pid,
+   'https://slack.com/archives/C01/p1714000002',
+   'Redis session store — staging provisioning',
+   'Karim confirmed Redis 7.2 provisioned on staging. Connection string shared in #infra-secrets. Session invalidation tests unblocked. No persistence needed for staging; AOF enabled for prod.',
+   'infra,redis,staging', v_author_id);
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int]; v_author_id := v_member_ids[1+floor(random()*v_nmem)::int];
+  INSERT INTO slack_threads (created_at, updated_at, project_id, message_link, topic, summary, tags, author_id) VALUES
+  (NOW()-interval'31 days', NOW()-interval'31 days', v_pid,
+   'https://slack.com/archives/C01/p1714000003',
+   'Dashboard widget API contract — product feedback',
+   'Product approved all 7 widget endpoints. Requested one change: sprint velocity chart should include carry-over points separately. Nadia to update the response schema. No timeline impact.',
+   'api,dashboard,product', v_author_id);
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int]; v_author_id := v_member_ids[1+floor(random()*v_nmem)::int];
+  INSERT INTO slack_threads (created_at, updated_at, project_id, message_link, topic, summary, tags, author_id) VALUES
+  (NOW()-interval'29 days', NOW()-interval'29 days', v_pid,
+   'https://slack.com/archives/C01/p1714000004',
+   'Chart.js v3 timezone offset bug',
+   'Confirmed upstream Chart.js issue #12350. Workaround: force dataset labels to UTC strings and display local time in tooltips only. Fix expected in Chart.js v4.1 — upgrade tracked in dev tasks.',
+   'frontend,bug,chartsjs', v_author_id);
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int]; v_author_id := v_member_ids[1+floor(random()*v_nmem)::int];
+  INSERT INTO slack_threads (created_at, updated_at, project_id, message_link, topic, summary, tags, author_id) VALUES
+  (NOW()-interval'27 days', NOW()-interval'27 days', v_pid,
+   'https://slack.com/archives/C01/p1714000005',
+   'N+1 query fix on sprint-summary endpoint',
+   'Root cause: tasks loaded one-by-one inside a loop. Fix: added Preload("Tasks") to sprint repo. Query time dropped from 340ms to 28ms on staging dataset (800 tasks). Added benchmark test to prevent regression.',
+   'performance,backend,gorm', v_author_id);
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int]; v_author_id := v_member_ids[1+floor(random()*v_nmem)::int];
+  INSERT INTO slack_threads (created_at, updated_at, project_id, message_link, topic, summary, tags, author_id) VALUES
+  (NOW()-interval'25 days', NOW()-interval'25 days', v_pid,
+   'https://slack.com/archives/C01/p1714000006',
+   'Notification polling vs WebSocket trade-off',
+   'Agreed on 30s polling for Sprint 12 given timeline constraints. WebSocket (socket.io or Go gorilla/websocket) deferred to Sprint 13. Polling endpoint should use ETag caching to reduce payload on no-change responses.',
+   'notifications,architecture,websocket', v_author_id);
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int]; v_author_id := v_member_ids[1+floor(random()*v_nmem)::int];
+  INSERT INTO slack_threads (created_at, updated_at, project_id, message_link, topic, summary, tags, author_id) VALUES
+  (NOW()-interval'22 days', NOW()-interval'22 days', v_pid,
+   'https://slack.com/archives/C01/p1714000007',
+   'GitHub Actions IAM role for staging deploys',
+   'New IAM role arn:aws:iam::123456789:role/github-actions-staging approved by Karim. Least-privilege: S3 write to deploy bucket + ECS task update only. Secrets stored in GitHub repo environment "staging".',
+   'ci-cd,infra,devops', v_author_id);
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int]; v_author_id := v_member_ids[1+floor(random()*v_nmem)::int];
+  INSERT INTO slack_threads (created_at, updated_at, project_id, message_link, topic, summary, tags, author_id) VALUES
+  (NOW()-interval'20 days', NOW()-interval'20 days', v_pid,
+   'https://slack.com/archives/C01/p1714000008',
+   'Docker layer caching strategy for faster builds',
+   'Arif restructured Dockerfile: dependencies layer first, source copy last. Added --mount=type=cache for Go module cache. Staging deploy time: 4min → 1min 40s. Template shared in #engineering for other services.',
+   'ci-cd,docker,performance', v_author_id);
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int]; v_author_id := v_member_ids[1+floor(random()*v_nmem)::int];
+  INSERT INTO slack_threads (created_at, updated_at, project_id, message_link, topic, summary, tags, author_id) VALUES
+  (NOW()-interval'17 days', NOW()-interval'17 days', v_pid,
+   'https://slack.com/archives/C01/p1714000009',
+   'Avatar upload file size validation',
+   'Bug: silent failure on files >2MB. Root cause: missing server-side validation (relied on frontend only). Fix: added MaxBytesReader in handler + user-facing error message. Also added accepted MIME type check (image/jpeg, image/png, image/webp).',
+   'bug,backend,ux', v_author_id);
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int]; v_author_id := v_member_ids[1+floor(random()*v_nmem)::int];
+  INSERT INTO slack_threads (created_at, updated_at, project_id, message_link, topic, summary, tags, author_id) VALUES
+  (NOW()-interval'15 days', NOW()-interval'15 days', v_pid,
+   'https://slack.com/archives/C01/p1714000010',
+   'Prod deployment approval gate design',
+   'Manual approval gate implemented via GitHub Actions environment protection rules. Required reviewers: any 1 of [lead, devops]. Timeout: 2 hours before auto-cancel. Prod secrets isolated in "production" environment.',
+   'ci-cd,devops,release', v_author_id);
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int]; v_author_id := v_member_ids[1+floor(random()*v_nmem)::int];
+  INSERT INTO slack_threads (created_at, updated_at, project_id, message_link, topic, summary, tags, author_id) VALUES
+  (NOW()-interval'13 days', NOW()-interval'13 days', v_pid,
+   'https://slack.com/archives/C01/p1714000011',
+   'v1.4 release comms and rollback plan',
+   'Release notes drafted and shared in #product-updates. Rollback plan: ECS task definition rollback to previous revision (< 5 min). DB migrations are additive-only so no rollback needed. On-call: Arif primary, Karim secondary.',
+   'release,comms,ops', v_author_id);
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int]; v_author_id := v_member_ids[1+floor(random()*v_nmem)::int];
+  INSERT INTO slack_threads (created_at, updated_at, project_id, message_link, topic, summary, tags, author_id) VALUES
+  (NOW()-interval'10 days', NOW()-interval'10 days', v_pid,
+   'https://slack.com/archives/C01/p1714000012',
+   'Notification badge init bug root cause',
+   'Bug in login handler: badge count seeded from DB after session cookie set but before response flushed — race condition on first page load. Fix: move badge seed to session middleware. Hotfix deployed v1.4.1 same day.',
+   'bug,notifications,hotfix', v_author_id);
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int]; v_author_id := v_member_ids[1+floor(random()*v_nmem)::int];
+  INSERT INTO slack_threads (created_at, updated_at, project_id, message_link, topic, summary, tags, author_id) VALUES
+  (NOW()-interval'8 days', NOW()-interval'8 days', v_pid,
+   'https://slack.com/archives/C01/p1714000013',
+   'Audit log JSONB vs relational metadata',
+   'Benchmarked both approaches on 1M row dataset. JSONB: flexible schema, 12ms read, 8ms write. Relational: rigid schema, 9ms read, 6ms write. Decision: JSONB for metadata given evolving audit requirements. Index on (user_id, created_at) added.',
+   'database,architecture,audit', v_author_id);
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int]; v_author_id := v_member_ids[1+floor(random()*v_nmem)::int];
+  INSERT INTO slack_threads (created_at, updated_at, project_id, message_link, topic, summary, tags, author_id) VALUES
+  (NOW()-interval'5 days', NOW()-interval'5 days', v_pid,
+   'https://slack.com/archives/C01/p1714000014',
+   'Timezone display format — UX decision',
+   'UX call outcome: show absolute local time (e.g. "2 May, 14:30") with UTC offset in tooltip on hover. Relative time ("2 hours ago") shown only in activity feeds. Rina to update component library. Nadia to start template refactor.',
+   'ux,frontend,timezone', v_author_id);
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int]; v_author_id := v_member_ids[1+floor(random()*v_nmem)::int];
+  INSERT INTO slack_threads (created_at, updated_at, project_id, message_link, topic, summary, tags, author_id) VALUES
+  (NOW()-interval'3 days', NOW()-interval'3 days', v_pid,
+   'https://slack.com/archives/C01/p1714000015',
+   'Performance profiling findings — Sprint 14',
+   'pprof results: top 3 slow endpoints are audit log list (fixed), sprint board load (340ms, index missing on sprint_tasks.sprint_id), and release detail (220ms, N+1 on stages). Two new tickets created for Sprint 14 backlog.',
+   'performance,profiling,backend', v_author_id);
+
+  RAISE NOTICE 'Done — 15 slack thread entries inserted.';
+END $$;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Seed: Sticky Notes
+-- ─────────────────────────────────────────────────────────────────────────────
+
+DO $$
+DECLARE
+  v_project_ids integer[];
+  v_nproj       integer;
+  v_pid         integer;
+
+BEGIN
+  SELECT ARRAY(SELECT id FROM projects WHERE deleted_at IS NULL ORDER BY id) INTO v_project_ids;
+  v_nproj := array_length(v_project_ids, 1);
+  IF v_nproj IS NULL THEN RAISE EXCEPTION 'No projects found.'; END IF;
+
+  RAISE NOTICE 'Seeding sticky notes…';
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO sticky_notes (created_at, updated_at, project_id, title, content, color, pinned) VALUES
+  (NOW()-interval'30 days', NOW()-interval'30 days', v_pid,
+   'Sprint 12 Goals',
+   'Auth module (JWT + refresh tokens), dashboard scaffold, 4 carry-over tickets from Sprint 11. Target: 54 points. Definition of Done: code reviewed, tests green, deployed to staging.',
+   'yellow', true);
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO sticky_notes (created_at, updated_at, project_id, title, content, color, pinned) VALUES
+  (NOW()-interval'28 days', NOW()-interval'28 days', v_pid,
+   'Redis config (staging)',
+   'Host: redis-staging.internal:6379. No auth (internal only). No persistence. Max memory: 256MB, policy: allkeys-lru. Use DB 0 for sessions, DB 1 for rate limiting.',
+   'blue', false);
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO sticky_notes (created_at, updated_at, project_id, title, content, color, pinned) VALUES
+  (NOW()-interval'26 days', NOW()-interval'26 days', v_pid,
+   'API versioning convention',
+   'All breaking changes go under /v2/ prefix. Non-breaking additions are backwards-compatible in /v1/. Deprecation notice required 2 sprints before removal. Document changes in CHANGELOG.md.',
+   'green', false);
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO sticky_notes (created_at, updated_at, project_id, title, content, color, pinned) VALUES
+  (NOW()-interval'24 days', NOW()-interval'24 days', v_pid,
+   'PR checklist',
+   '[ ] Tests written and passing. [ ] No N+1 queries introduced. [ ] Error messages are user-friendly. [ ] Migrations are reversible. [ ] Secrets not committed. [ ] PR description explains the why.',
+   'pink', true);
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO sticky_notes (created_at, updated_at, project_id, title, content, color, pinned) VALUES
+  (NOW()-interval'22 days', NOW()-interval'22 days', v_pid,
+   'On-call rotation',
+   'Week 1: Arif. Week 2: Nadia. Week 3: Karim. Week 4: Rina. Escalation: Slack #incidents first, then PagerDuty if no ack in 10 min. Runbook: notion.so/team/runbooks.',
+   'yellow', false);
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO sticky_notes (created_at, updated_at, project_id, title, content, color, pinned) VALUES
+  (NOW()-interval'20 days', NOW()-interval'20 days', v_pid,
+   'Notification polling endpoint',
+   'GET /api/notifications/count — returns unread count. Use ETag for caching. Client polls every 30s. Upgrade to WebSocket planned for Sprint 13. Rate limit: 10 req/min per user.',
+   'blue', false);
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO sticky_notes (created_at, updated_at, project_id, title, content, color, pinned) VALUES
+  (NOW()-interval'18 days', NOW()-interval'18 days', v_pid,
+   'Sprint 13 Goals',
+   'Release pipeline (staging + prod), CI/CD with GitHub Actions, user settings page (profile, password, notification prefs, timezone). 54 points. Sprint goal: prod pipeline live by May 15.',
+   'yellow', true);
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO sticky_notes (created_at, updated_at, project_id, title, content, color, pinned) VALUES
+  (NOW()-interval'16 days', NOW()-interval'16 days', v_pid,
+   'Staging deploy checklist',
+   '1. Merge to main. 2. GitHub Actions triggers automatically. 3. Wait for build (~90s). 4. Check ECS health — green? 5. Smoke test: /health endpoint + login flow. 6. Post in #deployments.',
+   'green', false);
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO sticky_notes (created_at, updated_at, project_id, title, content, color, pinned) VALUES
+  (NOW()-interval'14 days', NOW()-interval'14 days', v_pid,
+   'Accessibility findings (Sprint 13)',
+   '3 issues found in settings page audit: 1) Missing aria-label on icon buttons. 2) Focus trap broken in modal on Safari. 3) Color contrast ratio 3.2:1 on placeholder text (needs 4.5:1). All fixed before release.',
+   'pink', false);
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO sticky_notes (created_at, updated_at, project_id, title, content, color, pinned) VALUES
+  (NOW()-interval'12 days', NOW()-interval'12 days', v_pid,
+   'v1.4 release checklist',
+   '[ ] Regression suite green (312 tests). [ ] Staging verified by QA. [ ] Release notes approved. [ ] Rollback plan documented. [ ] On-call set. [ ] DB migrations additive only. [ ] Monitoring dashboards reviewed.',
+   'yellow', false);
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO sticky_notes (created_at, updated_at, project_id, title, content, color, pinned) VALUES
+  (NOW()-interval'10 days', NOW()-interval'10 days', v_pid,
+   'Prod DB connection pool',
+   'Increased from 10 → 25 connections before v1.4 release. Monitor pg_stat_activity during peak. Max connections on RDS instance: 100. Leave 25% headroom for migrations and admin connections.',
+   'blue', false);
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO sticky_notes (created_at, updated_at, project_id, title, content, color, pinned) VALUES
+  (NOW()-interval'8 days', NOW()-interval'8 days', v_pid,
+   'Sprint 14 Goals',
+   'Timezone refactor (11 templates), audit log (model + service + UI), performance profiling. 48 points. Key risk: timezone refactor touches many files — run full regression before merging.',
+   'yellow', true);
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO sticky_notes (created_at, updated_at, project_id, title, content, color, pinned) VALUES
+  (NOW()-interval'6 days', NOW()-interval'6 days', v_pid,
+   'Audit log schema',
+   'Table: audit_logs. Columns: id, user_id (FK), action (enum: create/update/delete/login/logout), entity_type (varchar), entity_id (uint), metadata (JSONB), created_at. Index: (user_id, created_at). No soft delete.',
+   'green', false);
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO sticky_notes (created_at, updated_at, project_id, title, content, color, pinned) VALUES
+  (NOW()-interval'4 days', NOW()-interval'4 days', v_pid,
+   'Performance profiling notes',
+   'Slow endpoints: sprint_board (340ms) — missing index on sprint_tasks.sprint_id. release_detail (220ms) — N+1 on stages. Both ticketed for Sprint 14. Use pprof at /debug/pprof/ (admin only).',
+   'pink', false);
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO sticky_notes (created_at, updated_at, project_id, title, content, color, pinned) VALUES
+  (NOW()-interval'2 days', NOW()-interval'2 days', v_pid,
+   'Team Slack channels',
+   '#engineering — general dev discussion. #incidents — alerts and on-call. #deployments — deploy logs. #product-updates — release comms. #infra-secrets — credentials (restricted). #standup — async updates.',
+   'purple', false);
+
+  RAISE NOTICE 'Done — 15 sticky note entries inserted.';
+END $$;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Seed: Deadlines
+-- ─────────────────────────────────────────────────────────────────────────────
+
+DO $$
+DECLARE
+  v_project_ids integer[];
+  v_nproj       integer;
+  v_pid         integer;
+
+BEGIN
+  SELECT ARRAY(SELECT id FROM projects WHERE deleted_at IS NULL ORDER BY id) INTO v_project_ids;
+  v_nproj := array_length(v_project_ids, 1);
+  IF v_nproj IS NULL THEN RAISE EXCEPTION 'No projects found.'; END IF;
+
+  RAISE NOTICE 'Seeding deadlines…';
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO deadlines (created_at, updated_at, project_id, title, due_date, priority) VALUES
+  (NOW()-interval'30 days', NOW()-interval'30 days', v_pid, 'Auth module code freeze', '2026-05-02', 'Critical');
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO deadlines (created_at, updated_at, project_id, title, due_date, priority) VALUES
+  (NOW()-interval'28 days', NOW()-interval'28 days', v_pid, 'Dashboard API contract sign-off', '2026-05-05', 'High');
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO deadlines (created_at, updated_at, project_id, title, due_date, priority) VALUES
+  (NOW()-interval'25 days', NOW()-interval'25 days', v_pid, 'Sprint 12 QA pass', '2026-05-07', 'High');
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO deadlines (created_at, updated_at, project_id, title, due_date, priority) VALUES
+  (NOW()-interval'22 days', NOW()-interval'22 days', v_pid, 'v1.4 release candidate tag', '2026-05-20', 'Critical');
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO deadlines (created_at, updated_at, project_id, title, due_date, priority) VALUES
+  (NOW()-interval'20 days', NOW()-interval'20 days', v_pid, 'v1.4 production release', '2026-05-22', 'Critical');
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO deadlines (created_at, updated_at, project_id, title, due_date, priority) VALUES
+  (NOW()-interval'18 days', NOW()-interval'18 days', v_pid, 'CI/CD staging pipeline live', '2026-05-15', 'High');
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO deadlines (created_at, updated_at, project_id, title, due_date, priority) VALUES
+  (NOW()-interval'15 days', NOW()-interval'15 days', v_pid, 'User settings page accessibility audit', '2026-05-18', 'Medium');
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO deadlines (created_at, updated_at, project_id, title, due_date, priority) VALUES
+  (NOW()-interval'12 days', NOW()-interval'12 days', v_pid, 'Timezone refactor complete', '2026-05-27', 'High');
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO deadlines (created_at, updated_at, project_id, title, due_date, priority) VALUES
+  (NOW()-interval'10 days', NOW()-interval'10 days', v_pid, 'Audit log UI in admin panel', '2026-06-06', 'High');
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO deadlines (created_at, updated_at, project_id, title, due_date, priority) VALUES
+  (NOW()-interval'8 days', NOW()-interval'8 days', v_pid, 'Performance profiling report', '2026-06-01', 'Medium');
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO deadlines (created_at, updated_at, project_id, title, due_date, priority) VALUES
+  (NOW()-interval'6 days', NOW()-interval'6 days', v_pid, 'Sprint 14 retrospective', '2026-06-12', 'Low');
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO deadlines (created_at, updated_at, project_id, title, due_date, priority) VALUES
+  (NOW()-interval'4 days', NOW()-interval'4 days', v_pid, 'Legal compliance review — session storage', '2026-06-20', 'Critical');
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO deadlines (created_at, updated_at, project_id, title, due_date, priority) VALUES
+  (NOW()-interval'3 days', NOW()-interval'3 days', v_pid, 'WebSocket spike completion', '2026-06-15', 'Medium');
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO deadlines (created_at, updated_at, project_id, title, due_date, priority) VALUES
+  (NOW()-interval'2 days', NOW()-interval'2 days', v_pid, 'v1.5 scope finalisation', '2026-06-25', 'High');
+
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO deadlines (created_at, updated_at, project_id, title, due_date, priority) VALUES
+  (NOW()-interval'1 day', NOW()-interval'1 day', v_pid, 'Sprint 15 planning session', '2026-06-30', 'Medium');
+
+  RAISE NOTICE 'Done — 15 deadline entries inserted.';
+END $$;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Seed: Sprints (with tasks)
+-- Assignees stored via FK in sprint_task_assignees junction table.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+DO $$
+DECLARE
+  v_project_ids  integer[];
+  v_member_ids   integer[];
+  v_nproj        integer;
+  v_nmem         integer;
+  v_pid          integer;
+  v_m1           integer;
+  v_m2           integer;
+  v_sprint_id    integer;
+  v_task_id      integer;
+
+BEGIN
+  SELECT ARRAY(SELECT id FROM projects WHERE deleted_at IS NULL ORDER BY id) INTO v_project_ids;
+  v_nproj := array_length(v_project_ids, 1);
+  IF v_nproj IS NULL THEN RAISE EXCEPTION 'No projects found.'; END IF;
+
+  SELECT ARRAY(SELECT id FROM team_members WHERE deleted_at IS NULL ORDER BY id) INTO v_member_ids;
+  v_nmem := coalesce(array_length(v_member_ids, 1), 0);
+  IF v_nmem = 0 THEN RAISE EXCEPTION 'No team members found — add team members before seeding sprints.'; END IF;
+
+  RAISE NOTICE 'Seeding sprints and tasks…';
+
+  -- ── Sprint 11 (completed) ───────────────────────────────────────────────────
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO sprints (created_at, updated_at, project_id, name, goal, progress, start_date, end_date, active)
+  VALUES (NOW()-interval'50 days', NOW()-interval'36 days', v_pid,
+    'Sprint 11', 'Complete user profile API and fix reported bugs from v1.3', 100,
+    '2026-04-06', '2026-04-18', false)
+  RETURNING id INTO v_sprint_id;
+
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_m2 := v_member_ids[1+floor(random()*v_nmem)::int];
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'50 days', NOW()-interval'38 days', v_sprint_id, 'User profile GET/PUT endpoints', 'Done', 'High')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m1) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'49 days', NOW()-interval'39 days', v_sprint_id, 'Fix pagination off-by-one on activity feed', 'Done', 'Medium')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m2) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'48 days', NOW()-interval'40 days', v_sprint_id, 'Avatar upload endpoint', 'Done', 'Medium')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m1) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'47 days', NOW()-interval'41 days', v_sprint_id, 'Email uniqueness validation on profile update', 'Done', 'Low')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m2) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'46 days', NOW()-interval'42 days', v_sprint_id, 'Fix XSS in user display name rendering', 'Done', 'Critical')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m1), (v_task_id, v_m2) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'45 days', NOW()-interval'43 days', v_sprint_id, 'Write service-layer tests for profile module', 'Done', 'Medium')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m2) ON CONFLICT DO NOTHING;
+
+  -- ── Sprint 12 (completed) ───────────────────────────────────────────────────
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO sprints (created_at, updated_at, project_id, name, goal, progress, start_date, end_date, active)
+  VALUES (NOW()-interval'35 days', NOW()-interval'22 days', v_pid,
+    'Sprint 12', 'Ship auth module, dashboard scaffold, and in-app notifications', 100,
+    '2026-04-20', '2026-05-08', false)
+  RETURNING id INTO v_sprint_id;
+
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_m2 := v_member_ids[1+floor(random()*v_nmem)::int];
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'35 days', NOW()-interval'30 days', v_sprint_id, 'JWT refresh-token endpoint', 'Done', 'High')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m1) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'34 days', NOW()-interval'29 days', v_sprint_id, 'Role-based access middleware', 'Done', 'High')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m2) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'33 days', NOW()-interval'28 days', v_sprint_id, 'Password reset email flow', 'Done', 'Medium')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m1) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'32 days', NOW()-interval'27 days', v_sprint_id, 'Dashboard top nav and sidebar', 'Done', 'Medium')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m2) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'31 days', NOW()-interval'26 days', v_sprint_id, 'Dashboard widget API endpoints (7)', 'Done', 'High')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m1), (v_task_id, v_m2) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'30 days', NOW()-interval'25 days', v_sprint_id, 'In-app notification model and dispatch', 'Done', 'High')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m1) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'29 days', NOW()-interval'24 days', v_sprint_id, 'Notification badge polling (30s)', 'Done', 'Medium')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m2) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'28 days', NOW()-interval'23 days', v_sprint_id, 'Fix Chart.js timezone offset bug', 'Done', 'Medium')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m2) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'27 days', NOW()-interval'22 days', v_sprint_id, 'Auth integration tests', 'Done', 'High')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m1) ON CONFLICT DO NOTHING;
+
+  -- ── Sprint 13 (completed) ───────────────────────────────────────────────────
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO sprints (created_at, updated_at, project_id, name, goal, progress, start_date, end_date, active)
+  VALUES (NOW()-interval'21 days', NOW()-interval'8 days', v_pid,
+    'Sprint 13', 'Release pipeline live on staging and prod; user settings page complete', 100,
+    '2026-05-11', '2026-05-22', false)
+  RETURNING id INTO v_sprint_id;
+
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_m2 := v_member_ids[1+floor(random()*v_nmem)::int];
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'21 days', NOW()-interval'16 days', v_sprint_id, 'GitHub Actions PR check pipeline', 'Done', 'High')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m1) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'20 days', NOW()-interval'15 days', v_sprint_id, 'Staging auto-deploy on merge to main', 'Done', 'High')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m1) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'19 days', NOW()-interval'14 days', v_sprint_id, 'Prod pipeline with manual approval gate', 'Done', 'Critical')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m1) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'18 days', NOW()-interval'13 days', v_sprint_id, 'Docker layer caching (4min → 90s)', 'Done', 'Medium')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m1) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'17 days', NOW()-interval'12 days', v_sprint_id, 'User settings schema and migration', 'Done', 'High')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m2) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'16 days', NOW()-interval'11 days', v_sprint_id, 'Profile and password change endpoints', 'Done', 'High')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m2) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'15 days', NOW()-interval'10 days', v_sprint_id, 'Notification preferences endpoint', 'Done', 'Medium')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m2) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'14 days', NOW()-interval'9 days', v_sprint_id, 'Settings page UI (Figma → implementation)', 'Done', 'High')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m2) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'13 days', NOW()-interval'8 days', v_sprint_id, 'Accessibility audit fixes (3 issues)', 'Done', 'Medium')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m2) ON CONFLICT DO NOTHING;
+
+  -- ── Sprint 14 (active) ──────────────────────────────────────────────────────
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  INSERT INTO sprints (created_at, updated_at, project_id, name, goal, progress, start_date, end_date, active)
+  VALUES (NOW()-interval'7 days', NOW(), v_pid,
+    'Sprint 14', 'Timezone refactor complete, audit log live in admin panel, performance profiling report', 61,
+    '2026-05-25', '2026-06-06', true)
+  RETURNING id INTO v_sprint_id;
+
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int]; v_m2 := v_member_ids[1+floor(random()*v_nmem)::int];
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'7 days', NOW()-interval'2 days', v_sprint_id, 'Timezone refactor — 11 templates', 'Done', 'High')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m1) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'7 days', NOW()-interval'3 days', v_sprint_id, 'Audit log model and migration', 'Done', 'High')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m2) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'6 days', NOW()-interval'2 days', v_sprint_id, 'Composite index on (user_id, created_at)', 'Done', 'High')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m2) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'6 days', NOW()-interval'1 day', v_sprint_id, 'Audit log service layer + tests', 'In Progress', 'High')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m2) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'5 days', NOW()-interval'1 day', v_sprint_id, 'Audit log admin UI (filterable table)', 'In Progress', 'Medium')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m2) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'5 days', NOW()-interval'5 days', v_sprint_id, 'pprof endpoint (admin only)', 'Done', 'Medium')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m1) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'4 days', NOW()-interval'1 day', v_sprint_id, 'Fix N+1 on sprint board load', 'In Progress', 'High')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m1) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'4 days', NOW()-interval'4 days', v_sprint_id, 'Fix N+1 on release detail stages', 'Todo', 'Medium')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m1) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'3 days', NOW()-interval'3 days', v_sprint_id, 'Performance profiling report (3 endpoints)', 'Todo', 'Medium')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m1) ON CONFLICT DO NOTHING;
+
+  INSERT INTO sprint_tasks (created_at, updated_at, sprint_id, title, status, priority)
+  VALUES (NOW()-interval'2 days', NOW()-interval'2 days', v_sprint_id, 'Fix flaky notification test (retry logic)', 'Todo', 'Low')
+  RETURNING id INTO v_task_id;
+  INSERT INTO sprint_task_assignees (sprint_task_id, team_member_id) VALUES (v_task_id, v_m2) ON CONFLICT DO NOTHING;
+
+  RAISE NOTICE 'Done — 4 sprints and tasks inserted.';
+END $$;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Seed: Releases (with stages and stories)
+-- ─────────────────────────────────────────────────────────────────────────────
+
+DO $$
+DECLARE
+  v_project_ids  integer[];
+  v_member_ids   integer[];
+  v_nproj        integer;
+  v_nmem         integer;
+  v_pid          integer;
+  v_m1           integer;
+  v_m2           integer;
+  v_release_id   integer;
+  v_stage_id     integer;
+
+BEGIN
+  SELECT ARRAY(SELECT id FROM projects WHERE deleted_at IS NULL ORDER BY id) INTO v_project_ids;
+  v_nproj := array_length(v_project_ids, 1);
+  IF v_nproj IS NULL THEN RAISE EXCEPTION 'No projects found.'; END IF;
+
+  SELECT ARRAY(SELECT id FROM team_members WHERE deleted_at IS NULL ORDER BY id) INTO v_member_ids;
+  v_nmem := coalesce(array_length(v_member_ids, 1), 0);
+  IF v_nmem = 0 THEN RAISE EXCEPTION 'No team members found — add team members before seeding releases.'; END IF;
+
+  RAISE NOTICE 'Seeding releases…';
+
+  -- ── v1.3 — Released ────────────────────────────────────────────────────────
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int];
+  v_m2 := v_member_ids[1+floor(random()*v_nmem)::int];
+  INSERT INTO releases (created_at, updated_at, project_id, name, description, status, target_date)
+  VALUES (NOW()-interval'55 days', NOW()-interval'40 days', v_pid,
+    'v1.3.0', 'Bug fixes from v1.2 feedback: pagination, XSS fix, profile API improvements.', 'Released', '2026-04-18')
+  RETURNING id INTO v_release_id;
+
+  INSERT INTO release_stages (created_at, updated_at, release_id, name, status)
+  VALUES (NOW()-interval'55 days', NOW()-interval'50 days', v_release_id, 'Development', 'Done')
+  RETURNING id INTO v_stage_id;
+  INSERT INTO release_stories (created_at, updated_at, stage_id, title, assignee_id, status) VALUES
+  (NOW()-interval'54 days', NOW()-interval'50 days', v_stage_id, 'Fix pagination off-by-one on activity feed', v_m1, 'Passed'),
+  (NOW()-interval'53 days', NOW()-interval'50 days', v_stage_id, 'Fix XSS in user display name', v_m2, 'Passed'),
+  (NOW()-interval'52 days', NOW()-interval'50 days', v_stage_id, 'User profile GET/PUT endpoints', v_m1, 'Passed');
+
+  INSERT INTO release_stages (created_at, updated_at, release_id, name, status)
+  VALUES (NOW()-interval'49 days', NOW()-interval'43 days', v_release_id, 'QA', 'Done')
+  RETURNING id INTO v_stage_id;
+  INSERT INTO release_stories (created_at, updated_at, stage_id, title, assignee_id, status) VALUES
+  (NOW()-interval'48 days', NOW()-interval'43 days', v_stage_id, 'Regression test suite run', v_m2, 'Passed'),
+  (NOW()-interval'47 days', NOW()-interval'43 days', v_stage_id, 'Smoke test on staging', v_m1, 'Passed');
+
+  INSERT INTO release_stages (created_at, updated_at, release_id, name, status)
+  VALUES (NOW()-interval'42 days', NOW()-interval'40 days', v_release_id, 'Production Deploy', 'Done')
+  RETURNING id INTO v_stage_id;
+  INSERT INTO release_stories (created_at, updated_at, stage_id, title, assignee_id, status) VALUES
+  (NOW()-interval'41 days', NOW()-interval'40 days', v_stage_id, 'Deploy to production', v_m1, 'Passed'),
+  (NOW()-interval'40 days', NOW()-interval'40 days', v_stage_id, 'Post-deploy health check', v_m2, 'Passed');
+
+  -- ── v1.4 — Released ────────────────────────────────────────────────────────
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int];
+  v_m2 := v_member_ids[1+floor(random()*v_nmem)::int];
+  INSERT INTO releases (created_at, updated_at, project_id, name, description, status, target_date)
+  VALUES (NOW()-interval'35 days', NOW()-interval'11 days', v_pid,
+    'v1.4.0', 'Auth module, dashboard with widgets, in-app notifications, user settings page.', 'Released', '2026-05-22')
+  RETURNING id INTO v_release_id;
+
+  INSERT INTO release_stages (created_at, updated_at, release_id, name, status)
+  VALUES (NOW()-interval'35 days', NOW()-interval'22 days', v_release_id, 'Development', 'Done')
+  RETURNING id INTO v_stage_id;
+  INSERT INTO release_stories (created_at, updated_at, stage_id, title, assignee_id, status) VALUES
+  (NOW()-interval'34 days', NOW()-interval'25 days', v_stage_id, 'JWT refresh-token + role middleware', v_m1, 'Passed'),
+  (NOW()-interval'33 days', NOW()-interval'26 days', v_stage_id, 'Dashboard widget API (7 endpoints)', v_m2, 'Passed'),
+  (NOW()-interval'32 days', NOW()-interval'27 days', v_stage_id, 'In-app notifications with polling', v_m1, 'Passed'),
+  (NOW()-interval'31 days', NOW()-interval'28 days', v_stage_id, 'User settings page (profile + password + prefs)', v_m2, 'Passed'),
+  (NOW()-interval'30 days', NOW()-interval'29 days', v_stage_id, 'CI/CD pipeline (staging + prod)', v_m1, 'Passed');
+
+  INSERT INTO release_stages (created_at, updated_at, release_id, name, status)
+  VALUES (NOW()-interval'21 days', NOW()-interval'13 days', v_release_id, 'QA', 'Done')
+  RETURNING id INTO v_stage_id;
+  INSERT INTO release_stories (created_at, updated_at, stage_id, title, assignee_id, status) VALUES
+  (NOW()-interval'20 days', NOW()-interval'14 days', v_stage_id, 'Full regression suite (312 tests)', v_m2, 'Passed'),
+  (NOW()-interval'19 days', NOW()-interval'14 days', v_stage_id, 'Accessibility audit — settings page', v_m2, 'Passed'),
+  (NOW()-interval'18 days', NOW()-interval'13 days', v_stage_id, 'Exploratory testing — dashboard + notifications', v_m1, 'Passed');
+
+  INSERT INTO release_stages (created_at, updated_at, release_id, name, status)
+  VALUES (NOW()-interval'12 days', NOW()-interval'11 days', v_release_id, 'Production Deploy', 'Done')
+  RETURNING id INTO v_stage_id;
+  INSERT INTO release_stories (created_at, updated_at, stage_id, title, assignee_id, status) VALUES
+  (NOW()-interval'12 days', NOW()-interval'11 days', v_stage_id, 'Zero-downtime deploy to production', v_m1, 'Passed'),
+  (NOW()-interval'11 days', NOW()-interval'11 days', v_stage_id, 'Post-deploy smoke test and monitoring check', v_m2, 'Passed');
+
+  -- ── v1.4.1 — Hotfix Released ────────────────────────────────────────────────
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int];
+  v_m2 := v_member_ids[1+floor(random()*v_nmem)::int];
+  INSERT INTO releases (created_at, updated_at, project_id, name, description, status, target_date)
+  VALUES (NOW()-interval'10 days', NOW()-interval'9 days', v_pid,
+    'v1.4.1', 'Hotfix: notification badge not initialising on first login after v1.4.0 release.', 'Released', '2026-05-22')
+  RETURNING id INTO v_release_id;
+
+  INSERT INTO release_stages (created_at, updated_at, release_id, name, status)
+  VALUES (NOW()-interval'10 days', NOW()-interval'10 days', v_release_id, 'Hotfix Development', 'Done')
+  RETURNING id INTO v_stage_id;
+  INSERT INTO release_stories (created_at, updated_at, stage_id, title, assignee_id, status) VALUES
+  (NOW()-interval'10 days', NOW()-interval'10 days', v_stage_id, 'Move badge seed to session middleware', v_m1, 'Passed'),
+  (NOW()-interval'10 days', NOW()-interval'10 days', v_stage_id, 'Add login-path integration test', v_m2, 'Passed');
+
+  INSERT INTO release_stages (created_at, updated_at, release_id, name, status)
+  VALUES (NOW()-interval'9 days', NOW()-interval'9 days', v_release_id, 'Production Hotfix Deploy', 'Done')
+  RETURNING id INTO v_stage_id;
+  INSERT INTO release_stories (created_at, updated_at, stage_id, title, assignee_id, status) VALUES
+  (NOW()-interval'9 days', NOW()-interval'9 days', v_stage_id, 'Hotfix deploy v1.4.1 to production', v_m1, 'Passed'),
+  (NOW()-interval'9 days', NOW()-interval'9 days', v_stage_id, 'Verify notification badge on first login', v_m2, 'Passed');
+
+  -- ── v1.5 — In Progress ─────────────────────────────────────────────────────
+  v_pid := v_project_ids[1+floor(random()*v_nproj)::int];
+  v_m1 := v_member_ids[1+floor(random()*v_nmem)::int];
+  v_m2 := v_member_ids[1+floor(random()*v_nmem)::int];
+  INSERT INTO releases (created_at, updated_at, project_id, name, description, status, target_date)
+  VALUES (NOW()-interval'5 days', NOW(), v_pid,
+    'v1.5.0', 'Audit log, WebSocket notifications, timezone support, performance improvements.', 'In Progress', '2026-06-20')
+  RETURNING id INTO v_release_id;
+
+  INSERT INTO release_stages (created_at, updated_at, release_id, name, status)
+  VALUES (NOW()-interval'5 days', NOW(), v_release_id, 'Development', 'Active')
+  RETURNING id INTO v_stage_id;
+  INSERT INTO release_stories (created_at, updated_at, stage_id, title, assignee_id, status) VALUES
+  (NOW()-interval'5 days', NOW()-interval'2 days', v_stage_id, 'Audit log model, migration and service', v_m2, 'In QA'),
+  (NOW()-interval'4 days', NOW()-interval'1 day',  v_stage_id, 'Audit log admin UI', v_m2, 'Pending'),
+  (NOW()-interval'4 days', NOW()-interval'2 days', v_stage_id, 'Timezone refactor (11 templates)', v_m1, 'Passed'),
+  (NOW()-interval'3 days', NOW()-interval'1 day',  v_stage_id, 'Fix N+1 on sprint board and release detail', v_m1, 'Pending'),
+  (NOW()-interval'2 days', NOW()-interval'2 days', v_stage_id, 'WebSocket notification spike', v_m1, 'Pending');
+
+  INSERT INTO release_stages (created_at, updated_at, release_id, name, status)
+  VALUES (NOW()-interval'1 day', NOW(), v_release_id, 'QA', 'Pending')
+  RETURNING id INTO v_stage_id;
+  INSERT INTO release_stories (created_at, updated_at, stage_id, title, assignee_id, status) VALUES
+  (NOW()-interval'1 day', NOW()-interval'1 day', v_stage_id, 'Full regression suite', v_m2, 'Pending'),
+  (NOW()-interval'1 day', NOW()-interval'1 day', v_stage_id, 'Performance regression check', v_m1, 'Pending');
+
+  INSERT INTO release_stages (created_at, updated_at, release_id, name, status)
+  VALUES (NOW(), NOW(), v_release_id, 'Production Deploy', 'Pending')
+  RETURNING id INTO v_stage_id;
+  INSERT INTO release_stories (created_at, updated_at, stage_id, title, assignee_id, status) VALUES
+  (NOW(), NOW(), v_stage_id, 'Deploy v1.5.0 to production', v_m1, 'Pending'),
+  (NOW(), NOW(), v_stage_id, 'Post-deploy monitoring — 24h watch', v_m2, 'Pending');
+
+  RAISE NOTICE 'Done — 4 releases with stages and stories inserted.';
 END $$;

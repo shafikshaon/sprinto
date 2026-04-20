@@ -59,7 +59,7 @@ func (h *SprintHandler) CreateTask(c *gin.Context) {
 	h.svc.AddTask(
 		uint(sprintID),
 		c.PostForm("title"),
-		c.PostFormArray("assignees"),
+		parseUintArray(c.PostFormArray("assignees")),
 		c.PostForm("status"),
 		c.PostForm("priority"),
 	)
@@ -103,7 +103,7 @@ func (h *SprintHandler) UpdateTask(c *gin.Context) {
 	h.svc.UpdateTask(
 		uint(id),
 		c.PostForm("title"),
-		c.PostFormArray("assignees"),
+		parseUintArray(c.PostFormArray("assignees")),
 		c.PostForm("status"),
 		c.PostForm("priority"),
 	)

@@ -10,8 +10,8 @@ import (
 type DevTaskService interface {
 	All(projectID uint, f repository.DevTaskFilter, page, perPage int) ([]models.DevTask, int64, error)
 	ByID(id uint) (models.DevTask, error)
-	Add(title, typ string, assignees []string, status, priority string, projectID uint) error
-	Update(id uint, title, typ string, assignees []string, status, priority string) error
+	Add(title, typ string, assigneeIDs []uint, status, priority string, projectID uint) error
+	Update(id uint, title, typ string, assigneeIDs []uint, status, priority string) error
 	Remove(id uint) error
 	OpenCountsByType(projectID uint) (map[string]int, error)
 	AddComment(taskID uint, author, content string) error
@@ -25,42 +25,31 @@ func NewDevTaskService(r repository.DevTaskRepository) DevTaskService {
 }
 
 func (s *devTaskService) All(projectID uint, f repository.DevTaskFilter, page, perPage int) ([]models.DevTask, int64, error) {
-	tasks, total, err := s.repo.All(projectID, f, page, perPage)
-	if err == nil {
-		for i := range tasks {
-			tasks[i].Assignees = splitAssignees(tasks[i].AssigneeCSV)
-		}
-	}
-	return tasks, total, err
+	return s.repo.All(projectID, f, page, perPage)
 }
 
 func (s *devTaskService) ByID(id uint) (models.DevTask, error) {
-	task, err := s.repo.ByID(id)
-	if err == nil {
-		task.Assignees = splitAssignees(task.AssigneeCSV)
-	}
-	return task, err
+	return s.repo.ByID(id)
 }
 
-func (s *devTaskService) Add(title, typ string, assignees []string, status, priority string, projectID uint) error {
+func (s *devTaskService) Add(title, typ string, assigneeIDs []uint, status, priority string, projectID uint) error {
 	if strings.TrimSpace(title) == "" {
 		return nil
 	}
 	return s.repo.Create(models.DevTask{
-		ProjectID:   projectID,
-		Title:       strings.TrimSpace(title),
-		Type:        typ,
-		AssigneeCSV: strings.Join(assignees, ","),
-		Status:      status,
-		Priority:    priority,
-	})
+		ProjectID: projectID,
+		Title:     strings.TrimSpace(title),
+		Type:      typ,
+		Status:    status,
+		Priority:  priority,
+	}, assigneeIDs)
 }
 
-func (s *devTaskService) Update(id uint, title, typ string, assignees []string, status, priority string) error {
+func (s *devTaskService) Update(id uint, title, typ string, assigneeIDs []uint, status, priority string) error {
 	if strings.TrimSpace(title) == "" {
 		return nil
 	}
-	return s.repo.Update(id, strings.TrimSpace(title), typ, strings.Join(assignees, ","), status, priority)
+	return s.repo.Update(id, strings.TrimSpace(title), typ, status, priority, assigneeIDs)
 }
 
 func (s *devTaskService) Remove(id uint) error { return s.repo.Delete(id) }

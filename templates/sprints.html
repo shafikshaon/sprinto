@@ -78,8 +78,8 @@
         <td class="px-4 py-3">
           <div class="flex items-center gap-1">
             {{range .Assignees}}
-            <div class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0" title="{{.}}">
-              <span class="text-indigo-700 font-bold text-[10px]">{{initials .}}</span>
+            <div class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0" title="{{.Name}}">
+              <span class="text-indigo-700 font-bold text-[10px]">{{initials .Name}}</span>
             </div>
             {{end}}
             {{if not .Assignees}}<span class="text-xs text-gray-300">—</span>{{end}}
@@ -96,7 +96,7 @@
             <button type="button"
               data-edit-task-id="{{.ID}}"
               data-edit-task-title="{{.Title}}"
-              data-edit-task-assignees="{{.AssigneeCSV}}"
+              data-edit-task-assignees="{{range $i, $a := .Assignees}}{{if $i}},{{end}}{{$a.ID}}{{end}}"
               data-edit-task-status="{{.Status}}"
               data-edit-task-priority="{{.Priority}}"
               class="text-xs text-white bg-indigo-600 hover:bg-indigo-700 px-2.5 py-1 rounded transition-colors font-medium">Edit</button>
@@ -139,12 +139,9 @@
         <label class="text-xs font-medium text-gray-600 block mb-1.5">Assignees</label>
         {{if .Members}}
         <select name="assignees" multiple class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400 h-24">
-          {{range .Members}}<option value="{{.Name}}">{{.Name}}{{if .Role}} · {{.Role}}{{end}}</option>{{end}}
+          {{range .Members}}<option value="{{.ID}}">{{.Name}}{{if .Role}} · {{.Role}}{{end}}</option>{{end}}
         </select>
         <p class="text-xs text-gray-400 mt-1">Hold Ctrl / Cmd to select multiple</p>
-        {{else}}
-        <input name="assignees" type="text" placeholder="Team member name"
-          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
         {{end}}
       </div>
       <div class="grid grid-cols-2 gap-3">
@@ -186,12 +183,9 @@
         <label class="text-xs font-medium text-gray-600 block mb-1.5">Assignees</label>
         {{if .Members}}
         <select id="edit-task-assignees" name="assignees" multiple class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400 h-24">
-          {{range .Members}}<option value="{{.Name}}">{{.Name}}{{if .Role}} · {{.Role}}{{end}}</option>{{end}}
+          {{range .Members}}<option value="{{.ID}}">{{.Name}}{{if .Role}} · {{.Role}}{{end}}</option>{{end}}
         </select>
         <p class="text-xs text-gray-400 mt-1">Hold Ctrl / Cmd to select multiple</p>
-        {{else}}
-        <input id="edit-task-assignees-text" name="assignees" type="text" placeholder="Team member name"
-          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
         {{end}}
       </div>
       <div class="grid grid-cols-2 gap-3">
@@ -230,8 +224,6 @@ document.addEventListener('click', function(e) {
       sel.options[i].selected = current.indexOf(sel.options[i].value) !== -1;
     }
   }
-  var txt = document.getElementById('edit-task-assignees-text');
-  if (txt) txt.value = current.join(', ');
   document.getElementById('edit-task-dialog').showModal();
 });
 </script>

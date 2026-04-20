@@ -10,11 +10,11 @@
         {{if .Task.Assignees}}
         <div class="flex items-center gap-1.5">
           {{range .Task.Assignees}}
-          <div class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0" title="{{.}}">
-            <span class="text-indigo-700 font-bold text-[10px]">{{initials .}}</span>
+          <div class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0" title="{{.Name}}">
+            <span class="text-indigo-700 font-bold text-[10px]">{{initials .Name}}</span>
           </div>
           {{end}}
-          <span class="text-xs text-gray-500">{{range $i, $a := .Task.Assignees}}{{if $i}}, {{end}}{{$a}}{{end}}</span>
+          <span class="text-xs text-gray-500">{{range $i, $a := .Task.Assignees}}{{if $i}}, {{end}}{{$a.Name}}{{end}}</span>
         </div>
         {{end}}
         <span class="text-xs font-semibold px-2 py-0.5 rounded-full {{statusClass .Task.Status}}">{{.Task.Status}}</span>
@@ -109,21 +109,18 @@
         <label class="text-xs font-medium text-gray-600 block mb-1.5">Assignees</label>
         {{if .Members}}
         <select id="edit-task-assignees" name="assignees" multiple class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400 h-24">
-          {{range .Members}}<option value="{{.Name}}">{{.Name}}{{if .Role}} · {{.Role}}{{end}}</option>{{end}}
+          {{range .Members}}<option value="{{.ID}}">{{.Name}}{{if .Role}} · {{.Role}}{{end}}</option>{{end}}
         </select>
         <p class="text-xs text-gray-400 mt-1">Hold Ctrl / Cmd to select multiple</p>
         <script>
         (function(){
-          var current = [{{range $i,$a := .Task.Assignees}}{{if $i}},{{end}}"{{$a}}"{{end}}];
+          var current = [{{range $i,$a := .Task.Assignees}}{{if $i}},{{end}}"{{$a.ID}}"{{end}}];
           var sel = document.getElementById('edit-task-assignees');
           for (var i = 0; i < sel.options.length; i++) {
             if (current.indexOf(sel.options[i].value) !== -1) sel.options[i].selected = true;
           }
         })();
         </script>
-        {{else}}
-        <input name="assignees" type="text" value="{{range $i,$a := .Task.Assignees}}{{if $i}}, {{end}}{{$a}}{{end}}"
-          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
         {{end}}
       </div>
       <div class="grid grid-cols-2 gap-3">

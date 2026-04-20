@@ -10,8 +10,8 @@ import (
 type SlackThreadService interface {
 	All(tag string) ([]models.SlackThread, error)
 	AllTags() ([]string, error)
-	Create(messageLink, topic, summary, tags, author string) error
-	Update(id uint, messageLink, topic, summary, tags, author string) error
+	Create(messageLink, topic, summary, tags string, authorID *uint) error
+	Update(id uint, messageLink, topic, summary, tags string, authorID *uint) error
 	Delete(id uint) error
 }
 
@@ -34,7 +34,7 @@ func (s *slackThreadService) All(tag string) ([]models.SlackThread, error) {
 
 func (s *slackThreadService) AllTags() ([]string, error) { return s.repo.AllTags() }
 
-func (s *slackThreadService) Create(messageLink, topic, summary, tags, author string) error {
+func (s *slackThreadService) Create(messageLink, topic, summary, tags string, authorID *uint) error {
 	topic = strings.TrimSpace(topic)
 	if topic == "" {
 		return nil
@@ -44,17 +44,17 @@ func (s *slackThreadService) Create(messageLink, topic, summary, tags, author st
 		Topic:       topic,
 		Summary:     strings.TrimSpace(summary),
 		TagCSV:      normaliseTags(tags),
-		Author:      strings.TrimSpace(author),
+		AuthorID:    authorID,
 	})
 }
 
-func (s *slackThreadService) Update(id uint, messageLink, topic, summary, tags, author string) error {
+func (s *slackThreadService) Update(id uint, messageLink, topic, summary, tags string, authorID *uint) error {
 	return s.repo.Update(id,
 		strings.TrimSpace(messageLink),
 		strings.TrimSpace(topic),
 		strings.TrimSpace(summary),
 		normaliseTags(tags),
-		strings.TrimSpace(author),
+		authorID,
 	)
 }
 

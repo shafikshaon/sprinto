@@ -13,8 +13,8 @@ import (
 type SprintService interface {
 	ActiveSprint(projectID uint) (models.Sprint, error)
 	TaskByID(id uint) (models.SprintTask, error)
-	AddTask(sprintID uint, title string, assignees []string, status, priority string) error
-	UpdateTask(id uint, title string, assignees []string, status, priority string) error
+	AddTask(sprintID uint, title string, assigneeIDs []uint, status, priority string) error
+	UpdateTask(id uint, title string, assigneeIDs []uint, status, priority string) error
 	RemoveTask(id uint) error
 	UpdateProgress(sprintID uint, progress int) error
 	AddComment(taskID uint, author, content string) error
@@ -32,40 +32,30 @@ func (s *sprintService) ActiveSprint(projectID uint) (models.Sprint, error) {
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return models.Sprint{}, nil
 	}
-	if err == nil {
-		for i := range sprint.Tasks {
-			sprint.Tasks[i].Assignees = splitAssignees(sprint.Tasks[i].AssigneeCSV)
-		}
-	}
 	return sprint, err
 }
 
-func (s *sprintService) AddTask(sprintID uint, title string, assignees []string, status, priority string) error {
+func (s *sprintService) AddTask(sprintID uint, title string, assigneeIDs []uint, status, priority string) error {
 	if strings.TrimSpace(title) == "" {
 		return nil
 	}
 	return s.repo.CreateTask(models.SprintTask{
-		SprintID:    sprintID,
-		Title:       strings.TrimSpace(title),
-		AssigneeCSV: strings.Join(assignees, ","),
-		Status:      status,
-		Priority:    priority,
-	})
+		SprintID: sprintID,
+		Title:    strings.TrimSpace(title),
+		Status:   status,
+		Priority: priority,
+	}, assigneeIDs)
 }
 
 func (s *sprintService) TaskByID(id uint) (models.SprintTask, error) {
-	task, err := s.repo.TaskByID(id)
-	if err == nil {
-		task.Assignees = splitAssignees(task.AssigneeCSV)
-	}
-	return task, err
+	return s.repo.TaskByID(id)
 }
 
-func (s *sprintService) UpdateTask(id uint, title string, assignees []string, status, priority string) error {
+func (s *sprintService) UpdateTask(id uint, title string, assigneeIDs []uint, status, priority string) error {
 	if strings.TrimSpace(title) == "" {
 		return nil
 	}
-	return s.repo.UpdateTask(id, strings.TrimSpace(title), strings.Join(assignees, ","), status, priority)
+	return s.repo.UpdateTask(id, strings.TrimSpace(title), status, priority, assigneeIDs)
 }
 
 func (s *sprintService) RemoveTask(id uint) error { return s.repo.DeleteTask(id) }

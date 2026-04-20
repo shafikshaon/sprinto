@@ -18,6 +18,7 @@ type ReleasesData struct {
 type ReleaseDetailData struct {
 	Meta    Meta
 	Release models.Release
+	Members []models.TeamMember
 }
 
 type ReleaseHandler struct {
@@ -68,9 +69,14 @@ func (h *ReleaseHandler) Detail(c *gin.Context) {
 		return
 	}
 	allProjects, activeProject, currentUser := projectMeta(c)
+	var members []models.TeamMember
+	if activeProject != nil {
+		members = activeProject.Members
+	}
 	render(c, "release_detail", ReleaseDetailData{
 		Meta:    Meta{Title: release.Name, CurrentPage: "releases", ActionLabel: "Add Stage", AllProjects: allProjects, ActiveProject: activeProject, CurrentUser: currentUser},
 		Release: release,
+		Members: members,
 	})
 }
 
@@ -97,7 +103,12 @@ func (h *ReleaseHandler) UpdateStageStatus(c *gin.Context) {
 func (h *ReleaseHandler) CreateStory(c *gin.Context) {
 	stageID, _ := strconv.ParseUint(c.Param("id"), 10, 64)
 	releaseID, _ := strconv.ParseUint(c.PostForm("release_id"), 10, 64)
-	h.svc.AddStory(uint(stageID), c.PostForm("title"), c.PostForm("assignee"))
+	var assigneeID *uint
+	if aid, err := strconv.ParseUint(c.PostForm("assignee"), 10, 64); err == nil && aid > 0 {
+		v := uint(aid)
+		assigneeID = &v
+	}
+	h.svc.AddStory(uint(stageID), c.PostForm("title"), assigneeID)
 	redirectTo(c, fmt.Sprintf("/releases/%d", releaseID))
 }
 
@@ -118,7 +129,12 @@ func (h *ReleaseHandler) UpdateStoryStatus(c *gin.Context) {
 func (h *ReleaseHandler) UpdateStory(c *gin.Context) {
 	storyID, _ := strconv.ParseUint(c.Param("id"), 10, 64)
 	releaseID, _ := strconv.ParseUint(c.PostForm("release_id"), 10, 64)
-	h.svc.UpdateStory(uint(storyID), c.PostForm("title"), c.PostForm("assignee"))
+	var assigneeID *uint
+	if aid, err := strconv.ParseUint(c.PostForm("assignee"), 10, 64); err == nil && aid > 0 {
+		v := uint(aid)
+		assigneeID = &v
+	}
+	h.svc.UpdateStory(uint(storyID), c.PostForm("title"), assigneeID)
 	redirectTo(c, fmt.Sprintf("/releases/%d", releaseID))
 }
 

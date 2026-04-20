@@ -29,14 +29,12 @@ type Sprint struct {
 
 type SprintTask struct {
 	gorm.Model
-	SprintID    uint                `gorm:"not null;index"`
-	Title       string              `gorm:"not null"`
-	AssigneeCSV string              `gorm:"column:assignees"`
-	Status      string              `gorm:"default:'Todo'"`
-	Priority    string              `gorm:"default:'Medium'"`
-	Comments    []SprintTaskComment `gorm:"foreignKey:TaskID"`
-	// Computed by service — not persisted
-	Assignees []string `gorm:"-"`
+	SprintID  uint                `gorm:"not null;index"`
+	Title     string              `gorm:"not null"`
+	Status    string              `gorm:"default:'Todo'"`
+	Priority  string              `gorm:"default:'Medium'"`
+	Comments  []SprintTaskComment `gorm:"foreignKey:TaskID"`
+	Assignees []TeamMember        `gorm:"many2many:sprint_task_assignees;"`
 }
 
 type SprintTaskComment struct {
@@ -131,15 +129,13 @@ type Meeting struct {
 
 type DevTask struct {
 	gorm.Model
-	ProjectID   uint             `gorm:"index"`
-	Title       string           `gorm:"not null"`
-	Type        string           `gorm:"default:'Improvement'"`
-	AssigneeCSV string           `gorm:"column:assignees"`
-	Status      string           `gorm:"default:'Todo'"`
-	Priority    string           `gorm:"default:'Medium'"`
-	Comments    []DevTaskComment `gorm:"foreignKey:TaskID"`
-	// Computed by service — not persisted
-	Assignees []string `gorm:"-"`
+	ProjectID uint             `gorm:"index"`
+	Title     string           `gorm:"not null"`
+	Type      string           `gorm:"default:'Improvement'"`
+	Status    string           `gorm:"default:'Todo'"`
+	Priority  string           `gorm:"default:'Medium'"`
+	Comments  []DevTaskComment `gorm:"foreignKey:TaskID"`
+	Assignees []TeamMember     `gorm:"many2many:dev_task_assignees;"`
 }
 
 func (DevTask) TableName() string { return "dev_tasks" }
@@ -178,10 +174,11 @@ func (ReleaseStage) TableName() string { return "release_stages" }
 
 type ReleaseStory struct {
 	gorm.Model
-	StageID  uint   `gorm:"not null;index"`
-	Title    string `gorm:"not null"`
-	Assignee string
-	Status   string `gorm:"default:'Pending'"` // Pending, In QA, Passed, Failed
+	StageID    uint        `gorm:"not null;index"`
+	Title      string      `gorm:"not null"`
+	AssigneeID *uint       `gorm:"index"`
+	Assignee   *TeamMember `gorm:"foreignKey:AssigneeID"`
+	Status     string      `gorm:"default:'Pending'"` // Pending, In QA, Passed, Failed
 }
 
 func (ReleaseStory) TableName() string { return "release_stories" }
@@ -214,12 +211,13 @@ func (StickyNote) TableName() string { return "sticky_notes" }
 
 type SlackThread struct {
 	gorm.Model
-	ProjectID   uint   `gorm:"index"`
+	ProjectID   uint        `gorm:"index"`
 	MessageLink string
-	Topic       string `gorm:"not null"`
+	Topic       string      `gorm:"not null"`
 	Summary     string
-	TagCSV      string `gorm:"column:tags"`
-	Author      string
+	TagCSV      string      `gorm:"column:tags"`
+	AuthorID    *uint       `gorm:"index"`
+	Author      *TeamMember `gorm:"foreignKey:AuthorID"`
 	// Computed by service — not persisted
 	Tags []string `gorm:"-"`
 }

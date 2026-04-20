@@ -87,7 +87,7 @@ func (h *DevTaskHandler) Create(c *gin.Context) {
 	h.svc.Add(
 		c.PostForm("title"),
 		c.PostForm("type"),
-		c.PostFormArray("assignees"),
+		parseUintArray(c.PostFormArray("assignees")),
 		c.PostForm("status"),
 		c.PostForm("priority"),
 		uint(pid),
@@ -126,7 +126,7 @@ func (h *DevTaskHandler) Update(c *gin.Context) {
 		uint(id),
 		c.PostForm("title"),
 		c.PostForm("type"),
-		c.PostFormArray("assignees"),
+		parseUintArray(c.PostFormArray("assignees")),
 		c.PostForm("status"),
 		c.PostForm("priority"),
 	)
