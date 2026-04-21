@@ -37,12 +37,12 @@
     <div class="relative">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input name="search" type="text" value="{{.Filter.Search}}" placeholder="Search by title…"
-        class="w-full text-sm border border-gray-200 rounded pl-8 pr-3 py-1.5 focus:outline-none focus:border-indigo-400 placeholder-gray-400"/>
+        class="w-full text-sm border border-gray-200 rounded pl-8 pr-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 placeholder-gray-400"/>
     </div>
   </div>
   <div class="flex flex-col gap-1">
     <label class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Type</label>
-    <select name="type" class="text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+    <select name="type" class="text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white">
       <option value="">All types</option>
       <option {{if eq .Filter.Type "Improvement"}}selected{{end}}>Improvement</option>
       <option {{if eq .Filter.Type "Tech Debt"}}selected{{end}}>Tech Debt</option>
@@ -52,7 +52,7 @@
   </div>
   <div class="flex flex-col gap-1">
     <label class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Status</label>
-    <select name="status" class="text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+    <select name="status" class="text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white">
       <option value="">All statuses</option>
       <option {{if eq .Filter.Status "Todo"}}selected{{end}}>Todo</option>
       <option {{if eq .Filter.Status "In Progress"}}selected{{end}}>In Progress</option>
@@ -61,7 +61,7 @@
   </div>
   <div class="flex flex-col gap-1">
     <label class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Priority</label>
-    <select name="priority" class="text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+    <select name="priority" class="text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white">
       <option value="">All priorities</option>
       <option {{if eq .Filter.Priority "Low"}}selected{{end}}>Low</option>
       <option {{if eq .Filter.Priority "Medium"}}selected{{end}}>Medium</option>
@@ -70,7 +70,7 @@
     </select>
   </div>
   <div class="flex items-center gap-2">
-    <button type="submit" class="flex items-center gap-1.5 text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded transition-colors">
+    <button type="submit" class="flex items-center gap-1.5 text-xs font-semibold bg-violet-600 hover:bg-violet-700 text-white px-3 py-1.5 rounded transition-colors">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-3 h-3"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
       Filter
     </button>
@@ -95,8 +95,8 @@
       {{range .DevTasks}}
       <tr class="hover:bg-gray-50 transition-colors">
         <td class="px-4 py-2.5 max-w-xs">
-          <a href="/devtasks/{{.ID}}" class="text-sm font-medium text-gray-800 hover:text-indigo-600 transition-colors">{{.Title}}</a>
-          {{if .Comments}}<span class="ml-1.5 text-[10px] bg-indigo-50 text-indigo-600 font-semibold px-1.5 py-0.5 rounded-full">{{len .Comments}}</span>{{end}}
+          <a href="/devtasks/{{.ID}}" class="text-sm font-medium text-gray-800 hover:text-violet-600 transition-colors">{{.Title}}</a>
+          {{if .Comments}}<span class="ml-1.5 text-[10px] bg-violet-50 text-violet-600 font-semibold px-1.5 py-0.5 rounded-full">{{len .Comments}}</span>{{end}}
         </td>
         <td class="px-4 py-2.5">
           <span class="text-xs font-semibold px-2 py-0.5 rounded-full {{typeClass .Type}}">{{.Type}}</span>
@@ -104,11 +104,11 @@
         <td class="px-4 py-2.5">
           <div class="flex flex-wrap items-center gap-1">
             {{range .Assignees}}
-            <div class="flex items-center gap-1 bg-indigo-50 border border-indigo-100 rounded-full pl-0.5 pr-2 py-0.5">
-              <div class="w-4 h-4 rounded-full bg-indigo-200 flex items-center justify-center flex-shrink-0">
-                <span class="text-indigo-700 font-bold text-[8px]">{{initials .Name}}</span>
+            <div class="flex items-center gap-1 bg-violet-50 border border-violet-100 rounded-full pl-0.5 pr-2 py-0.5">
+              <div class="w-4 h-4 rounded-full bg-violet-200 flex items-center justify-center flex-shrink-0">
+                <span class="text-violet-700 font-bold text-[8px]">{{initials .Name}}</span>
               </div>
-              <span class="text-xs text-indigo-700">{{.Name}}</span>
+              <span class="text-xs text-violet-700">{{.Name}}</span>
             </div>
             {{end}}
             {{if not .Assignees}}<span class="text-xs text-gray-300">—</span>{{end}}
@@ -129,11 +129,11 @@
               data-edit-task-assignees="{{range $i, $a := .Assignees}}{{if $i}},{{end}}{{$a.ID}}{{end}}"
               data-edit-task-status="{{.Status}}"
               data-edit-task-priority="{{.Priority}}"
-              class="text-xs font-medium text-gray-600 hover:text-indigo-600 border border-gray-200 hover:border-indigo-300 px-2.5 py-1 rounded transition-colors">Edit</button>
+              class="text-xs font-medium text-violet-600 hover:text-violet-700 bg-violet-50 hover:bg-violet-100 border border-violet-200 hover:border-violet-300 px-2.5 py-1 rounded transition-colors">Edit</button>
             <button type="button"
               data-delete-action="/devtasks/{{.ID}}/delete"
               data-delete-name="{{.Title}}"
-              class="text-xs font-medium text-gray-500 hover:text-red-600 border border-gray-200 hover:border-red-200 px-2.5 py-1 rounded transition-colors">Delete</button>
+              class="text-xs font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 px-2.5 py-1 rounded transition-colors">Delete</button>
           </div>
         </td>
       </tr>
@@ -162,7 +162,7 @@
     {{end}}
     {{range .Pages}}
     <a href="/devtasks?page={{.}}&search={{$.Filter.Search}}&type={{$.Filter.Type}}&status={{$.Filter.Status}}&priority={{$.Filter.Priority}}"
-      class="px-2.5 py-1 text-xs font-semibold border rounded transition-colors {{if eq . $.Page}}bg-indigo-600 text-white border-indigo-600{{else}}border-gray-200 text-gray-600 hover:bg-gray-50{{end}}">{{.}}</a>
+      class="px-2.5 py-1 text-xs font-semibold border rounded transition-colors {{if eq . $.Page}}bg-violet-600 text-white border-violet-600{{else}}border-gray-200 text-gray-600 hover:bg-gray-50{{end}}">{{.}}</a>
     {{end}}
     {{if lt .Page .TotalPages}}
     <a href="/devtasks?page={{add .Page 1}}&search={{.Filter.Search}}&type={{.Filter.Type}}&status={{.Filter.Status}}&priority={{.Filter.Priority}}"
@@ -184,7 +184,7 @@
   <form method="POST" action="/devtasks" class="px-5 py-4 space-y-3">
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Project <span class="text-red-400">*</span></label>
-      <select name="project_id" required class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+      <select name="project_id" required class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white">
         <option value="">— Select project —</option>
         {{range .Meta.AllProjects}}<option value="{{.ID}}">{{.Name}}</option>{{end}}
       </select>
@@ -192,12 +192,12 @@
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Task Title <span class="text-red-400">*</span></label>
       <input name="title" type="text" required placeholder="e.g. Migrate REST to GraphQL"
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
     </div>
     {{if .Members}}
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Assignees</label>
-      <select name="assignees" multiple class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 h-20">
+      <select name="assignees" multiple class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 h-20">
         {{range .Members}}<option value="{{.ID}}">{{.Name}}{{if .Role}} · {{.Role}}{{end}}</option>{{end}}
       </select>
       <p class="text-xs text-gray-400 mt-0.5">Hold Ctrl / Cmd to select multiple</p>
@@ -206,25 +206,25 @@
     <div class="grid grid-cols-3 gap-3">
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Type</label>
-        <select name="type" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+        <select name="type" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white">
           <option>Improvement</option><option>Tech Debt</option><option>Research</option><option>Other</option>
         </select>
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Status</label>
-        <select name="status" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+        <select name="status" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white">
           <option>Todo</option><option>In Progress</option><option>Done</option>
         </select>
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Priority</label>
-        <select name="priority" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+        <select name="priority" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white">
           <option>Medium</option><option>High</option><option>Critical</option><option>Low</option>
         </select>
       </div>
     </div>
     <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
-      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Add Task</button>
+      <button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Add Task</button>
       <button type="button" onclick="document.getElementById('add-dialog').close()" class="text-xs text-gray-500 hover:text-gray-700 border border-gray-200 px-3.5 py-2 rounded transition-colors">Cancel</button>
     </div>
   </form>
@@ -240,12 +240,12 @@
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Title <span class="text-red-400">*</span></label>
       <input id="edit-task-title" name="title" type="text" required
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
     </div>
     {{if .Members}}
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Assignees</label>
-      <select id="edit-task-assignees" name="assignees" multiple class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 h-20">
+      <select id="edit-task-assignees" name="assignees" multiple class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 h-20">
         {{range .Members}}<option value="{{.ID}}">{{.Name}}{{if .Role}} · {{.Role}}{{end}}</option>{{end}}
       </select>
       <p class="text-xs text-gray-400 mt-0.5">Hold Ctrl / Cmd to select multiple</p>
@@ -254,25 +254,25 @@
     <div class="grid grid-cols-3 gap-3">
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Type</label>
-        <select id="edit-task-type" name="type" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+        <select id="edit-task-type" name="type" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white">
           <option>Improvement</option><option>Tech Debt</option><option>Research</option><option>Other</option>
         </select>
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Status</label>
-        <select id="edit-task-status" name="status" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+        <select id="edit-task-status" name="status" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white">
           <option>Todo</option><option>In Progress</option><option>Done</option>
         </select>
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Priority</label>
-        <select id="edit-task-priority" name="priority" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+        <select id="edit-task-priority" name="priority" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white">
           <option>Low</option><option>Medium</option><option>High</option><option>Critical</option>
         </select>
       </div>
     </div>
     <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
-      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save Changes</button>
+      <button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save Changes</button>
       <button type="button" onclick="document.getElementById('edit-task-dialog').close()" class="text-xs text-gray-500 hover:text-gray-700 border border-gray-200 px-3.5 py-2 rounded transition-colors">Cancel</button>
     </div>
   </form>

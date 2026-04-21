@@ -25,10 +25,10 @@
     </thead>
     <tbody class="divide-y divide-gray-100">
       {{range .AllSprints}}
-      <tr class="hover:bg-gray-50 transition-colors {{if .Active}}bg-indigo-50/30{{end}}">
+      <tr class="hover:bg-gray-50 transition-colors {{if .Active}}bg-violet-50/30{{end}}">
         <td class="px-4 py-2.5">
           <span class="text-sm font-semibold text-gray-800">{{.Name}}</span>
-          {{if .Active}}<span class="ml-2 text-[10px] font-bold bg-indigo-600 text-white px-1.5 py-0.5 rounded-full uppercase tracking-wide">Active</span>{{end}}
+          {{if .Active}}<span class="ml-2 text-[10px] font-bold bg-violet-600 text-white px-1.5 py-0.5 rounded-full uppercase tracking-wide">Active</span>{{end}}
         </td>
         <td class="px-4 py-2.5 max-w-xs">
           <span class="text-xs text-gray-500 truncate block">{{if .Goal}}{{.Goal}}{{else}}<span class="text-gray-300">—</span>{{end}}</span>
@@ -41,10 +41,10 @@
         </td>
         <td class="px-4 py-2.5">
           {{if .Active}}
-          <span class="text-xs text-indigo-500 font-semibold">Current board</span>
+          <span class="text-xs text-violet-500 font-semibold">Current board</span>
           {{else}}
           <form method="POST" action="/sprints/{{.ID}}/activate" class="inline">
-            <button type="submit" class="text-xs font-medium text-gray-600 hover:text-indigo-600 border border-gray-200 hover:border-indigo-300 px-2.5 py-1 rounded transition-colors">Activate</button>
+            <button type="submit" class="text-xs font-medium text-violet-600 hover:text-violet-700 bg-violet-50 hover:bg-violet-100 border border-violet-200 hover:border-violet-300 px-2.5 py-1 rounded transition-colors">Activate</button>
           </form>
           {{end}}
         </td>
@@ -56,11 +56,11 @@
               data-edit-sprint-goal="{{.Goal}}"
               data-edit-sprint-start="{{.StartDate}}"
               data-edit-sprint-end="{{.EndDate}}"
-              class="text-xs font-medium text-gray-600 hover:text-indigo-600 border border-gray-200 hover:border-indigo-300 px-2.5 py-1 rounded transition-colors">Edit</button>
+              class="text-xs font-medium text-violet-600 hover:text-violet-700 bg-violet-50 hover:bg-violet-100 border border-violet-200 hover:border-violet-300 px-2.5 py-1 rounded transition-colors">Edit</button>
             <button type="button"
               data-delete-action="/sprints/{{.ID}}/delete"
               data-delete-name="{{.Name}}"
-              class="text-xs font-medium text-gray-500 hover:text-red-600 border border-gray-200 hover:border-red-200 px-2.5 py-1 rounded transition-colors">Delete</button>
+              class="text-xs font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 px-2.5 py-1 rounded transition-colors">Delete</button>
           </div>
         </td>
       </tr>
@@ -92,22 +92,22 @@
     <div class="flex items-center gap-2 flex-shrink-0">
       <span class="text-xs text-gray-400">{{.Sprint.StartDate}} – {{.Sprint.EndDate}}</span>
       <button type="button" onclick="document.getElementById('add-task-dialog').showModal()"
-        class="text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-3 py-1.5 rounded transition-colors">+ Add Task</button>
+        class="text-xs font-semibold text-white bg-violet-600 hover:bg-violet-700 px-3 py-1.5 rounded transition-colors">+ Add Task</button>
       <button type="button" onclick="document.getElementById('edit-release-dialog').showModal()"
-        class="text-xs font-medium text-indigo-600 hover:text-indigo-800 border border-indigo-200 hover:border-indigo-400 px-2.5 py-1.5 rounded transition-colors">Edit Release</button>
+        class="text-xs font-medium text-violet-600 hover:text-violet-800 border border-violet-200 hover:border-violet-400 px-2.5 py-1.5 rounded transition-colors">Edit Release</button>
       <form method="POST" action="/sprints/progress" class="flex items-center gap-1">
         <input type="hidden" name="sprint_id" value="{{.Sprint.ID}}"/>
         <input type="number" name="progress" value="{{.Sprint.Progress}}" min="0" max="100"
-          class="w-12 text-sm border border-gray-200 rounded px-2 py-1.5 text-center focus:outline-none focus:border-indigo-400"/>
-        <button type="submit" class="text-xs font-medium bg-gray-100 hover:bg-indigo-100 text-gray-600 hover:text-indigo-700 px-2 py-1.5 rounded transition-colors">%</button>
+          class="w-12 text-sm border border-gray-200 rounded px-2 py-1.5 text-center focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
+        <button type="submit" class="text-xs font-medium bg-gray-100 hover:bg-violet-100 text-gray-600 hover:text-violet-700 px-2 py-1.5 rounded transition-colors">%</button>
       </form>
     </div>
   </div>
   <div class="flex items-center gap-2">
     <div class="flex-1 bg-gray-100 rounded-full h-1">
-      <div class="bg-indigo-500 h-1 rounded-full" style="width:{{.Sprint.Progress}}%"></div>
+      <div class="bg-violet-500 h-1 rounded-full" style="width:{{.Sprint.Progress}}%"></div>
     </div>
-    <span class="text-xs font-semibold text-indigo-700 w-8 text-right">{{.Sprint.Progress}}%</span>
+    <span class="text-xs font-semibold text-violet-700 w-8 text-right">{{.Sprint.Progress}}%</span>
   </div>
 </div>
 
@@ -151,14 +151,14 @@
       {{range .Sprint.Tasks}}
       <tr class="hover:bg-gray-50 transition-colors">
         <td class="px-4 py-2.5">
-          <a href="/sprints/tasks/{{.ID}}" class="text-sm font-medium text-gray-800 hover:text-indigo-600 hover:underline">{{.Title}}</a>
-          {{if .Comments}}<span class="ml-1.5 text-xs bg-indigo-50 text-indigo-500 font-semibold px-1.5 py-0.5 rounded-full">{{len .Comments}}</span>{{end}}
+          <a href="/sprints/tasks/{{.ID}}" class="text-sm font-medium text-gray-800 hover:text-violet-600 hover:underline">{{.Title}}</a>
+          {{if .Comments}}<span class="ml-1.5 text-xs bg-violet-50 text-violet-500 font-semibold px-1.5 py-0.5 rounded-full">{{len .Comments}}</span>{{end}}
         </td>
         <td class="px-4 py-2.5">
           <div class="flex items-center gap-1">
             {{range .Assignees}}
-            <div class="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0" title="{{.Name}}">
-              <span class="text-indigo-700 font-bold text-[9px]">{{initials .Name}}</span>
+            <div class="w-5 h-5 rounded-full bg-violet-100 flex items-center justify-center flex-shrink-0" title="{{.Name}}">
+              <span class="text-violet-700 font-bold text-[9px]">{{initials .Name}}</span>
             </div>
             {{end}}
             {{if not .Assignees}}<span class="text-xs text-gray-300">—</span>{{end}}
@@ -178,11 +178,11 @@
               data-edit-task-assignees="{{range $i, $a := .Assignees}}{{if $i}},{{end}}{{$a.ID}}{{end}}"
               data-edit-task-status="{{.Status}}"
               data-edit-task-priority="{{.Priority}}"
-              class="text-xs font-medium text-gray-600 hover:text-indigo-600 border border-gray-200 hover:border-indigo-300 px-2.5 py-1 rounded transition-colors">Edit</button>
+              class="text-xs font-medium text-violet-600 hover:text-violet-700 bg-violet-50 hover:bg-violet-100 border border-violet-200 hover:border-violet-300 px-2.5 py-1 rounded transition-colors">Edit</button>
             <button type="button"
               data-delete-action="/sprints/tasks/{{.ID}}/delete"
               data-delete-name="{{.Title}}"
-              class="text-xs font-medium text-gray-500 hover:text-red-600 border border-gray-200 hover:border-red-200 px-2.5 py-1 rounded transition-colors">Delete</button>
+              class="text-xs font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 px-2.5 py-1 rounded transition-colors">Delete</button>
           </div>
         </td>
       </tr>
@@ -203,7 +203,7 @@
   <div class="flex items-center justify-between mb-3">
     <h2 class="text-sm font-semibold text-gray-800">Release Stages</h2>
     <button type="button" onclick="document.getElementById('add-stage-dialog').showModal()"
-      class="text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-3 py-1.5 rounded transition-colors">+ Add Stage</button>
+      class="text-xs font-semibold text-white bg-violet-600 hover:bg-violet-700 px-3 py-1.5 rounded transition-colors">+ Add Stage</button>
   </div>
 
   {{if not .Sprint.Stages}}
@@ -223,18 +223,18 @@
         </div>
         <div class="flex items-center gap-2">
           <form method="POST" action="/sprints/stages/{{.ID}}/status" class="flex items-center gap-1.5">
-            <select name="status" class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:border-indigo-400 bg-white text-gray-700">
+            <select name="status" class="text-xs border border-gray-200 rounded px-2 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white text-gray-700">
               <option {{if eq .Status "Pending"}}selected{{end}}>Pending</option>
               <option {{if eq .Status "Active"}}selected{{end}}>Active</option>
               <option {{if eq .Status "Done"}}selected{{end}}>Done</option>
               <option {{if eq .Status "Failed"}}selected{{end}}>Failed</option>
             </select>
-            <button type="submit" class="text-xs font-medium text-gray-600 hover:text-indigo-600 border border-gray-200 hover:border-indigo-300 px-2.5 py-1.5 rounded transition-colors">Save</button>
+            <button type="submit" class="text-xs font-medium text-violet-600 hover:text-violet-700 bg-violet-50 hover:bg-violet-100 border border-violet-200 hover:border-violet-300 px-2.5 py-1.5 rounded transition-colors">Save</button>
           </form>
           <button type="button"
             data-delete-action="/sprints/stages/{{.ID}}/delete"
             data-delete-name="{{.Name}}"
-            class="text-xs font-medium text-gray-500 hover:text-red-600 border border-gray-200 hover:border-red-200 px-2.5 py-1.5 rounded transition-colors">Delete</button>
+            class="text-xs font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 px-2.5 py-1.5 rounded transition-colors">Delete</button>
         </div>
       </div>
       <!-- Stories -->
@@ -257,8 +257,8 @@
               <td class="px-3 py-2">
                 {{if .Assignee}}
                 <div class="flex items-center gap-1.5">
-                  <div class="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
-                    <span class="text-indigo-700 font-bold text-[9px]">{{initials .Assignee.Name}}</span>
+                  <div class="w-5 h-5 rounded-full bg-violet-100 flex items-center justify-center flex-shrink-0">
+                    <span class="text-violet-700 font-bold text-[9px]">{{initials .Assignee.Name}}</span>
                   </div>
                   <span class="text-xs text-gray-500">{{.Assignee.Name}}</span>
                 </div>
@@ -285,7 +285,7 @@
                     data-edit-story-id="{{.ID}}"
                     data-edit-story-title="{{.Title}}"
                     data-edit-story-assignee="{{if .Assignee}}{{.Assignee.ID}}{{end}}"
-                    class="text-xs font-medium text-gray-600 hover:text-indigo-600 border border-gray-200 hover:border-indigo-300 px-2 py-0.5 rounded transition-colors">Edit</button>
+                    class="text-xs font-medium text-violet-600 hover:text-violet-700 bg-violet-50 hover:bg-violet-100 border border-violet-200 hover:border-violet-300 px-2 py-0.5 rounded transition-colors">Edit</button>
                   <button type="button"
                     data-delete-action="/sprints/stories/{{.ID}}/delete"
                     data-delete-name="{{.Title}}"
@@ -299,14 +299,14 @@
         {{end}}
         <form method="POST" action="/sprints/stages/{{.ID}}/stories" class="flex items-center gap-2">
           <input name="title" type="text" required placeholder="Story / ticket title..."
-            class="flex-1 text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+            class="flex-1 text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
           {{if $.Members}}
-          <select name="assignee" class="w-36 text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+          <select name="assignee" class="w-36 text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white">
             <option value="">— Assignee —</option>
             {{range $.Members}}<option value="{{.ID}}">{{.Name}}</option>{{end}}
           </select>
           {{end}}
-          <button type="submit" class="text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-3 py-1.5 rounded transition-colors whitespace-nowrap">+ Story</button>
+          <button type="submit" class="text-xs font-semibold text-white bg-violet-600 hover:bg-violet-700 px-3 py-1.5 rounded transition-colors whitespace-nowrap">+ Story</button>
         </form>
       </div>
       <!-- Slack Updates -->
@@ -338,10 +338,10 @@
         {{end}}
         <form method="POST" action="/sprints/stages/{{.ID}}/slack" class="space-y-2">
           <textarea name="message" required placeholder="Message summary..." rows="2"
-            class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 resize-none"></textarea>
+            class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 resize-none"></textarea>
           <div class="flex items-center gap-2">
             <input name="author" type="text" placeholder="Posted by"
-              class="w-36 text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+              class="w-36 text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
             <button type="submit" class="text-xs font-semibold text-white bg-[#4A154B] hover:bg-[#611f69] px-3 py-1.5 rounded transition-colors whitespace-nowrap">+ Slack</button>
           </div>
         </form>
@@ -364,27 +364,27 @@
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Sprint Name <span class="text-red-400">*</span></label>
       <input name="name" type="text" required placeholder="e.g. Sprint 12"
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
     </div>
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Goal</label>
       <input name="goal" type="text" placeholder="e.g. Ship checkout flow improvements"
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
     </div>
     <div class="grid grid-cols-2 gap-3">
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Start Date</label>
         <input name="start_date" type="date"
-          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">End Date</label>
         <input name="end_date" type="date"
-          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
       </div>
     </div>
     <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
-      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Create Sprint</button>
+      <button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Create Sprint</button>
       <button type="button" onclick="document.getElementById('add-dialog').close()" class="text-xs text-gray-500 hover:text-gray-700 border border-gray-200 px-3.5 py-2 rounded transition-colors">Cancel</button>
     </div>
   </form>
@@ -400,27 +400,27 @@
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Sprint Name <span class="text-red-400">*</span></label>
       <input id="edit-sprint-name" name="name" type="text" required
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
     </div>
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Goal</label>
       <input id="edit-sprint-goal" name="goal" type="text"
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
     </div>
     <div class="grid grid-cols-2 gap-3">
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Start Date</label>
         <input id="edit-sprint-start" name="start_date" type="date"
-          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">End Date</label>
         <input id="edit-sprint-end" name="end_date" type="date"
-          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
       </div>
     </div>
     <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
-      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save Changes</button>
+      <button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save Changes</button>
       <button type="button" onclick="document.getElementById('edit-sprint-dialog').close()" class="text-xs text-gray-500 hover:text-gray-700 border border-gray-200 px-3.5 py-2 rounded transition-colors">Cancel</button>
     </div>
   </form>
@@ -437,12 +437,12 @@
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Task Title <span class="text-red-400">*</span></label>
       <input name="title" type="text" required placeholder="e.g. Implement rate limiting middleware"
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
     </div>
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Assignees</label>
       {{if .Members}}
-      <select name="assignees" multiple class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 h-20">
+      <select name="assignees" multiple class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 h-20">
         {{range .Members}}<option value="{{.ID}}">{{.Name}}{{if .Role}} · {{.Role}}{{end}}</option>{{end}}
       </select>
       <p class="text-xs text-gray-400 mt-0.5">Hold Ctrl / Cmd to select multiple</p>
@@ -451,19 +451,19 @@
     <div class="grid grid-cols-2 gap-3">
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Status</label>
-        <select name="status" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+        <select name="status" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white">
           <option>Todo</option><option>In Progress</option><option>Done</option><option>Blocked</option>
         </select>
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Priority</label>
-        <select name="priority" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+        <select name="priority" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white">
           <option>Medium</option><option>High</option><option>Critical</option><option>Low</option>
         </select>
       </div>
     </div>
     <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
-      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Add Task</button>
+      <button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Add Task</button>
       <button type="button" onclick="document.getElementById('add-task-dialog').close()" class="text-xs text-gray-500 hover:text-gray-700 border border-gray-200 px-3.5 py-2 rounded transition-colors">Cancel</button>
     </div>
   </form>
@@ -479,12 +479,12 @@
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Title <span class="text-red-400">*</span></label>
       <input id="edit-task-title" name="title" type="text" required
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
     </div>
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Assignees</label>
       {{if .Members}}
-      <select id="edit-task-assignees" name="assignees" multiple class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 h-20">
+      <select id="edit-task-assignees" name="assignees" multiple class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 h-20">
         {{range .Members}}<option value="{{.ID}}">{{.Name}}{{if .Role}} · {{.Role}}{{end}}</option>{{end}}
       </select>
       <p class="text-xs text-gray-400 mt-0.5">Hold Ctrl / Cmd to select multiple</p>
@@ -493,19 +493,19 @@
     <div class="grid grid-cols-2 gap-3">
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Status</label>
-        <select id="edit-task-status" name="status" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+        <select id="edit-task-status" name="status" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white">
           <option>Todo</option><option>In Progress</option><option>Done</option><option>Blocked</option>
         </select>
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Priority</label>
-        <select id="edit-task-priority" name="priority" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+        <select id="edit-task-priority" name="priority" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white">
           <option>Low</option><option>Medium</option><option>High</option><option>Critical</option>
         </select>
       </div>
     </div>
     <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
-      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save Changes</button>
+      <button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save Changes</button>
       <button type="button" onclick="document.getElementById('edit-task-dialog').close()" class="text-xs text-gray-500 hover:text-gray-700 border border-gray-200 px-3.5 py-2 rounded transition-colors">Cancel</button>
     </div>
   </form>
@@ -522,12 +522,12 @@
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Description</label>
       <textarea name="description" rows="2" placeholder="Release notes or summary..."
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 resize-none">{{.Sprint.Description}}</textarea>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 resize-none">{{.Sprint.Description}}</textarea>
     </div>
     <div class="grid grid-cols-2 gap-3">
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Release Status</label>
-        <select name="status" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+        <select name="status" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white">
           <option {{if eq .Sprint.Status "Draft"}}selected{{end}}>Draft</option>
           <option {{if eq .Sprint.Status "In Progress"}}selected{{end}}>In Progress</option>
           <option {{if eq .Sprint.Status "Released"}}selected{{end}}>Released</option>
@@ -537,11 +537,11 @@
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Target Date</label>
         <input name="target_date" type="date" value="{{.Sprint.TargetDate}}"
-          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
       </div>
     </div>
     <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
-      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save</button>
+      <button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save</button>
       <button type="button" onclick="document.getElementById('edit-release-dialog').close()" class="text-xs text-gray-500 hover:text-gray-700 border border-gray-200 px-3.5 py-2 rounded transition-colors">Cancel</button>
     </div>
   </form>
@@ -558,16 +558,16 @@
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Stage Name <span class="text-red-400">*</span></label>
       <input name="name" type="text" required placeholder="e.g. QA Round 1, Staging Deploy, Canary..."
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
     </div>
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Initial Status</label>
-      <select name="status" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+      <select name="status" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white">
         <option>Pending</option><option>Active</option><option>Done</option><option>Failed</option>
       </select>
     </div>
     <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
-      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Add Stage</button>
+      <button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Add Stage</button>
       <button type="button" onclick="document.getElementById('add-stage-dialog').close()" class="text-xs text-gray-500 hover:text-gray-700 border border-gray-200 px-3.5 py-2 rounded transition-colors">Cancel</button>
     </div>
   </form>
@@ -583,19 +583,19 @@
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Story Title <span class="text-red-400">*</span></label>
       <input id="edit-story-title" name="title" type="text" required
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
     </div>
     {{if .Members}}
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Assignee</label>
-      <select id="edit-story-assignee" name="assignee" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+      <select id="edit-story-assignee" name="assignee" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white">
         <option value="">— No assignee —</option>
         {{range .Members}}<option value="{{.ID}}">{{.Name}}{{if .Role}} · {{.Role}}{{end}}</option>{{end}}
       </select>
     </div>
     {{end}}
     <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
-      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save Changes</button>
+      <button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save Changes</button>
       <button type="button" onclick="document.getElementById('edit-story-dialog').close()" class="text-xs text-gray-500 hover:text-gray-700 border border-gray-200 px-3.5 py-2 rounded transition-colors">Cancel</button>
     </div>
   </form>

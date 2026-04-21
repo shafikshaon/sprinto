@@ -26,8 +26,8 @@
       <tr class="hover:bg-gray-50 transition-colors">
         <td class="px-4 py-2.5">
           <div class="flex items-center gap-2">
-            <div class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
-              <span class="text-indigo-700 font-semibold text-[10px]">{{initials .Name}}</span>
+            <div class="w-6 h-6 rounded-full bg-violet-100 flex items-center justify-center flex-shrink-0">
+              <span class="text-violet-700 font-semibold text-[10px]">{{initials .Name}}</span>
             </div>
             <span class="text-sm font-semibold text-gray-800">{{.Name}}</span>
           </div>
@@ -40,7 +40,7 @@
         <td class="px-4 py-2.5">
           <div class="flex flex-wrap gap-1">
             {{range .Projects}}
-            <span class="text-xs font-medium bg-indigo-50 text-indigo-600 border border-indigo-100 px-2 py-0.5 rounded">{{.Name}}</span>
+            <span class="text-xs font-medium bg-violet-50 text-violet-600 border border-violet-100 px-2 py-0.5 rounded">{{.Name}}</span>
             {{else}}
             <span class="text-xs text-gray-400 italic">No projects</span>
             {{end}}
@@ -53,11 +53,11 @@
               data-edit-member-name="{{.Name}}"
               data-edit-member-role="{{.Role}}"
               data-edit-member-email="{{.Email}}"
-              class="text-xs font-medium text-gray-600 hover:text-indigo-600 border border-gray-200 hover:border-indigo-300 px-2.5 py-1 rounded transition-colors">Edit</button>
+              class="text-xs font-medium text-violet-600 hover:text-violet-700 bg-violet-50 hover:bg-violet-100 border border-violet-200 hover:border-violet-300 px-2.5 py-1 rounded transition-colors">Edit</button>
             <button type="button"
               data-delete-action="/team/{{.ID}}/delete"
               data-delete-name="{{.Name}}"
-              class="text-xs font-medium text-gray-500 hover:text-red-600 border border-gray-200 hover:border-red-200 px-2.5 py-1 rounded transition-colors">Delete</button>
+              class="text-xs font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 px-2.5 py-1 rounded transition-colors">Delete</button>
           </div>
         </td>
       </tr>
@@ -77,22 +77,22 @@
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Name <span class="text-red-400">*</span></label>
       <input name="name" type="text" required placeholder="Full name"
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
     </div>
     <div class="grid grid-cols-2 gap-3">
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Role</label>
         <input name="role" type="text" placeholder="e.g. Backend Engineer"
-          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Email</label>
         <input name="email" type="email" placeholder="name@example.com"
-          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
       </div>
     </div>
     <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
-      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Add Member</button>
+      <button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Add Member</button>
       <button type="button" onclick="document.getElementById('add-dialog').close()" class="text-xs text-gray-500 hover:text-gray-700 border border-gray-200 px-3.5 py-2 rounded transition-colors">Cancel</button>
     </div>
   </form>
@@ -108,22 +108,22 @@
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Name <span class="text-red-400">*</span></label>
       <input id="edit-member-name" name="name" type="text" required
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
     </div>
     <div class="grid grid-cols-2 gap-3">
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Role</label>
         <input id="edit-member-role" name="role" type="text" placeholder="e.g. Backend Engineer"
-          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Email</label>
         <input id="edit-member-email" name="email" type="email" placeholder="name@example.com"
-          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
       </div>
     </div>
     <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
-      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save Changes</button>
+      <button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save Changes</button>
       <button type="button" onclick="document.getElementById('edit-member-dialog').close()" class="text-xs text-gray-500 hover:text-gray-700 border border-gray-200 px-3.5 py-2 rounded transition-colors">Cancel</button>
     </div>
   </form>

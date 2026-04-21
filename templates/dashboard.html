@@ -7,7 +7,7 @@
     <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Sprint Progress</p>
     <p class="text-2xl font-bold text-gray-900">{{.Sprint.Progress}}<span class="text-sm text-gray-400 font-normal">%</span></p>
     <div class="w-full bg-gray-100 rounded-full h-1 my-2">
-      <div class="bg-indigo-500 h-1 rounded-full" style="width:{{.Sprint.Progress}}%"></div>
+      <div class="bg-violet-500 h-1 rounded-full" style="width:{{.Sprint.Progress}}%"></div>
     </div>
     <p class="text-xs text-gray-400 truncate">{{if .Sprint.Name}}{{.Sprint.Name}}{{else}}No active sprint{{end}}</p>
   </div>
@@ -21,21 +21,21 @@
     <p class="text-2xl font-bold text-gray-300">–</p>
     <p class="text-xs text-gray-400 mt-2">Not logged yet</p>
     {{end}}
-    <a href="/standups" class="text-xs text-indigo-600 hover:underline font-medium mt-1 block">View standups →</a>
+    <a href="/standups" class="text-xs text-violet-600 hover:underline font-medium mt-1 block">View standups →</a>
   </div>
 
   <div class="bg-white border border-gray-200 rounded-lg px-4 py-3.5">
     <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Upcoming Deadlines</p>
     <p class="text-2xl font-bold text-gray-900">{{len .Deadlines}}</p>
     <p class="text-xs mt-2 {{if gt .CriticalDeadlines 0}}text-red-500 font-semibold{{else}}text-gray-400{{end}}">{{.CriticalDeadlines}} critical · ≤3 days</p>
-    <a href="/deadlines" class="text-xs text-indigo-600 hover:underline font-medium mt-1 block">View deadlines →</a>
+    <a href="/deadlines" class="text-xs text-violet-600 hover:underline font-medium mt-1 block">View deadlines →</a>
   </div>
 
   <div class="bg-white border border-gray-200 rounded-lg px-4 py-3.5">
     <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Open Dev Tasks</p>
     <p class="text-2xl font-bold text-gray-900">{{.OpenDevTasks}}</p>
     <p class="text-xs text-gray-400 mt-2">Improvements · Tech debt · Research</p>
-    <a href="/devtasks" class="text-xs text-indigo-600 hover:underline font-medium mt-1 block">View tasks →</a>
+    <a href="/devtasks" class="text-xs text-violet-600 hover:underline font-medium mt-1 block">View tasks →</a>
   </div>
 
 </div>
@@ -46,7 +46,7 @@
   <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
     <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
       <h2 class="text-sm font-semibold text-gray-800">Today's Standup</h2>
-      <a href="/standups" class="text-xs text-indigo-600 hover:underline">View all →</a>
+      <a href="/standups" class="text-xs text-violet-600 hover:underline">View all →</a>
     </div>
     {{if not .TodayStandup}}
     <div class="px-4 py-10 text-center">
@@ -80,7 +80,7 @@
   <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
     <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
       <h2 class="text-sm font-semibold text-gray-800">Upcoming Deadlines</h2>
-      <a href="/deadlines" class="text-xs text-indigo-600 hover:underline">View all →</a>
+      <a href="/deadlines" class="text-xs text-violet-600 hover:underline">View all →</a>
     </div>
     {{if not .Deadlines}}
     <div class="px-4 py-10 text-center">
@@ -110,7 +110,7 @@
 <!-- ── Sprint Goal ─────────────────────────────────────────────────── -->
 {{if .Sprint.Goal}}
 <div class="bg-white border border-gray-200 rounded-lg px-4 py-3.5 flex items-center gap-3">
-  <div class="w-7 h-7 rounded bg-indigo-600 flex items-center justify-center flex-shrink-0">
+  <div class="w-7 h-7 rounded bg-violet-600 flex items-center justify-center flex-shrink-0">
     <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
   </div>
   <div>

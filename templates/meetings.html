@@ -5,24 +5,24 @@
   <div class="flex flex-col gap-1">
     <label class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">From</label>
     <input name="date_from" type="date" value="{{.Filter.DateFrom}}"
-      class="text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 text-gray-700 bg-white"/>
+      class="text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 text-gray-700 bg-white"/>
   </div>
   <div class="flex flex-col gap-1">
     <label class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">To</label>
     <input name="date_to" type="date" value="{{.Filter.DateTo}}"
-      class="text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 text-gray-700 bg-white"/>
+      class="text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 text-gray-700 bg-white"/>
   </div>
   <div class="flex flex-col gap-1 flex-1 min-w-48">
     <label class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Search</label>
     <div class="relative">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input name="search" type="text" value="{{.Filter.Search}}" placeholder="Title or notes…"
-        class="w-full text-sm border border-gray-200 rounded pl-8 pr-3 py-1.5 focus:outline-none focus:border-indigo-400 text-gray-700 placeholder-gray-400"/>
+        class="w-full text-sm border border-gray-200 rounded pl-8 pr-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 text-gray-700 placeholder-gray-400"/>
     </div>
   </div>
   <div class="flex flex-col gap-1">
     <label class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Project</label>
-    <select name="project" class="text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 text-gray-700 bg-white">
+    <select name="project" class="text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 text-gray-700 bg-white">
       <option value="">All projects</option>
       {{range .Meta.AllProjects}}
       <option value="{{.ID}}" {{if eq (printf "%d" .ID) (printf "%d" $.Filter.Project)}}selected{{end}}>{{.Name}}</option>
@@ -30,7 +30,7 @@
     </select>
   </div>
   <div class="flex items-center gap-2">
-    <button type="submit" class="flex items-center gap-1.5 text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded transition-colors">
+    <button type="submit" class="flex items-center gap-1.5 text-xs font-semibold bg-violet-600 hover:bg-violet-700 text-white px-3 py-1.5 rounded transition-colors">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-3 h-3"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
       Filter
     </button>
@@ -57,7 +57,7 @@
     <div class="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-100">
       <div class="flex items-center gap-3 flex-wrap min-w-0">
         <div class="flex items-center gap-2 flex-shrink-0">
-          <div class="w-6 h-6 rounded bg-indigo-600 flex items-center justify-center flex-shrink-0">
+          <div class="w-6 h-6 rounded bg-violet-600 flex items-center justify-center flex-shrink-0">
             <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" class="w-3 h-3"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
           </div>
           <span class="text-sm font-semibold text-gray-800">{{.Title}}</span>
@@ -69,7 +69,7 @@
         {{if .Attendees}}
         <div class="flex items-center gap-1 flex-wrap">
           {{range .Attendees}}
-          <span class="text-xs font-medium bg-indigo-50 text-indigo-600 border border-indigo-100 px-2 py-0.5 rounded-full">{{.}}</span>
+          <span class="text-xs font-medium bg-violet-50 text-violet-600 border border-violet-100 px-2 py-0.5 rounded-full">{{.}}</span>
           {{end}}
         </div>
         {{end}}
@@ -86,11 +86,11 @@
           data-edit-meeting-date="{{.Date}}"
           data-edit-meeting-attendees="{{.AttendeeCSV}}"
           data-edit-meeting-notes="{{.Notes}}"
-          class="text-xs font-medium text-gray-600 hover:text-indigo-600 border border-gray-200 hover:border-indigo-300 px-2.5 py-1 rounded transition-colors">Edit</button>
+          class="text-xs font-medium text-violet-600 hover:text-violet-700 bg-violet-50 hover:bg-violet-100 border border-violet-200 hover:border-violet-300 px-2.5 py-1 rounded transition-colors">Edit</button>
         <button type="button"
           data-delete-action="/meetings/{{.ID}}/delete"
           data-delete-name="{{.Title}}"
-          class="text-xs font-medium text-gray-500 hover:text-red-600 border border-gray-200 hover:border-red-200 px-2.5 py-1 rounded transition-colors">Delete</button>
+          class="text-xs font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 px-2.5 py-1 rounded transition-colors">Delete</button>
       </div>
     </div>
 
@@ -149,7 +149,7 @@
     {{end}}
     {{range .Pages}}
     <a href="/meetings?page={{.}}&date_from={{$.Filter.DateFrom}}&date_to={{$.Filter.DateTo}}&search={{$.Filter.Search}}&project={{$.Filter.Project}}"
-      class="px-2.5 py-1 text-xs font-semibold border rounded transition-colors {{if eq . $.Page}}bg-indigo-600 text-white border-indigo-600{{else}}border-gray-200 text-gray-600 hover:bg-gray-50{{end}}">{{.}}</a>
+      class="px-2.5 py-1 text-xs font-semibold border rounded transition-colors {{if eq . $.Page}}bg-violet-600 text-white border-violet-600{{else}}border-gray-200 text-gray-600 hover:bg-gray-50{{end}}">{{.}}</a>
     {{end}}
     {{if lt .Page .TotalPages}}
     <a href="/meetings?page={{add .Page 1}}&date_from={{.Filter.DateFrom}}&date_to={{.Filter.DateTo}}&search={{.Filter.Search}}&project={{.Filter.Project}}"
@@ -171,7 +171,7 @@
   <form method="POST" action="/meetings" class="px-5 py-4 space-y-3 max-h-[80vh] overflow-y-auto">
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Project <span class="text-gray-400 font-normal">(optional)</span></label>
-      <select name="project_id" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+      <select name="project_id" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white">
         <option value="">— No project —</option>
         {{range .Meta.AllProjects}}<option value="{{.ID}}">{{.Name}}</option>{{end}}
       </select>
@@ -180,26 +180,26 @@
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Meeting Title <span class="text-red-400">*</span></label>
         <input name="title" type="text" required placeholder="e.g. Sprint 13 Planning"
-          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Date <span class="text-red-400">*</span></label>
         <input name="date" type="text" required placeholder="e.g. Apr 18, 2026"
-          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
       </div>
     </div>
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Attendees <span class="text-gray-400 font-normal">(comma-separated)</span></label>
       <input name="attendees" type="text" placeholder="Alice Chen, Bob Martinez"
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
     </div>
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Notes</label>
       <textarea name="notes" rows="4" placeholder="Key discussion points, decisions made…"
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 resize-none"></textarea>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 resize-none"></textarea>
     </div>
     <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
-      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save Meeting</button>
+      <button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save Meeting</button>
       <button type="button" onclick="document.getElementById('add-dialog').close()" class="text-xs text-gray-500 hover:text-gray-700 border border-gray-200 px-3.5 py-2 rounded transition-colors">Cancel</button>
     </div>
   </form>
@@ -214,7 +214,7 @@
   <form id="edit-meeting-form" method="POST" action="" class="px-5 py-4 space-y-3 max-h-[80vh] overflow-y-auto">
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Project <span class="text-gray-400 font-normal">(optional)</span></label>
-      <select id="edit-meeting-project-id" name="project_id" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+      <select id="edit-meeting-project-id" name="project_id" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white">
         <option value="">— No project —</option>
         {{range .Meta.AllProjects}}<option value="{{.ID}}">{{.Name}}</option>{{end}}
       </select>
@@ -223,26 +223,26 @@
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Meeting Title <span class="text-red-400">*</span></label>
         <input id="edit-meeting-title" name="title" type="text" required
-          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Date <span class="text-red-400">*</span></label>
         <input id="edit-meeting-date" name="date" type="text" required
-          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
       </div>
     </div>
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Attendees <span class="text-gray-400 font-normal">(comma-separated)</span></label>
       <input id="edit-meeting-attendees" name="attendees" type="text"
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
     </div>
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Notes</label>
       <textarea id="edit-meeting-notes" name="notes" rows="4"
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 resize-none"></textarea>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 resize-none"></textarea>
     </div>
     <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
-      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save Changes</button>
+      <button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save Changes</button>
       <button type="button" onclick="document.getElementById('edit-meeting-dialog').close()" class="text-xs text-gray-500 hover:text-gray-700 border border-gray-200 px-3.5 py-2 rounded transition-colors">Cancel</button>
     </div>
   </form>

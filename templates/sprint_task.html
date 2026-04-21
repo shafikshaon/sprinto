@@ -2,7 +2,7 @@
 
 <!-- ── Task Header ─────────────────────────────────────────────────── -->
 <div class="bg-white border border-gray-200 rounded-lg px-4 py-4 mb-4">
-  <a href="/sprints" class="text-xs text-gray-400 hover:text-indigo-600 font-medium">← Sprint Board</a>
+  <a href="/sprints" class="text-xs text-gray-400 hover:text-violet-600 font-medium">← Sprint Board</a>
   <div class="flex items-start justify-between mt-3">
     <div class="min-w-0">
       <h2 class="text-base font-semibold text-gray-900">{{.Task.Title}}</h2>
@@ -10,8 +10,8 @@
         {{if .Task.Assignees}}
         <div class="flex items-center gap-1.5">
           {{range .Task.Assignees}}
-          <div class="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0" title="{{.Name}}">
-            <span class="text-indigo-700 font-bold text-[9px]">{{initials .Name}}</span>
+          <div class="w-5 h-5 rounded-full bg-violet-100 flex items-center justify-center flex-shrink-0" title="{{.Name}}">
+            <span class="text-violet-700 font-bold text-[9px]">{{initials .Name}}</span>
           </div>
           {{end}}
           <span class="text-xs text-gray-500">{{range $i, $a := .Task.Assignees}}{{if $i}}, {{end}}{{$a.Name}}{{end}}</span>
@@ -23,11 +23,11 @@
     </div>
     <div class="flex items-center gap-1.5 flex-shrink-0 ml-4">
       <button type="button" onclick="document.getElementById('edit-task-dialog').showModal()"
-        class="text-xs font-medium text-gray-600 hover:text-indigo-600 border border-gray-200 hover:border-indigo-300 px-2.5 py-1.5 rounded transition-colors">Edit</button>
+        class="text-xs font-medium text-violet-600 hover:text-violet-700 bg-violet-50 hover:bg-violet-100 border border-violet-200 hover:border-violet-300 px-2.5 py-1.5 rounded transition-colors">Edit</button>
       <button type="button"
         data-delete-action="/sprints/tasks/{{.Task.ID}}/delete"
         data-delete-name="{{.Task.Title}}"
-        class="text-xs font-medium text-gray-500 hover:text-red-600 border border-gray-200 hover:border-red-200 px-2.5 py-1.5 rounded transition-colors">Delete</button>
+        class="text-xs font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 px-2.5 py-1.5 rounded transition-colors">Delete</button>
     </div>
   </div>
 </div>
@@ -47,8 +47,8 @@
   <div class="divide-y divide-gray-100">
     {{range .Task.Comments}}
     <div class="px-4 py-3 flex items-start gap-3 hover:bg-gray-50 transition-colors">
-      <div class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-        <span class="text-indigo-700 font-semibold text-[10px]">{{initials .Author}}</span>
+      <div class="w-6 h-6 rounded-full bg-violet-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+        <span class="text-violet-700 font-semibold text-[10px]">{{initials .Author}}</span>
       </div>
       <div class="flex-1 min-w-0">
         <div class="flex items-center gap-2 mb-1">
@@ -77,14 +77,14 @@
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Your Name</label>
         <input name="author" type="text" value="{{if .Meta.CurrentUser}}{{.Meta.CurrentUser.FullName}}{{end}}" placeholder="Your name"
-          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Comment <span class="text-red-400">*</span></label>
         <textarea name="content" rows="3" required placeholder="Add a comment, update, or blocker note..."
-          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 resize-none"></textarea>
+          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 resize-none"></textarea>
       </div>
-      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Post Comment</button>
+      <button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Post Comment</button>
     </div>
   </form>
 </div>
@@ -99,12 +99,12 @@
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Title <span class="text-red-400">*</span></label>
       <input name="title" type="text" required value="{{.Task.Title}}"
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
     </div>
     {{if .Members}}
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Assignees</label>
-      <select id="edit-task-assignees" name="assignees" multiple class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 h-20">
+      <select id="edit-task-assignees" name="assignees" multiple class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 h-20">
         {{range .Members}}<option value="{{.ID}}">{{.Name}}{{if .Role}} · {{.Role}}{{end}}</option>{{end}}
       </select>
       <p class="text-xs text-gray-400 mt-0.5">Hold Ctrl / Cmd to select multiple</p>
@@ -122,7 +122,7 @@
     <div class="grid grid-cols-2 gap-3">
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Status</label>
-        <select name="status" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+        <select name="status" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white">
           <option {{if eq .Task.Status "Todo"}}selected{{end}}>Todo</option>
           <option {{if eq .Task.Status "In Progress"}}selected{{end}}>In Progress</option>
           <option {{if eq .Task.Status "Done"}}selected{{end}}>Done</option>
@@ -131,7 +131,7 @@
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Priority</label>
-        <select name="priority" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+        <select name="priority" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white">
           <option {{if eq .Task.Priority "Low"}}selected{{end}}>Low</option>
           <option {{if eq .Task.Priority "Medium"}}selected{{end}}>Medium</option>
           <option {{if eq .Task.Priority "High"}}selected{{end}}>High</option>
@@ -140,7 +140,7 @@
       </div>
     </div>
     <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
-      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save Changes</button>
+      <button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save Changes</button>
       <button type="button" onclick="document.getElementById('edit-task-dialog').close()" class="text-xs text-gray-500 hover:text-gray-700 border border-gray-200 px-3.5 py-2 rounded transition-colors">Cancel</button>
     </div>
   </form>

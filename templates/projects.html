@@ -5,7 +5,7 @@
   <p class="text-sm font-medium text-gray-400">No projects yet</p>
   <p class="text-xs text-gray-300 mt-1">Click "+ New Project" to create your first project</p>
   <button type="button" onclick="document.getElementById('add-dialog').showModal()"
-    class="mt-4 text-xs font-semibold text-indigo-600 hover:underline">Create project →</button>
+    class="mt-4 text-xs font-semibold text-violet-600 hover:underline">Create project →</button>
 </div>
 {{else}}
 <div class="space-y-3">
@@ -23,11 +23,11 @@
           data-edit-project-id="{{.ID}}"
           data-edit-project-name="{{.Name}}"
           data-edit-project-description="{{.Description}}"
-          class="text-xs font-medium text-gray-600 hover:text-indigo-600 border border-gray-200 hover:border-indigo-300 px-2.5 py-1 rounded transition-colors">Edit</button>
+          class="text-xs font-medium text-violet-600 hover:text-violet-700 bg-violet-50 hover:bg-violet-100 border border-violet-200 hover:border-violet-300 px-2.5 py-1 rounded transition-colors">Edit</button>
         <button type="button"
           data-delete-action="/projects/{{.ID}}/delete"
           data-delete-name="{{.Name}}"
-          class="text-xs font-medium text-gray-500 hover:text-red-600 border border-gray-200 hover:border-red-200 px-2.5 py-1 rounded transition-colors">Delete</button>
+          class="text-xs font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 px-2.5 py-1 rounded transition-colors">Delete</button>
       </div>
     </div>
     <div class="px-4 py-3">
@@ -35,8 +35,8 @@
       <div class="flex flex-wrap gap-1.5 mb-3">
         {{range .Members}}
         <div class="flex items-center gap-1.5 bg-gray-50 border border-gray-200 rounded-full pl-2 pr-2.5 py-0.5">
-          <div class="w-4 h-4 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
-            <span class="text-indigo-700 font-bold text-[8px]">{{initials .Name}}</span>
+          <div class="w-4 h-4 rounded-full bg-violet-100 flex items-center justify-center flex-shrink-0">
+            <span class="text-violet-700 font-bold text-[8px]">{{initials .Name}}</span>
           </div>
           <span class="text-xs font-medium text-gray-700">{{.Name}}</span>
           <span class="text-xs text-gray-400">· {{.Role}}</span>
@@ -53,13 +53,13 @@
       </div>
       {{if $.AllMembers}}
       <form method="POST" action="/projects/{{$project.ID}}/members" class="flex items-center gap-2">
-        <select name="member_id" class="text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white text-gray-700">
+        <select name="member_id" class="text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white text-gray-700">
           <option value="">— add member —</option>
           {{range $.AllMembers}}
           <option value="{{.ID}}">{{.Name}} ({{.Role}})</option>
           {{end}}
         </select>
-        <button type="submit" class="text-xs font-medium text-gray-600 hover:text-indigo-600 border border-gray-200 hover:border-indigo-300 px-2.5 py-1.5 rounded transition-colors">Add</button>
+        <button type="submit" class="text-xs font-medium text-violet-600 hover:text-violet-700 bg-violet-50 hover:bg-violet-100 border border-violet-200 hover:border-violet-300 px-2.5 py-1.5 rounded transition-colors">Add</button>
       </form>
       {{end}}
     </div>
@@ -78,15 +78,15 @@
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Project Name <span class="text-red-400">*</span></label>
       <input id="edit-project-name" name="name" type="text" required
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
     </div>
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Description</label>
       <input id="edit-project-description" name="description" type="text" placeholder="Short description..."
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
     </div>
     <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
-      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save Changes</button>
+      <button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save Changes</button>
       <button type="button" onclick="document.getElementById('edit-project-dialog').close()" class="text-xs text-gray-500 hover:text-gray-700 border border-gray-200 px-3.5 py-2 rounded transition-colors">Cancel</button>
     </div>
   </form>
@@ -112,15 +112,15 @@ document.addEventListener('click', function(e) {
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Project Name <span class="text-red-400">*</span></label>
       <input name="name" type="text" required placeholder="e.g. Platform, Mobile, Data Infra..."
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
     </div>
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Description</label>
       <input name="description" type="text" placeholder="Short description..."
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
     </div>
     <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
-      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Create Project</button>
+      <button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Create Project</button>
       <button type="button" onclick="document.getElementById('add-dialog').close()" class="text-xs text-gray-500 hover:text-gray-700 border border-gray-200 px-3.5 py-2 rounded transition-colors">Cancel</button>
     </div>
   </form>

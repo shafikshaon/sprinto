@@ -3,12 +3,12 @@
 <!-- ── Tag Filter Bar ──────────────────────────────────────────────── -->
 <div class="flex items-center gap-2 mb-4 flex-wrap">
   <a href="/slack"
-     class="text-xs font-semibold px-3 py-1.5 rounded border transition-colors {{if eq .Tag ""}}bg-indigo-600 text-white border-indigo-600{{else}}bg-white text-gray-500 border-gray-200 hover:border-indigo-300 hover:text-indigo-600{{end}}">
+     class="text-xs font-semibold px-3 py-1.5 rounded border transition-colors {{if eq .Tag ""}}bg-violet-600 text-white border-violet-600{{else}}bg-white text-gray-500 border-gray-200 hover:border-violet-300 hover:text-violet-600{{end}}">
     All
   </a>
   {{range .AllTags}}
   <a href="/slack?tag={{.}}"
-     class="text-xs font-semibold px-3 py-1.5 rounded border transition-colors {{if eq . $.Tag}}bg-indigo-600 text-white border-indigo-600{{else}}bg-white text-gray-500 border-gray-200 hover:border-indigo-300 hover:text-indigo-600{{end}}">
+     class="text-xs font-semibold px-3 py-1.5 rounded border transition-colors {{if eq . $.Tag}}bg-violet-600 text-white border-violet-600{{else}}bg-white text-gray-500 border-gray-200 hover:border-violet-300 hover:text-violet-600{{end}}">
     {{.}}
   </a>
   {{end}}
@@ -23,7 +23,7 @@
   <div class="w-8 h-8 rounded bg-[#4A154B]/10 flex items-center justify-center mx-auto mb-3">
     <span class="text-[#4A154B] font-bold text-sm">#</span>
   </div>
-  <p class="text-sm font-medium text-gray-400">No threads yet{{if .Tag}} for tag <span class="font-semibold text-indigo-600">{{.Tag}}</span>{{end}}</p>
+  <p class="text-sm font-medium text-gray-400">No threads yet{{if .Tag}} for tag <span class="font-semibold text-violet-600">{{.Tag}}</span>{{end}}</p>
   <p class="text-xs text-gray-300 mt-1">Click "+ Add Thread" to log a Slack discussion</p>
 </div>
 {{else}}
@@ -52,7 +52,7 @@
           {{if .Summary}}<p class="text-xs text-gray-500 leading-relaxed mb-2">{{.Summary}}</p>{{end}}
           <div class="flex items-center gap-1.5 flex-wrap">
             {{range .Tags}}
-            <a href="/slack?tag={{.}}" class="text-[11px] font-medium px-2 py-0.5 rounded bg-indigo-50 text-indigo-600 border border-indigo-100 hover:bg-indigo-100 transition-colors">{{.}}</a>
+            <a href="/slack?tag={{.}}" class="text-[11px] font-medium px-2 py-0.5 rounded bg-violet-50 text-violet-600 border border-violet-100 hover:bg-violet-100 transition-colors">{{.}}</a>
             {{end}}
             {{if .AuthorName}}<span class="text-xs text-gray-400 ml-1">— {{.AuthorName}}</span>{{end}}
           </div>
@@ -66,11 +66,11 @@
           data-edit-slack-summary="{{.Summary}}"
           data-edit-slack-tags="{{.TagCSV}}"
           data-edit-slack-author="{{if .AuthorID}}{{.AuthorID}}{{end}}"
-          class="text-xs font-medium text-gray-600 hover:text-indigo-600 border border-gray-200 hover:border-indigo-300 px-2.5 py-1 rounded transition-colors">Edit</button>
+          class="text-xs font-medium text-violet-600 hover:text-violet-700 bg-violet-50 hover:bg-violet-100 border border-violet-200 hover:border-violet-300 px-2.5 py-1 rounded transition-colors">Edit</button>
         <button type="button"
           data-delete-action="/slack/{{.ID}}/delete"
           data-delete-name="{{.Topic}}"
-          class="text-xs font-medium text-gray-500 hover:text-red-600 border border-gray-200 hover:border-red-200 px-2.5 py-1 rounded transition-colors">Delete</button>
+          class="text-xs font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 px-2.5 py-1 rounded transition-colors">Delete</button>
       </div>
     </div>
   </div>
@@ -88,28 +88,28 @@
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Topic / Title <span class="text-red-400">*</span></label>
       <input name="topic" type="text" required placeholder="What was discussed?"
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
     </div>
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Summary</label>
       <textarea name="summary" rows="3" placeholder="Key points, decisions, or action items from the thread..."
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 resize-none"></textarea>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 resize-none"></textarea>
     </div>
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Tags <span class="text-gray-400 font-normal">(comma-separated)</span></label>
       <input name="tags" type="text" placeholder="architecture, backend, incident..."
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
     </div>
     <div class="grid grid-cols-2 gap-3">
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Slack Message Link</label>
         <input name="message_link" type="url" placeholder="https://yourworkspace.slack.com/..."
-          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Posted by</label>
         {{if .Members}}
-        <select name="author" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+        <select name="author" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white">
           <option value="">Select team member…</option>
           {{range .Members}}
           <option value="{{.ID}}" {{if $.Meta.CurrentUser}}{{if eq $.Meta.CurrentUser.FullName .Name}}selected{{end}}{{end}}>{{.Name}}{{if .Role}} · {{.Role}}{{end}}</option>
@@ -117,12 +117,12 @@
         </select>
         {{else}}
         <input name="author" type="text" value="{{if .Meta.CurrentUser}}{{.Meta.CurrentUser.FullName}}{{end}}" placeholder="Your name"
-          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
         {{end}}
       </div>
     </div>
     <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
-      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Add Thread</button>
+      <button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Add Thread</button>
       <button type="button" onclick="document.getElementById('add-dialog').close()" class="text-xs text-gray-500 hover:text-gray-700 border border-gray-200 px-3.5 py-2 rounded transition-colors">Cancel</button>
     </div>
   </form>
@@ -138,28 +138,28 @@
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Topic / Title <span class="text-red-400">*</span></label>
       <input id="edit-slack-topic" name="topic" type="text" required
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
     </div>
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Summary</label>
       <textarea id="edit-slack-summary" name="summary" rows="3"
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 resize-none"></textarea>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 resize-none"></textarea>
     </div>
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Tags <span class="text-gray-400 font-normal">(comma-separated)</span></label>
       <input id="edit-slack-tags" name="tags" type="text"
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
     </div>
     <div class="grid grid-cols-2 gap-3">
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Slack Message Link</label>
         <input id="edit-slack-message-link" name="message_link" type="url"
-          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Posted by</label>
         {{if .Members}}
-        <select id="edit-slack-author" name="author" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+        <select id="edit-slack-author" name="author" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white">
           <option value="">Select team member…</option>
           {{range .Members}}
           <option value="{{.ID}}">{{.Name}}{{if .Role}} · {{.Role}}{{end}}</option>
@@ -167,12 +167,12 @@
         </select>
         {{else}}
         <input id="edit-slack-author" name="author" type="text"
-          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
         {{end}}
       </div>
     </div>
     <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
-      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save Changes</button>
+      <button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save Changes</button>
       <button type="button" onclick="document.getElementById('edit-slack-dialog').close()" class="text-xs text-gray-500 hover:text-gray-700 border border-gray-200 px-3.5 py-2 rounded transition-colors">Cancel</button>
     </div>
   </form>

@@ -26,14 +26,14 @@
 </style>
 
 <div class="mb-3">
-  <a href="/notes" class="text-xs text-gray-400 hover:text-indigo-600 font-medium">← Notes</a>
+  <a href="/notes" class="text-xs text-gray-400 hover:text-violet-600 font-medium">← Notes</a>
 </div>
 
 <form method="POST" action="/notes/{{.Note.ID}}/update">
   <!-- Title + Color bar -->
   <div class="bg-white rounded-lg border border-gray-200 px-4 py-3 mb-3 flex items-center gap-3">
     <input name="title" type="text" placeholder="Note title (optional)" value="{{.Note.Title}}"
-      class="flex-1 text-sm font-semibold border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+      class="flex-1 text-sm font-semibold border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
     <div class="flex items-center gap-2">
       <span class="text-xs text-gray-400 font-medium">Color:</span>
       <label class="cursor-pointer" title="Yellow"><input type="radio" name="color" value="yellow" class="sr-only peer" {{if eq .Note.Color "yellow"}}checked{{end}}><span class="block w-4 h-4 rounded-full bg-yellow-300 ring-2 ring-transparent peer-checked:ring-yellow-500 peer-checked:ring-offset-1 transition-all"></span></label>
@@ -43,7 +43,7 @@
       <label class="cursor-pointer" title="Purple"><input type="radio" name="color" value="purple" class="sr-only peer" {{if eq .Note.Color "purple"}}checked{{end}}><span class="block w-4 h-4 rounded-full bg-purple-300 ring-2 ring-transparent peer-checked:ring-purple-500 peer-checked:ring-offset-1 transition-all"></span></label>
     </div>
     <div class="flex items-center gap-2 ml-1">
-      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save Changes</button>
+      <button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save Changes</button>
       <a href="/notes" class="text-xs text-gray-500 hover:text-gray-700 border border-gray-200 px-3.5 py-2 rounded transition-colors">Cancel</a>
     </div>
   </div>
@@ -98,7 +98,7 @@
       </div>
       <textarea id="note-content" name="content" required
         placeholder="Write in Markdown..."
-        class="flex-1 w-full text-sm border border-gray-200 rounded-b px-4 py-3 focus:outline-none focus:border-indigo-400 resize-none font-mono leading-relaxed">{{.Note.Content}}</textarea>
+        class="flex-1 w-full text-sm border border-gray-200 rounded-b px-4 py-3 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 resize-none font-mono leading-relaxed">{{.Note.Content}}</textarea>
     </div>
 
     <!-- Preview pane -->

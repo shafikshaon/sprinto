@@ -68,11 +68,11 @@
               data-edit-deadline-project="{{.Project}}"
               data-edit-deadline-due="{{.DueDateRaw}}"
               data-edit-deadline-priority="{{.Priority}}"
-              class="text-xs font-medium text-gray-600 hover:text-indigo-600 border border-gray-200 hover:border-indigo-300 px-2.5 py-1 rounded transition-colors">Edit</button>
+              class="text-xs font-medium text-violet-600 hover:text-violet-700 bg-violet-50 hover:bg-violet-100 border border-violet-200 hover:border-violet-300 px-2.5 py-1 rounded transition-colors">Edit</button>
             <button type="button"
               data-delete-action="/deadlines/{{.ID}}/delete"
               data-delete-name="{{.Title}}"
-              class="text-xs font-medium text-gray-500 hover:text-red-600 border border-gray-200 hover:border-red-200 px-2.5 py-1 rounded transition-colors">Delete</button>
+              class="text-xs font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 px-2.5 py-1 rounded transition-colors">Delete</button>
           </div>
         </td>
       </tr>
@@ -99,35 +99,35 @@
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Deadline Name <span class="text-red-400">*</span></label>
       <input name="title" type="text" required placeholder="e.g. API v2 Launch"
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
     </div>
     <div class="grid grid-cols-2 gap-3">
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Project</label>
         {{if .Projects}}
-        <select name="project" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+        <select name="project" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white">
           <option value="">— None —</option>
           {{range .Projects}}<option value="{{.Name}}">{{.Name}}</option>{{end}}
         </select>
         {{else}}
         <input name="project" type="text" placeholder="Platform, Mobile…"
-          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
         {{end}}
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Due Date <span class="text-red-400">*</span></label>
         <input name="due_date" type="date" required
-          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
       </div>
     </div>
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Priority</label>
-      <select name="priority" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+      <select name="priority" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white">
         <option>Medium</option><option>High</option><option>Critical</option><option>Low</option>
       </select>
     </div>
     <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
-      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Add Deadline</button>
+      <button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Add Deadline</button>
       <button type="button" onclick="document.getElementById('add-dialog').close()" class="text-xs text-gray-500 hover:text-gray-700 border border-gray-200 px-3.5 py-2 rounded transition-colors">Cancel</button>
     </div>
   </form>
@@ -143,35 +143,35 @@
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Deadline Name <span class="text-red-400">*</span></label>
       <input id="edit-deadline-title" name="title" type="text" required
-        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
     </div>
     <div class="grid grid-cols-2 gap-3">
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Project</label>
         {{if .Projects}}
-        <select id="edit-deadline-project" name="project" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+        <select id="edit-deadline-project" name="project" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white">
           <option value="">— None —</option>
           {{range .Projects}}<option value="{{.Name}}">{{.Name}}</option>{{end}}
         </select>
         {{else}}
         <input id="edit-deadline-project" name="project" type="text"
-          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
         {{end}}
       </div>
       <div>
         <label class="text-xs font-medium text-gray-600 block mb-1">Due Date <span class="text-red-400">*</span></label>
         <input id="edit-deadline-due" name="due_date" type="date" required
-          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"/>
       </div>
     </div>
     <div>
       <label class="text-xs font-medium text-gray-600 block mb-1">Priority</label>
-      <select id="edit-deadline-priority" name="priority" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+      <select id="edit-deadline-priority" name="priority" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600 bg-white">
         <option>Medium</option><option>High</option><option>Critical</option><option>Low</option>
       </select>
     </div>
     <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
-      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save Changes</button>
+      <button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save Changes</button>
       <button type="button" onclick="document.getElementById('edit-deadline-dialog').close()" class="text-xs text-gray-500 hover:text-gray-700 border border-gray-200 px-3.5 py-2 rounded transition-colors">Cancel</button>
     </div>
   </form>
