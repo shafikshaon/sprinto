@@ -8,20 +8,22 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     ::-webkit-scrollbar { width: 4px; height: 4px; }
-    ::-webkit-scrollbar-track { background: #f1f5f9; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
-    dialog { padding: 0; border: none; border-radius: 0.5rem; box-shadow: 0 16px 48px rgba(0,0,0,0.14); max-width: 30rem; width: 92%; }
-    dialog::backdrop { background: rgba(15,23,42,0.25); }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
+    .main-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
+    .main-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+    dialog { padding: 0; border: none; border-radius: 0.625rem; box-shadow: 0 20px 60px rgba(0,0,0,0.18); max-width: 30rem; width: 92%; }
+    dialog::backdrop { background: rgba(15,23,42,0.35); backdrop-filter: blur(2px); }
   </style>
 </head>
-<body class="bg-gray-100 text-gray-900 antialiased">
+<body class="bg-slate-50 text-gray-900 antialiased">
 <div class="flex h-screen overflow-hidden">
 
   <!-- ── Sidebar ──────────────────────────────────────────────────────── -->
   <aside class="w-52 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 overflow-hidden">
 
     <!-- Logo -->
-    <div class="h-11 flex items-center px-4 border-b border-gray-100 flex-shrink-0">
+    <div class="h-12 flex items-center px-4 border-b border-gray-100 flex-shrink-0">
       <a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
         <div class="w-6 h-6 bg-indigo-600 rounded flex items-center justify-center flex-shrink-0">
           <span class="text-white font-bold text-[10px] tracking-tight">SP</span>
@@ -126,27 +128,42 @@
   <div class="flex-1 flex flex-col overflow-hidden">
 
     <!-- Top bar -->
-    <header class="h-11 bg-white border-b border-gray-200 flex items-center justify-between px-5 flex-shrink-0">
-      <div>
+    <header class="h-12 bg-white border-b border-gray-200 flex items-center justify-between px-5 flex-shrink-0">
+      <!-- Page title + sprint label -->
+      <div class="flex items-center gap-3">
+        <h1 class="text-sm font-bold text-gray-900">{{.Meta.Title}}</h1>
         {{if .Meta.SprintLabel}}
-        <span class="text-xs text-gray-400 bg-gray-50 border border-gray-200 px-2 py-0.5 rounded">{{.Meta.SprintLabel}}</span>
+        <span class="text-[10px] font-medium text-indigo-600 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-full">{{.Meta.SprintLabel}}</span>
         {{end}}
       </div>
+
+      <!-- Right side -->
       <div class="flex items-center gap-3">
-        {{if .Meta.ActiveProject}}
-        <span class="text-xs font-medium text-indigo-700 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded">{{.Meta.ActiveProject.Name}}</span>
-        <span class="text-gray-200">|</span>
+        {{if .Meta.ActionLabel}}
+        <button type="button" onclick="document.getElementById('add-dialog').showModal()"
+           class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3 py-1.5 rounded-md transition-colors">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+          {{.Meta.ActionLabel}}
+        </button>
         {{end}}
-        <span class="text-xs text-gray-500 font-medium">{{gregorianDate}}</span>
+
+        <div class="h-4 w-px bg-gray-200"></div>
+
+        {{if .Meta.ActiveProject}}
+        <span class="text-xs font-medium text-indigo-700 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-md">{{.Meta.ActiveProject.Name}}</span>
+        {{end}}
+
+        <span class="text-xs text-gray-400 font-medium">{{gregorianDate}}</span>
+
         {{if .Meta.CurrentUser}}
-        <span class="text-gray-200">|</span>
+        <div class="h-4 w-px bg-gray-200"></div>
         <div class="flex items-center gap-2">
-          <div class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
-            <span class="text-indigo-700 font-bold text-[10px]">{{initials .Meta.CurrentUser.FullName}}</span>
+          <div class="w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center flex-shrink-0">
+            <span class="text-white font-bold text-[10px]">{{initials .Meta.CurrentUser.FullName}}</span>
           </div>
           <span class="text-xs font-medium text-gray-700">{{.Meta.CurrentUser.FullName}}</span>
           <form method="POST" action="/logout" class="inline">
-            <button type="submit" class="text-xs text-gray-400 hover:text-red-500 transition-colors">Sign out</button>
+            <button type="submit" class="text-xs text-gray-400 hover:text-red-500 transition-colors font-medium">Sign out</button>
           </form>
         </div>
         {{end}}
@@ -154,20 +171,7 @@
     </header>
 
     <!-- Page content -->
-    <main class="flex-1 overflow-y-auto bg-gray-100 px-5 py-4">
-
-      <!-- Page header -->
-      <div class="flex items-center justify-between mb-4">
-        <h1 class="text-lg font-bold text-gray-900">{{.Meta.Title}}</h1>
-        {{if .Meta.ActionLabel}}
-        <button type="button" onclick="document.getElementById('add-dialog').showModal()"
-           class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3 py-1.5 rounded transition-colors">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-          {{.Meta.ActionLabel}}
-        </button>
-        {{end}}
-      </div>
-
+    <main class="main-scroll flex-1 overflow-y-auto bg-slate-50 px-5 py-4">
       {{template "content" .}}
     </main>
 
