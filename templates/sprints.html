@@ -1,9 +1,79 @@
 {{define "content"}}
 
+<!-- ── Sprint Management Panel ─────────────────────────────────────── -->
+<div class="bg-white rounded-lg border border-gray-200 overflow-hidden mb-5">
+  <div class="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
+    <h2 class="text-sm font-semibold text-gray-800">Sprints</h2>
+    <span class="text-xs text-gray-400">{{len .AllSprints}} total</span>
+  </div>
+  {{if not .AllSprints}}
+  <div class="px-5 py-8 text-center">
+    <p class="text-sm font-medium text-gray-400">No sprints yet</p>
+    <p class="text-xs text-gray-300 mt-1">Click "New Sprint" to create your first sprint</p>
+  </div>
+  {{else}}
+  <table class="w-full">
+    <thead>
+      <tr class="border-b border-gray-100 bg-gray-50">
+        <th class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider px-5 py-3">Name</th>
+        <th class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Goal</th>
+        <th class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Dates</th>
+        <th class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Release</th>
+        <th class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">State</th>
+        <th class="px-4 py-3"></th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-50">
+      {{range .AllSprints}}
+      <tr class="hover:bg-gray-50 transition-colors {{if .Active}}bg-indigo-50/40{{end}}">
+        <td class="px-5 py-3">
+          <span class="text-sm font-semibold text-gray-800">{{.Name}}</span>
+          {{if .Active}}<span class="ml-2 text-[10px] font-bold bg-indigo-600 text-white px-1.5 py-0.5 rounded-full uppercase tracking-wide">Active</span>{{end}}
+        </td>
+        <td class="px-4 py-3 max-w-xs">
+          <span class="text-xs text-gray-500 truncate block">{{if .Goal}}{{.Goal}}{{else}}<span class="text-gray-300">—</span>{{end}}</span>
+        </td>
+        <td class="px-4 py-3 whitespace-nowrap">
+          <span class="text-xs text-gray-500">{{if .StartDate}}{{.StartDate}}{{else}}—{{end}} → {{if .EndDate}}{{.EndDate}}{{else}}—{{end}}</span>
+        </td>
+        <td class="px-4 py-3">
+          <span class="text-xs font-semibold px-2 py-0.5 rounded-full {{statusClass .Status}}">{{.Status}}</span>
+        </td>
+        <td class="px-4 py-3">
+          {{if .Active}}
+          <span class="text-xs text-indigo-500 font-semibold">Current board</span>
+          {{else}}
+          <form method="POST" action="/sprints/{{.ID}}/activate" class="inline">
+            <button type="submit" class="text-xs text-white bg-indigo-600 hover:bg-indigo-700 px-2.5 py-1 rounded transition-colors font-medium">Activate</button>
+          </form>
+          {{end}}
+        </td>
+        <td class="px-4 py-3 text-right">
+          <div class="flex items-center justify-end gap-2">
+            <button type="button"
+              data-edit-sprint-id="{{.ID}}"
+              data-edit-sprint-name="{{.Name}}"
+              data-edit-sprint-goal="{{.Goal}}"
+              data-edit-sprint-start="{{.StartDate}}"
+              data-edit-sprint-end="{{.EndDate}}"
+              class="text-xs text-white bg-gray-500 hover:bg-gray-600 px-2.5 py-1 rounded transition-colors font-medium">Edit</button>
+            <button type="button"
+              data-delete-action="/sprints/{{.ID}}/delete"
+              data-delete-name="{{.Name}}"
+              class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete</button>
+          </div>
+        </td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+  {{end}}
+</div>
+
 {{if not .Sprint.ID}}
 <div class="bg-white rounded-lg border border-gray-200 px-5 py-12 text-center">
   <p class="text-sm font-medium text-gray-400">No active sprint</p>
-  <p class="text-xs text-gray-300 mt-1">There is no active sprint for this project yet</p>
+  <p class="text-xs text-gray-300 mt-1">Activate a sprint above or create a new one to start the board</p>
 </div>
 {{else}}
 
@@ -11,11 +81,20 @@
 <div class="bg-white rounded-lg border border-gray-200 p-5 mb-4">
   <div class="flex items-start justify-between mb-4">
     <div>
-      <h2 class="text-base font-semibold text-gray-900">{{.Sprint.Name}}</h2>
-      <p class="text-sm text-gray-500 mt-0.5">{{.Sprint.Goal}}</p>
+      <div class="flex items-center gap-2.5 mb-0.5">
+        <h2 class="text-base font-semibold text-gray-900">{{.Sprint.Name}}</h2>
+        <span class="text-xs font-semibold px-2 py-0.5 rounded-full {{statusClass .Sprint.Status}}">{{.Sprint.Status}}</span>
+      </div>
+      <p class="text-sm text-gray-500">{{.Sprint.Goal}}</p>
+      {{if .Sprint.Description}}<p class="text-xs text-gray-400 mt-0.5">{{.Sprint.Description}}</p>{{end}}
+      {{if .Sprint.TargetDate}}<p class="text-xs text-gray-400 mt-0.5">Target release: <span class="font-medium text-gray-600">{{.Sprint.TargetDate}}</span></p>{{end}}
     </div>
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-2">
       <span class="text-sm text-gray-400">{{.Sprint.StartDate}} – {{.Sprint.EndDate}}</span>
+      <button type="button" onclick="document.getElementById('add-task-dialog').showModal()"
+        class="text-xs text-white bg-indigo-600 hover:bg-indigo-700 px-3 py-1.5 rounded-md transition-colors font-medium">+ Add Task</button>
+      <button type="button" onclick="document.getElementById('edit-release-dialog').showModal()"
+        class="text-xs text-indigo-600 hover:text-indigo-800 border border-indigo-200 hover:border-indigo-400 px-2.5 py-1.5 rounded-md transition-colors font-medium">Edit Release</button>
       <form method="POST" action="/sprints/progress" class="flex items-center gap-1.5">
         <input type="hidden" name="sprint_id" value="{{.Sprint.ID}}"/>
         <input type="number" name="progress" value="{{.Sprint.Progress}}" min="0" max="100"
@@ -53,7 +132,7 @@
 </div>
 
 <!-- ── Task Table ──────────────────────────────────────────────────── -->
-<div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+<div class="bg-white rounded-lg border border-gray-200 overflow-hidden mb-6">
   <div class="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
     <h2 class="text-sm font-semibold text-gray-800">Sprint Tasks</h2>
     <span class="text-xs text-gray-400">{{len .Sprint.Tasks}} tasks</span>
@@ -119,13 +198,243 @@
   </table>
 </div>
 
+<!-- ── Release Stages ──────────────────────────────────────────────── -->
+<div class="mb-4">
+  <div class="flex items-center justify-between mb-3">
+    <h2 class="text-sm font-semibold text-gray-800">Release Stages</h2>
+    <button type="button" onclick="document.getElementById('add-stage-dialog').showModal()"
+      class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-3 py-1.5 rounded-md transition-colors">+ Add Stage</button>
+  </div>
+
+  {{if not .Sprint.Stages}}
+  <div class="bg-white rounded-lg border border-gray-200 px-5 py-10 text-center">
+    <p class="text-sm font-medium text-gray-400">No stages yet</p>
+    <p class="text-xs text-gray-300 mt-1">Click "+ Add Stage" to break this release into stages</p>
+  </div>
+  {{else}}
+  <div class="space-y-4">
+    {{range .Sprint.Stages}}
+    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      <!-- Stage header -->
+      <div class="px-5 py-3.5 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-sm font-semibold text-gray-800">{{.Name}}</span>
+          <span class="text-xs font-semibold px-2 py-0.5 rounded-full {{statusClass .Status}}">{{.Status}}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <form method="POST" action="/sprints/stages/{{.ID}}/status" class="flex items-center gap-2">
+            <select name="status" class="text-xs border-[1.5px] border-gray-200 rounded px-2.5 py-1.5 focus:outline-none focus:border-indigo-400 bg-white text-gray-700">
+              <option {{if eq .Status "Pending"}}selected{{end}}>Pending</option>
+              <option {{if eq .Status "Active"}}selected{{end}}>Active</option>
+              <option {{if eq .Status "Done"}}selected{{end}}>Done</option>
+              <option {{if eq .Status "Failed"}}selected{{end}}>Failed</option>
+            </select>
+            <button type="submit" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-3 py-1.5 rounded-md transition-colors">Save</button>
+          </form>
+          <button type="button"
+            data-delete-action="/sprints/stages/{{.ID}}/delete"
+            data-delete-name="{{.Name}}"
+            class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete</button>
+        </div>
+      </div>
+      <!-- Stories -->
+      <div class="px-5 py-4 border-b border-gray-100">
+        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Stories / QA Items</p>
+        {{if .Stories}}
+        <table class="w-full mb-4">
+          <thead>
+            <tr class="bg-gray-50 border-b border-gray-100">
+              <th class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider px-4 py-2.5">Story</th>
+              <th class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider px-4 py-2.5">Assignee</th>
+              <th class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider px-4 py-2.5">QA Status</th>
+              <th class="px-4 py-2.5"></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-50">
+            {{range .Stories}}
+            <tr class="hover:bg-gray-50 transition-colors">
+              <td class="px-4 py-3"><span class="text-sm font-medium text-gray-800">{{.Title}}</span></td>
+              <td class="px-4 py-3">
+                {{if .Assignee}}
+                <div class="flex items-center gap-2">
+                  <div class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                    <span class="text-indigo-700 font-bold text-[10px]">{{initials .Assignee.Name}}</span>
+                  </div>
+                  <span class="text-sm text-gray-500">{{.Assignee.Name}}</span>
+                </div>
+                {{else}}<span class="text-sm text-gray-300">—</span>{{end}}
+              </td>
+              <td class="px-4 py-3">
+                <span class="text-xs font-semibold px-2 py-0.5 rounded-full {{statusClass .Status}}">{{.Status}}</span>
+              </td>
+              <td class="px-4 py-3 text-right">
+                <div class="flex items-center justify-end gap-2">
+                  <form method="POST" action="/sprints/stories/{{.ID}}/status" class="inline">
+                    <input type="hidden" name="status" value="In QA">
+                    <button type="submit" class="text-xs text-white bg-blue-500 hover:bg-blue-600 px-2 py-1 rounded transition-colors font-medium">QA</button>
+                  </form>
+                  <form method="POST" action="/sprints/stories/{{.ID}}/status" class="inline">
+                    <input type="hidden" name="status" value="Passed">
+                    <button type="submit" class="text-xs text-white bg-green-500 hover:bg-green-600 px-2 py-1 rounded transition-colors font-medium">Pass</button>
+                  </form>
+                  <form method="POST" action="/sprints/stories/{{.ID}}/status" class="inline">
+                    <input type="hidden" name="status" value="Failed">
+                    <button type="submit" class="text-xs text-white bg-red-500 hover:bg-red-600 px-2 py-1 rounded transition-colors font-medium">Fail</button>
+                  </form>
+                  <button type="button"
+                    data-edit-story-id="{{.ID}}"
+                    data-edit-story-title="{{.Title}}"
+                    data-edit-story-assignee="{{if .Assignee}}{{.Assignee.ID}}{{end}}"
+                    class="text-xs text-white bg-indigo-600 hover:bg-indigo-700 px-2.5 py-1 rounded transition-colors font-medium">Edit</button>
+                  <button type="button"
+                    data-delete-action="/sprints/stories/{{.ID}}/delete"
+                    data-delete-name="{{.Title}}"
+                    class="text-xs text-gray-300 hover:text-red-500 transition-colors font-bold flex-shrink-0">✕</button>
+                </div>
+              </td>
+            </tr>
+            {{end}}
+          </tbody>
+        </table>
+        {{end}}
+        <form method="POST" action="/sprints/stages/{{.ID}}/stories" class="flex items-center gap-2">
+          <input name="title" type="text" required placeholder="Story / ticket title..."
+            class="flex-1 text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+          {{if $.Members}}
+          <select name="assignee" class="w-40 text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400 bg-white">
+            <option value="">— Assignee —</option>
+            {{range $.Members}}<option value="{{.ID}}">{{.Name}}</option>{{end}}
+          </select>
+          {{end}}
+          <button type="submit" class="text-sm bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-md transition-colors whitespace-nowrap">+ Story</button>
+        </form>
+      </div>
+      <!-- Slack Updates -->
+      <div class="px-5 py-4">
+        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+          Slack Updates
+          {{if .SlackUpdates}}<span class="ml-1.5 text-xs font-semibold bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded-full">{{len .SlackUpdates}}</span>{{end}}
+        </p>
+        {{if .SlackUpdates}}
+        <div class="space-y-2 mb-4">
+          {{range .SlackUpdates}}
+          <div class="flex items-start justify-between gap-3 bg-gray-50 rounded-md px-4 py-3">
+            <div class="flex items-start gap-2.5 min-w-0">
+              <div class="w-5 h-5 rounded bg-[#4A154B] flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span class="text-white font-bold text-[8px]">#</span>
+              </div>
+              <div class="min-w-0">
+                <p class="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{{.Message}}</p>
+                <p class="text-xs text-gray-400 mt-0.5">{{if .Author}}{{.Author}}{{else}}Unknown{{end}}{{if .PostedAt}} · {{.PostedAt}}{{end}}</p>
+              </div>
+            </div>
+            <button type="button"
+              data-delete-action="/sprints/slack/{{.ID}}/delete"
+              data-delete-name="Slack update"
+              class="text-xs text-gray-300 hover:text-red-500 transition-colors font-bold flex-shrink-0">✕</button>
+          </div>
+          {{end}}
+        </div>
+        {{end}}
+        <form method="POST" action="/sprints/stages/{{.ID}}/slack" class="space-y-2">
+          <textarea name="message" required placeholder="Message summary..." rows="2"
+            class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400 resize-none"></textarea>
+          <div class="flex items-center gap-2">
+            <input name="author" type="text" placeholder="Posted by"
+              class="w-40 text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+            <button type="submit" class="text-sm bg-[#4A154B] hover:bg-[#611f69] text-white font-semibold px-4 py-2 rounded-md transition-colors whitespace-nowrap">+ Slack</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    {{end}}
+  </div>
+  {{end}}
+</div>
+
 {{end}}
 
-<!-- ── Add Task Modal ──────────────────────────────────────────────── -->
+<!-- ── Create Sprint Dialog ─────────────────────────────────────────── -->
 <dialog id="add-dialog">
   <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-    <h3 class="text-sm font-semibold text-gray-900">Add Task to Sprint</h3>
+    <h3 class="text-sm font-semibold text-gray-900">New Sprint</h3>
     <button type="button" onclick="document.getElementById('add-dialog').close()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+  </div>
+  <form method="POST" action="/sprints" class="p-5">
+    <div class="space-y-3 mb-5">
+      <div>
+        <label class="text-xs font-medium text-gray-600 block mb-1.5">Sprint Name <span class="text-red-400">*</span></label>
+        <input name="name" type="text" required placeholder="e.g. Sprint 12"
+          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+      </div>
+      <div>
+        <label class="text-xs font-medium text-gray-600 block mb-1.5">Goal</label>
+        <input name="goal" type="text" placeholder="e.g. Ship checkout flow improvements"
+          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-xs font-medium text-gray-600 block mb-1.5">Start Date</label>
+          <input name="start_date" type="date"
+            class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-600 block mb-1.5">End Date</label>
+          <input name="end_date" type="date"
+            class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+        </div>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-md transition-colors">Create Sprint</button>
+      <button type="button" onclick="document.getElementById('add-dialog').close()" class="text-sm text-gray-500 hover:text-gray-700 px-4 py-2 rounded-md border border-gray-200 transition-colors">Cancel</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- ── Edit Sprint Dialog ───────────────────────────────────────────── -->
+<dialog id="edit-sprint-dialog">
+  <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+    <h3 class="text-sm font-semibold text-gray-900">Edit Sprint</h3>
+    <button type="button" onclick="document.getElementById('edit-sprint-dialog').close()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+  </div>
+  <form id="edit-sprint-form" method="POST" action="" class="p-5">
+    <div class="space-y-3 mb-5">
+      <div>
+        <label class="text-xs font-medium text-gray-600 block mb-1.5">Sprint Name <span class="text-red-400">*</span></label>
+        <input id="edit-sprint-name" name="name" type="text" required
+          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+      </div>
+      <div>
+        <label class="text-xs font-medium text-gray-600 block mb-1.5">Goal</label>
+        <input id="edit-sprint-goal" name="goal" type="text"
+          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-xs font-medium text-gray-600 block mb-1.5">Start Date</label>
+          <input id="edit-sprint-start" name="start_date" type="date"
+            class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-600 block mb-1.5">End Date</label>
+          <input id="edit-sprint-end" name="end_date" type="date"
+            class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+        </div>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-md transition-colors">Save Changes</button>
+      <button type="button" onclick="document.getElementById('edit-sprint-dialog').close()" class="text-sm text-gray-500 hover:text-gray-700 px-4 py-2 rounded-md border border-gray-200 transition-colors">Cancel</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- ── Add Task Dialog ─────────────────────────────────────────────── -->
+<dialog id="add-task-dialog">
+  <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+    <h3 class="text-sm font-semibold text-gray-900">Add Task to Sprint</h3>
+    <button type="button" onclick="document.getElementById('add-task-dialog').close()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
   </div>
   <form method="POST" action="/sprints/tasks" class="p-5">
     <input type="hidden" name="sprint_id" value="{{.Sprint.ID}}"/>
@@ -161,7 +470,7 @@
     </div>
     <div class="flex items-center gap-2">
       <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-md transition-colors">Add Task</button>
-      <button type="button" onclick="document.getElementById('add-dialog').close()" class="text-sm text-gray-500 hover:text-gray-700 px-4 py-2 rounded-md border border-gray-200 transition-colors">Cancel</button>
+      <button type="button" onclick="document.getElementById('add-task-dialog').close()" class="text-sm text-gray-500 hover:text-gray-700 px-4 py-2 rounded-md border border-gray-200 transition-colors">Cancel</button>
     </div>
   </form>
 </dialog>
@@ -209,22 +518,142 @@
     </div>
   </form>
 </dialog>
+
+<!-- ── Edit Release Dialog ──────────────────────────────────────────── -->
+<dialog id="edit-release-dialog">
+  <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+    <h3 class="text-sm font-semibold text-gray-900">Edit Release Info</h3>
+    <button type="button" onclick="document.getElementById('edit-release-dialog').close()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+  </div>
+  <form method="POST" action="/sprints/release/update" class="p-5">
+    <input type="hidden" name="sprint_id" value="{{.Sprint.ID}}"/>
+    <div class="space-y-3 mb-5">
+      <div>
+        <label class="text-xs font-medium text-gray-600 block mb-1.5">Description</label>
+        <textarea name="description" rows="2" placeholder="Release notes or summary..."
+          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400 resize-none">{{.Sprint.Description}}</textarea>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-xs font-medium text-gray-600 block mb-1.5">Release Status</label>
+          <select name="status" class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400">
+            <option {{if eq .Sprint.Status "Draft"}}selected{{end}}>Draft</option>
+            <option {{if eq .Sprint.Status "In Progress"}}selected{{end}}>In Progress</option>
+            <option {{if eq .Sprint.Status "Released"}}selected{{end}}>Released</option>
+            <option {{if eq .Sprint.Status "Rolled Back"}}selected{{end}}>Rolled Back</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-600 block mb-1.5">Target Date</label>
+          <input name="target_date" type="date" value="{{.Sprint.TargetDate}}"
+            class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+        </div>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-md transition-colors">Save</button>
+      <button type="button" onclick="document.getElementById('edit-release-dialog').close()" class="text-sm text-gray-500 hover:text-gray-700 px-4 py-2 rounded-md border border-gray-200 transition-colors">Cancel</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- ── Add Stage Dialog ─────────────────────────────────────────────── -->
+<dialog id="add-stage-dialog">
+  <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+    <h3 class="text-sm font-semibold text-gray-900">Add Release Stage</h3>
+    <button type="button" onclick="document.getElementById('add-stage-dialog').close()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+  </div>
+  <form method="POST" action="/sprints/stages" class="p-5">
+    <input type="hidden" name="sprint_id" value="{{.Sprint.ID}}"/>
+    <div class="space-y-3 mb-5">
+      <div>
+        <label class="text-xs font-medium text-gray-600 block mb-1.5">Stage Name <span class="text-red-400">*</span></label>
+        <input name="name" type="text" required placeholder="e.g. QA Round 1, Staging Deploy, Canary..."
+          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+      </div>
+      <div>
+        <label class="text-xs font-medium text-gray-600 block mb-1.5">Initial Status</label>
+        <select name="status" class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400">
+          <option>Pending</option><option>Active</option><option>Done</option><option>Failed</option>
+        </select>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-md transition-colors">Add Stage</button>
+      <button type="button" onclick="document.getElementById('add-stage-dialog').close()" class="text-sm text-gray-500 hover:text-gray-700 px-4 py-2 rounded-md border border-gray-200 transition-colors">Cancel</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- ── Edit Story Dialog ────────────────────────────────────────────── -->
+<dialog id="edit-story-dialog">
+  <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+    <h3 class="text-sm font-semibold text-gray-900">Edit Story</h3>
+    <button type="button" onclick="document.getElementById('edit-story-dialog').close()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+  </div>
+  <form id="edit-story-form" method="POST" action="" class="p-5">
+    <div class="space-y-3 mb-5">
+      <div>
+        <label class="text-xs font-medium text-gray-600 block mb-1.5">Story Title <span class="text-red-400">*</span></label>
+        <input id="edit-story-title" name="title" type="text" required
+          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+      </div>
+      {{if .Members}}
+      <div>
+        <label class="text-xs font-medium text-gray-600 block mb-1.5">Assignee</label>
+        <select id="edit-story-assignee" name="assignee" class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400 bg-white">
+          <option value="">— No assignee —</option>
+          {{range .Members}}<option value="{{.ID}}">{{.Name}}{{if .Role}} · {{.Role}}{{end}}</option>{{end}}
+        </select>
+      </div>
+      {{end}}
+    </div>
+    <div class="flex items-center gap-2">
+      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-md transition-colors">Save Changes</button>
+      <button type="button" onclick="document.getElementById('edit-story-dialog').close()" class="text-sm text-gray-500 hover:text-gray-700 px-4 py-2 rounded-md border border-gray-200 transition-colors">Cancel</button>
+    </div>
+  </form>
+</dialog>
+
 <script>
 document.addEventListener('click', function(e) {
-  var btn = e.target.closest('[data-edit-task-id]');
-  if (!btn) return;
-  document.getElementById('edit-task-form').action = '/sprints/tasks/' + btn.dataset.editTaskId + '/update';
-  document.getElementById('edit-task-title').value = btn.dataset.editTaskTitle;
-  document.getElementById('edit-task-status').value = btn.dataset.editTaskStatus;
-  document.getElementById('edit-task-priority').value = btn.dataset.editTaskPriority;
-  var current = btn.dataset.editTaskAssignees ? btn.dataset.editTaskAssignees.split(',').map(function(s){ return s.trim(); }) : [];
-  var sel = document.getElementById('edit-task-assignees');
-  if (sel) {
-    for (var i = 0; i < sel.options.length; i++) {
-      sel.options[i].selected = current.indexOf(sel.options[i].value) !== -1;
-    }
+  // Edit sprint
+  var sprintBtn = e.target.closest('[data-edit-sprint-id]');
+  if (sprintBtn) {
+    document.getElementById('edit-sprint-form').action = '/sprints/' + sprintBtn.dataset.editSprintId + '/update';
+    document.getElementById('edit-sprint-name').value  = sprintBtn.dataset.editSprintName;
+    document.getElementById('edit-sprint-goal').value  = sprintBtn.dataset.editSprintGoal;
+    document.getElementById('edit-sprint-start').value = sprintBtn.dataset.editSprintStart;
+    document.getElementById('edit-sprint-end').value   = sprintBtn.dataset.editSprintEnd;
+    document.getElementById('edit-sprint-dialog').showModal();
+    return;
   }
-  document.getElementById('edit-task-dialog').showModal();
+  // Edit task
+  var taskBtn = e.target.closest('[data-edit-task-id]');
+  if (taskBtn) {
+    document.getElementById('edit-task-form').action = '/sprints/tasks/' + taskBtn.dataset.editTaskId + '/update';
+    document.getElementById('edit-task-title').value    = taskBtn.dataset.editTaskTitle;
+    document.getElementById('edit-task-status').value   = taskBtn.dataset.editTaskStatus;
+    document.getElementById('edit-task-priority').value = taskBtn.dataset.editTaskPriority;
+    var current = taskBtn.dataset.editTaskAssignees ? taskBtn.dataset.editTaskAssignees.split(',').map(function(s){ return s.trim(); }) : [];
+    var sel = document.getElementById('edit-task-assignees');
+    if (sel) {
+      for (var i = 0; i < sel.options.length; i++) {
+        sel.options[i].selected = current.indexOf(sel.options[i].value) !== -1;
+      }
+    }
+    document.getElementById('edit-task-dialog').showModal();
+    return;
+  }
+  // Edit story
+  var storyBtn = e.target.closest('[data-edit-story-id]');
+  if (storyBtn) {
+    document.getElementById('edit-story-form').action = '/sprints/stories/' + storyBtn.dataset.editStoryId + '/update';
+    document.getElementById('edit-story-title').value  = storyBtn.dataset.editStoryTitle;
+    var assigneeEl = document.getElementById('edit-story-assignee');
+    if (assigneeEl) assigneeEl.value = storyBtn.dataset.editStoryAssignee || '';
+    document.getElementById('edit-story-dialog').showModal();
+  }
 });
 </script>
 

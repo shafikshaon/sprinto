@@ -13,13 +13,13 @@ type DevTaskFilter struct {
 }
 
 type DevTaskRepository interface {
-	All(projectID uint, f DevTaskFilter, page, perPage int) ([]models.DevTask, int64, error)
-	ByID(id uint) (models.DevTask, error)
-	Create(t models.DevTask, assigneeIDs []uint) error
+	All(projectID uint, f DevTaskFilter, page, perPage int) ([]models.Task, int64, error)
+	ByID(id uint) (models.Task, error)
+	Create(t models.Task, assigneeIDs []uint) error
 	Update(id uint, title, typ, status, priority string, assigneeIDs []uint) error
 	Delete(id uint) error
 	OpenCountsByType(projectID uint) (map[string]int, error)
-	AddComment(c models.DevTaskComment) error
+	AddComment(c models.TaskComment) error
 	DeleteComment(id uint) error
 }
 
@@ -28,7 +28,7 @@ type devTaskRepo struct{ db *gorm.DB }
 func NewDevTaskRepository(db *gorm.DB) DevTaskRepository { return &devTaskRepo{db: db} }
 
 func (r *devTaskRepo) filtered(projectID uint, f DevTaskFilter) *gorm.DB {
-	q := r.db.Model(&models.DevTask{})
+	q := r.db.Model(&models.Task{}).Where("category = ?", "dev")
 	if projectID > 0 {
 		q = q.Where("project_id = ?", projectID)
 	}
@@ -47,8 +47,8 @@ func (r *devTaskRepo) filtered(projectID uint, f DevTaskFilter) *gorm.DB {
 	return q
 }
 
-func (r *devTaskRepo) All(projectID uint, f DevTaskFilter, page, perPage int) ([]models.DevTask, int64, error) {
-	var tasks []models.DevTask
+func (r *devTaskRepo) All(projectID uint, f DevTaskFilter, page, perPage int) ([]models.Task, int64, error) {
+	var tasks []models.Task
 	var total int64
 	if err := r.filtered(projectID, f).Count(&total).Error; err != nil {
 		return nil, 0, err
@@ -63,15 +63,15 @@ func (r *devTaskRepo) All(projectID uint, f DevTaskFilter, page, perPage int) ([
 	return tasks, total, err
 }
 
-func (r *devTaskRepo) ByID(id uint) (models.DevTask, error) {
-	var t models.DevTask
+func (r *devTaskRepo) ByID(id uint) (models.Task, error) {
+	var t models.Task
 	result := r.db.Preload("Comments", func(db *gorm.DB) *gorm.DB {
 		return db.Order("created_at ASC")
 	}).Preload("Assignees").First(&t, id)
 	return t, result.Error
 }
 
-func (r *devTaskRepo) Create(t models.DevTask, assigneeIDs []uint) error {
+func (r *devTaskRepo) Create(t models.Task, assigneeIDs []uint) error {
 	t.Assignees = nil
 	if err := r.db.Create(&t).Error; err != nil {
 		return err
@@ -87,11 +87,11 @@ func (r *devTaskRepo) Create(t models.DevTask, assigneeIDs []uint) error {
 }
 
 func (r *devTaskRepo) Update(id uint, title, typ, status, priority string, assigneeIDs []uint) error {
-	if err := r.db.Model(&models.DevTask{}).Where("id = ?", id).
+	if err := r.db.Model(&models.Task{}).Where("id = ?", id).
 		Updates(map[string]interface{}{"title": title, "type": typ, "status": status, "priority": priority}).Error; err != nil {
 		return err
 	}
-	task := models.DevTask{Model: gorm.Model{ID: id}}
+	task := models.Task{Model: gorm.Model{ID: id}}
 	members := make([]models.TeamMember, len(assigneeIDs))
 	for i, aid := range assigneeIDs {
 		members[i] = models.TeamMember{Model: gorm.Model{ID: aid}}
@@ -99,12 +99,12 @@ func (r *devTaskRepo) Update(id uint, title, typ, status, priority string, assig
 	return r.db.Model(&task).Association("Assignees").Replace(members)
 }
 
-func (r *devTaskRepo) Delete(id uint) error { return r.db.Delete(&models.DevTask{}, id).Error }
+func (r *devTaskRepo) Delete(id uint) error { return r.db.Delete(&models.Task{}, id).Error }
 
-func (r *devTaskRepo) AddComment(c models.DevTaskComment) error { return r.db.Create(&c).Error }
+func (r *devTaskRepo) AddComment(c models.TaskComment) error { return r.db.Create(&c).Error }
 
 func (r *devTaskRepo) DeleteComment(id uint) error {
-	return r.db.Delete(&models.DevTaskComment{}, id).Error
+	return r.db.Delete(&models.TaskComment{}, id).Error
 }
 
 func (r *devTaskRepo) OpenCountsByType(projectID uint) (map[string]int, error) {
@@ -113,9 +113,9 @@ func (r *devTaskRepo) OpenCountsByType(projectID uint) (map[string]int, error) {
 		Count int
 	}
 	var rows []row
-	q := r.db.Model(&models.DevTask{}).
+	q := r.db.Model(&models.Task{}).
 		Select("type, COUNT(*) as count").
-		Where("status != ?", "Done")
+		Where("category = ? AND status != ?", "dev", "Done")
 	if projectID > 0 {
 		q = q.Where("project_id = ?", projectID)
 	}

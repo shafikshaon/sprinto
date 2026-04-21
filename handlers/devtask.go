@@ -15,14 +15,14 @@ const devTaskPerPage = 15
 
 type DevTasksData struct {
 	Meta     Meta
-	DevTasks []models.DevTask
+	DevTasks []models.Task
 	Counts   map[string]int
 	Members  []models.TeamMember
 }
 
 type DevTaskDetailData struct {
 	Meta    Meta
-	Task    models.DevTask
+	Task    models.Task
 	Members []models.TeamMember
 }
 

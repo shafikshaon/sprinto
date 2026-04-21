@@ -8,8 +8,8 @@ import (
 )
 
 type DevTaskService interface {
-	All(projectID uint, f repository.DevTaskFilter, page, perPage int) ([]models.DevTask, int64, error)
-	ByID(id uint) (models.DevTask, error)
+	All(projectID uint, f repository.DevTaskFilter, page, perPage int) ([]models.Task, int64, error)
+	ByID(id uint) (models.Task, error)
 	Add(title, typ string, assigneeIDs []uint, status, priority string, projectID uint) error
 	Update(id uint, title, typ string, assigneeIDs []uint, status, priority string) error
 	Remove(id uint) error
@@ -24,11 +24,11 @@ func NewDevTaskService(r repository.DevTaskRepository) DevTaskService {
 	return &devTaskService{repo: r}
 }
 
-func (s *devTaskService) All(projectID uint, f repository.DevTaskFilter, page, perPage int) ([]models.DevTask, int64, error) {
+func (s *devTaskService) All(projectID uint, f repository.DevTaskFilter, page, perPage int) ([]models.Task, int64, error) {
 	return s.repo.All(projectID, f, page, perPage)
 }
 
-func (s *devTaskService) ByID(id uint) (models.DevTask, error) {
+func (s *devTaskService) ByID(id uint) (models.Task, error) {
 	return s.repo.ByID(id)
 }
 
@@ -36,7 +36,8 @@ func (s *devTaskService) Add(title, typ string, assigneeIDs []uint, status, prio
 	if strings.TrimSpace(title) == "" {
 		return nil
 	}
-	return s.repo.Create(models.DevTask{
+	return s.repo.Create(models.Task{
+		Category:  "dev",
 		ProjectID: projectID,
 		Title:     strings.TrimSpace(title),
 		Type:      typ,
@@ -67,7 +68,7 @@ func (s *devTaskService) AddComment(taskID uint, author, content string) error {
 	if author == "" {
 		author = "Anonymous"
 	}
-	return s.repo.AddComment(models.DevTaskComment{
+	return s.repo.AddComment(models.TaskComment{
 		TaskID:  taskID,
 		Author:  author,
 		Content: content,

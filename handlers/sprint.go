@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -10,15 +11,16 @@ import (
 )
 
 type SprintsData struct {
-	Meta    Meta
-	Sprint  models.Sprint
-	Stats   models.SprintStats
-	Members []models.TeamMember
+	Meta       Meta
+	Sprint     models.Sprint
+	AllSprints []models.Sprint
+	Stats      models.SprintStats
+	Members    []models.TeamMember
 }
 
 type SprintTaskData struct {
 	Meta    Meta
-	Task    models.SprintTask
+	Task    models.Task
 	Members []models.TeamMember
 }
 
@@ -37,6 +39,11 @@ func (h *SprintHandler) List(c *gin.Context) {
 		c.String(500, "DB error: %s", err.Error())
 		return
 	}
+	allSprints, err := h.svc.ListSprints(projectID)
+	if err != nil {
+		c.String(500, "DB error: %s", err.Error())
+		return
+	}
 	sprintLabel := sprint.Name
 	if sprint.StartDate != "" && sprint.EndDate != "" {
 		sprintLabel += " · " + sprint.StartDate + " – " + sprint.EndDate
@@ -47,12 +54,15 @@ func (h *SprintHandler) List(c *gin.Context) {
 		members = activeProject.Members
 	}
 	render(c, "sprints", SprintsData{
-		Meta:    Meta{Title: "Sprint Board", CurrentPage: "sprints", ActionLabel: "Add Task", SprintLabel: sprintLabel, AllProjects: allProjects, ActiveProject: activeProject, CurrentUser: currentUser},
-		Sprint:  sprint,
-		Stats:   models.ComputeStats(sprint.Tasks),
-		Members: members,
+		Meta:       Meta{Title: "Sprint Board", CurrentPage: "sprints", ActionLabel: "New Sprint", SprintLabel: sprintLabel, AllProjects: allProjects, ActiveProject: activeProject, CurrentUser: currentUser},
+		Sprint:     sprint,
+		AllSprints: allSprints,
+		Stats:      models.ComputeStats(sprint.Tasks),
+		Members:    members,
 	})
 }
+
+// ── Sprint Tasks ──────────────────────────────────────────────────────────────
 
 func (h *SprintHandler) CreateTask(c *gin.Context) {
 	sprintID, _ := strconv.ParseUint(c.PostForm("sprint_id"), 10, 64)
@@ -121,4 +131,120 @@ func (h *SprintHandler) DeleteComment(c *gin.Context) {
 	taskID := c.PostForm("task_id")
 	h.svc.DeleteComment(uint(commentID))
 	redirectTo(c, "/sprints/tasks/"+taskID)
+}
+
+// ── Sprint Management ─────────────────────────────────────────────────────────
+
+func (h *SprintHandler) CreateSprint(c *gin.Context) {
+	projectID := activeProjectIDFromCtx(c)
+	h.svc.CreateSprint(
+		projectID,
+		c.PostForm("name"),
+		c.PostForm("goal"),
+		c.PostForm("start_date"),
+		c.PostForm("end_date"),
+	)
+	redirectTo(c, "/sprints")
+}
+
+func (h *SprintHandler) UpdateSprint(c *gin.Context) {
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	h.svc.UpdateSprint(
+		uint(id),
+		c.PostForm("name"),
+		c.PostForm("goal"),
+		c.PostForm("start_date"),
+		c.PostForm("end_date"),
+	)
+	redirectTo(c, "/sprints")
+}
+
+func (h *SprintHandler) DeleteSprint(c *gin.Context) {
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	h.svc.DeleteSprint(uint(id))
+	redirectTo(c, "/sprints")
+}
+
+func (h *SprintHandler) ActivateSprint(c *gin.Context) {
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	projectID := activeProjectIDFromCtx(c)
+	h.svc.ActivateSprint(uint(id), projectID)
+	redirectTo(c, "/sprints")
+}
+
+// ── Release (merged) ──────────────────────────────────────────────────────────
+
+func (h *SprintHandler) UpdateRelease(c *gin.Context) {
+	sprintID, _ := strconv.ParseUint(c.PostForm("sprint_id"), 10, 64)
+	h.svc.UpdateRelease(uint(sprintID), c.PostForm("description"), c.PostForm("status"), c.PostForm("target_date"))
+	redirectTo(c, "/sprints")
+}
+
+func (h *SprintHandler) CreateStage(c *gin.Context) {
+	sprintID, _ := strconv.ParseUint(c.PostForm("sprint_id"), 10, 64)
+	h.svc.AddStage(uint(sprintID), c.PostForm("name"), c.PostForm("status"))
+	redirectTo(c, "/sprints")
+}
+
+func (h *SprintHandler) DeleteStage(c *gin.Context) {
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	h.svc.DeleteStage(uint(id))
+	redirectTo(c, "/sprints")
+}
+
+func (h *SprintHandler) UpdateStageStatus(c *gin.Context) {
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	h.svc.UpdateStageStatus(uint(id), c.PostForm("status"))
+	redirectTo(c, "/sprints")
+}
+
+func (h *SprintHandler) CreateStory(c *gin.Context) {
+	stageID, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	var assigneeID *uint
+	if aid, err := strconv.ParseUint(c.PostForm("assignee"), 10, 64); err == nil && aid > 0 {
+		v := uint(aid)
+		assigneeID = &v
+	}
+	h.svc.AddStory(uint(stageID), c.PostForm("title"), assigneeID)
+	redirectTo(c, "/sprints")
+}
+
+func (h *SprintHandler) DeleteStory(c *gin.Context) {
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	h.svc.DeleteStory(uint(id))
+	redirectTo(c, "/sprints")
+}
+
+func (h *SprintHandler) UpdateStoryStatus(c *gin.Context) {
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	h.svc.UpdateStoryStatus(uint(id), c.PostForm("status"))
+	redirectTo(c, "/sprints")
+}
+
+func (h *SprintHandler) UpdateStory(c *gin.Context) {
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	var assigneeID *uint
+	if aid, err := strconv.ParseUint(c.PostForm("assignee"), 10, 64); err == nil && aid > 0 {
+		v := uint(aid)
+		assigneeID = &v
+	}
+	h.svc.UpdateStory(uint(id), c.PostForm("title"), assigneeID)
+	redirectTo(c, "/sprints")
+}
+
+func (h *SprintHandler) CreateSlackUpdate(c *gin.Context) {
+	stageID, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	h.svc.AddSlackUpdate(
+		uint(stageID),
+		c.PostForm("channel"),
+		c.PostForm("message"),
+		fmt.Sprintf("%s", c.PostForm("author")),
+	)
+	redirectTo(c, "/sprints")
+}
+
+func (h *SprintHandler) DeleteSlackUpdate(c *gin.Context) {
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	h.svc.DeleteSlackUpdate(uint(id))
+	redirectTo(c, "/sprints")
 }

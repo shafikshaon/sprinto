@@ -13,38 +13,25 @@ type User struct {
 
 func (User) TableName() string { return "users" }
 
-// ─── Sprint ───────────────────────────────────────────────────────────────────
+// ─── Sprint (absorbs Release) ─────────────────────────────────────────────────
 
 type Sprint struct {
 	gorm.Model
-	ProjectID uint   `gorm:"index"`
-	Name      string `gorm:"not null"`
-	Goal      string `gorm:"default:''"`
-	Progress  int    `gorm:"default:0"`
-	StartDate string
-	EndDate   string
-	Active    bool         `gorm:"default:false;index"`
-	Tasks     []SprintTask `gorm:"foreignKey:SprintID"`
+	ProjectID   uint           `gorm:"index"`
+	Name        string         `gorm:"not null"`
+	Goal        string         `gorm:"default:''"`
+	Progress    int            `gorm:"default:0"`
+	StartDate   string
+	EndDate     string
+	Active      bool           `gorm:"default:false;index"`
+	// Release fields
+	Description string
+	Status      string         `gorm:"default:'Draft'"` // Draft, In Progress, Released, Rolled Back
+	TargetDate  string
+	// Associations
+	Tasks  []Task         `gorm:"foreignKey:SprintID"`
+	Stages []ReleaseStage `gorm:"foreignKey:SprintID"`
 }
-
-type SprintTask struct {
-	gorm.Model
-	SprintID  uint                `gorm:"not null;index"`
-	Title     string              `gorm:"not null"`
-	Status    string              `gorm:"default:'Todo'"`
-	Priority  string              `gorm:"default:'Medium'"`
-	Comments  []SprintTaskComment `gorm:"foreignKey:TaskID"`
-	Assignees []TeamMember        `gorm:"many2many:sprint_task_assignees;"`
-}
-
-type SprintTaskComment struct {
-	gorm.Model
-	TaskID  uint   `gorm:"not null;index"`
-	Author  string `gorm:"not null"`
-	Content string `gorm:"not null"`
-}
-
-func (SprintTaskComment) TableName() string { return "sprint_task_comments" }
 
 type SprintStats struct {
 	Todo       int
@@ -53,7 +40,7 @@ type SprintStats struct {
 	Blocked    int
 }
 
-func ComputeStats(tasks []SprintTask) SprintStats {
+func ComputeStats(tasks []Task) SprintStats {
 	s := SprintStats{}
 	for _, t := range tasks {
 		switch t.Status {
@@ -69,6 +56,64 @@ func ComputeStats(tasks []SprintTask) SprintStats {
 	}
 	return s
 }
+
+// ─── Task (unified: sprint task / dev task / release task) ────────────────────
+
+type Task struct {
+	gorm.Model
+	Category string `gorm:"not null;index"` // "sprint", "dev", "release"
+	Title    string `gorm:"not null"`
+	Status   string `gorm:"default:'Todo'"`
+	Priority string `gorm:"default:'Medium'"`
+	Type     string `gorm:"default:''"` // dev tasks: Improvement, Tech Debt, Research, Other
+
+	// Parent FKs — only one is non-zero per task
+	SprintID       uint `gorm:"index"`
+	ProjectID      uint `gorm:"index"` // dev tasks
+	ReleaseStageID uint `gorm:"index"` // release tasks
+
+	// Release tasks use a single assignee; sprint/dev use Assignees (many2many)
+	AssigneeID *uint       `gorm:"index"`
+	Assignee   *TeamMember `gorm:"foreignKey:AssigneeID"`
+
+	Comments  []TaskComment `gorm:"foreignKey:TaskID"`
+	Assignees []TeamMember  `gorm:"many2many:task_assignees;"`
+}
+
+func (Task) TableName() string { return "tasks" }
+
+type TaskComment struct {
+	gorm.Model
+	TaskID  uint   `gorm:"not null;index"`
+	Author  string `gorm:"not null"`
+	Content string `gorm:"not null"`
+}
+
+func (TaskComment) TableName() string { return "task_comments" }
+
+// ─── Release Stage ────────────────────────────────────────────────────────────
+
+type ReleaseStage struct {
+	gorm.Model
+	SprintID     uint                 `gorm:"index"` // FK → Sprint.ID
+	Name         string               `gorm:"not null"`
+	Status       string               `gorm:"default:'Pending'"` // Pending, Active, Done, Failed
+	Stories      []Task               `gorm:"foreignKey:ReleaseStageID"`
+	SlackUpdates []ReleaseSlackUpdate `gorm:"foreignKey:StageID"`
+}
+
+func (ReleaseStage) TableName() string { return "release_stages" }
+
+type ReleaseSlackUpdate struct {
+	gorm.Model
+	StageID  uint   `gorm:"not null;index"`
+	Channel  string
+	Message  string `gorm:"not null"`
+	Author   string
+	PostedAt string
+}
+
+func (ReleaseSlackUpdate) TableName() string { return "release_slack_updates" }
 
 // ─── Standup ──────────────────────────────────────────────────────────────────
 
@@ -124,75 +169,6 @@ type Meeting struct {
 	// Computed by service — not persisted
 	Attendees []string `gorm:"-"`
 }
-
-// ─── Dev Task ─────────────────────────────────────────────────────────────────
-
-type DevTask struct {
-	gorm.Model
-	ProjectID uint             `gorm:"index"`
-	Title     string           `gorm:"not null"`
-	Type      string           `gorm:"default:'Improvement'"`
-	Status    string           `gorm:"default:'Todo'"`
-	Priority  string           `gorm:"default:'Medium'"`
-	Comments  []DevTaskComment `gorm:"foreignKey:TaskID"`
-	Assignees []TeamMember     `gorm:"many2many:dev_task_assignees;"`
-}
-
-func (DevTask) TableName() string { return "dev_tasks" }
-
-type DevTaskComment struct {
-	gorm.Model
-	TaskID  uint   `gorm:"not null;index"`
-	Author  string `gorm:"not null"`
-	Content string `gorm:"not null"`
-}
-
-func (DevTaskComment) TableName() string { return "dev_task_comments" }
-
-// ─── Release ──────────────────────────────────────────────────────────────────
-
-type Release struct {
-	gorm.Model
-	ProjectID   uint           `gorm:"index"`
-	Name        string         `gorm:"not null"`
-	Description string
-	Status      string         `gorm:"default:'Draft'"` // Draft, In Progress, Released, Rolled Back
-	TargetDate  string
-	Stages      []ReleaseStage `gorm:"foreignKey:ReleaseID"`
-}
-
-type ReleaseStage struct {
-	gorm.Model
-	ReleaseID    uint                 `gorm:"not null;index"`
-	Name         string               `gorm:"not null"`
-	Status       string               `gorm:"default:'Pending'"` // Pending, Active, Done, Failed
-	Stories      []ReleaseStory       `gorm:"foreignKey:StageID"`
-	SlackUpdates []ReleaseSlackUpdate `gorm:"foreignKey:StageID"`
-}
-
-func (ReleaseStage) TableName() string { return "release_stages" }
-
-type ReleaseStory struct {
-	gorm.Model
-	StageID    uint        `gorm:"not null;index"`
-	Title      string      `gorm:"not null"`
-	AssigneeID *uint       `gorm:"index"`
-	Assignee   *TeamMember `gorm:"foreignKey:AssigneeID"`
-	Status     string      `gorm:"default:'Pending'"` // Pending, In QA, Passed, Failed
-}
-
-func (ReleaseStory) TableName() string { return "release_stories" }
-
-type ReleaseSlackUpdate struct {
-	gorm.Model
-	StageID  uint   `gorm:"not null;index"`
-	Channel  string
-	Message  string `gorm:"not null"`
-	Author   string
-	PostedAt string
-}
-
-func (ReleaseSlackUpdate) TableName() string { return "release_slack_updates" }
 
 // ─── Sticky Note ──────────────────────────────────────────────────────────────
 
