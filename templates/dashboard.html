@@ -1,66 +1,60 @@
 {{define "content"}}
 
 <!-- ── Stat Cards ──────────────────────────────────────────────────── -->
-<div class="grid grid-cols-4 gap-4 mb-5">
+<div class="grid grid-cols-4 gap-3 mb-4">
 
-  <!-- Sprint Progress -->
-  <div class="bg-white rounded-lg border border-gray-200 px-5 py-4">
-    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Sprint Progress</p>
-    <p class="text-2xl font-bold text-gray-900 mb-1">{{.Sprint.Progress}}<span class="text-base text-gray-400 font-medium">%</span></p>
-    <div class="w-full bg-gray-100 rounded-full h-1.5 mb-2">
-      <div class="bg-indigo-500 h-1.5 rounded-full" style="width:{{.Sprint.Progress}}%"></div>
+  <div class="bg-white border border-gray-200 rounded-lg px-4 py-3.5">
+    <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Sprint Progress</p>
+    <p class="text-2xl font-bold text-gray-900">{{.Sprint.Progress}}<span class="text-sm text-gray-400 font-normal">%</span></p>
+    <div class="w-full bg-gray-100 rounded-full h-1 my-2">
+      <div class="bg-indigo-500 h-1 rounded-full" style="width:{{.Sprint.Progress}}%"></div>
     </div>
-    <p class="text-xs text-gray-400">{{.Sprint.Name}}</p>
-    <p class="text-xs text-gray-300 mt-0.5">{{.Sprint.StartDate}} → {{.Sprint.EndDate}}</p>
+    <p class="text-xs text-gray-400 truncate">{{if .Sprint.Name}}{{.Sprint.Name}}{{else}}No active sprint{{end}}</p>
   </div>
 
-  <!-- Standup Today -->
-  <div class="bg-white rounded-lg border border-gray-200 px-5 py-4">
-    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Standup Today</p>
+  <div class="bg-white border border-gray-200 rounded-lg px-4 py-3.5">
+    <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Standup Today</p>
     {{if .TodayStandup}}
-    <p class="text-2xl font-bold text-green-600 mb-1">✓</p>
-    <p class="text-xs text-gray-500 mb-1 truncate">{{if .TodayStandup.Issues}}<span class="text-red-500 font-semibold">Issues logged</span>{{else}}No issues{{end}}</p>
+    <p class="text-2xl font-bold text-green-600">✓</p>
+    <p class="text-xs mt-2 {{if .TodayStandup.Issues}}text-red-500 font-semibold{{else}}text-gray-400{{end}}">{{if .TodayStandup.Issues}}Issues logged{{else}}No issues{{end}}</p>
     {{else}}
-    <p class="text-2xl font-bold text-gray-300 mb-1">–</p>
-    <p class="text-xs text-gray-400 mb-1">Not logged yet</p>
+    <p class="text-2xl font-bold text-gray-300">–</p>
+    <p class="text-xs text-gray-400 mt-2">Not logged yet</p>
     {{end}}
-    <a href="/standups" class="text-xs font-semibold text-indigo-600 hover:underline">View standups →</a>
+    <a href="/standups" class="text-xs text-indigo-600 hover:underline font-medium mt-1 block">View standups →</a>
   </div>
 
-  <!-- Deadlines -->
-  <div class="bg-white rounded-lg border border-gray-200 px-5 py-4">
-    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Upcoming Deadlines</p>
-    <p class="text-2xl font-bold text-gray-900 mb-1">{{len .Deadlines}}</p>
-    <p class="text-xs {{if gt .CriticalDeadlines 0}}text-red-500 font-semibold{{else}}text-gray-500{{end}} mb-1">{{.CriticalDeadlines}} critical · due within 3 days</p>
-    <a href="/deadlines" class="text-xs font-semibold text-indigo-600 hover:underline">View deadlines →</a>
+  <div class="bg-white border border-gray-200 rounded-lg px-4 py-3.5">
+    <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Upcoming Deadlines</p>
+    <p class="text-2xl font-bold text-gray-900">{{len .Deadlines}}</p>
+    <p class="text-xs mt-2 {{if gt .CriticalDeadlines 0}}text-red-500 font-semibold{{else}}text-gray-400{{end}}">{{.CriticalDeadlines}} critical · ≤3 days</p>
+    <a href="/deadlines" class="text-xs text-indigo-600 hover:underline font-medium mt-1 block">View deadlines →</a>
   </div>
 
-  <!-- Open Dev Tasks -->
-  <div class="bg-white rounded-lg border border-gray-200 px-5 py-4">
-    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Open Dev Tasks</p>
-    <p class="text-2xl font-bold text-gray-900 mb-1">{{.OpenDevTasks}}</p>
-    <p class="text-xs text-gray-500 mb-1">Improvements · Tech debt · Research</p>
-    <a href="/devtasks" class="text-xs font-semibold text-indigo-600 hover:underline">View tasks →</a>
+  <div class="bg-white border border-gray-200 rounded-lg px-4 py-3.5">
+    <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Open Dev Tasks</p>
+    <p class="text-2xl font-bold text-gray-900">{{.OpenDevTasks}}</p>
+    <p class="text-xs text-gray-400 mt-2">Improvements · Tech debt · Research</p>
+    <a href="/devtasks" class="text-xs text-indigo-600 hover:underline font-medium mt-1 block">View tasks →</a>
   </div>
 
 </div>
 
 <!-- ── Bottom panels ──────────────────────────────────────────────── -->
-<div class="grid grid-cols-2 gap-4 mb-4">
+<div class="grid grid-cols-2 gap-3 mb-3">
 
-  <!-- Today's Standup -->
-  <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
-    <div class="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
+  <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+    <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
       <h2 class="text-sm font-semibold text-gray-800">Today's Standup</h2>
-      <a href="/standups" class="text-xs text-indigo-600 hover:underline font-medium">View all →</a>
+      <a href="/standups" class="text-xs text-indigo-600 hover:underline">View all →</a>
     </div>
     {{if not .TodayStandup}}
-    <div class="px-5 py-10 text-center">
-      <p class="text-sm font-medium text-gray-400">No standup recorded today</p>
-      <p class="text-xs text-gray-300 mt-1">Head to Standups to log today's meeting</p>
+    <div class="px-4 py-10 text-center">
+      <p class="text-sm text-gray-400">No standup recorded today</p>
+      <p class="text-xs text-gray-300 mt-1">Go to Standups to log today's meeting</p>
     </div>
     {{else}}
-    <div class="px-5 py-4 space-y-3">
+    <div class="px-4 py-3 space-y-3">
       {{if .TodayStandup.Summary}}
       <div>
         <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Summary</p>
@@ -83,27 +77,26 @@
     {{end}}
   </div>
 
-  <!-- Upcoming Deadlines -->
-  <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
-    <div class="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
+  <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+    <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
       <h2 class="text-sm font-semibold text-gray-800">Upcoming Deadlines</h2>
-      <a href="/deadlines" class="text-xs text-indigo-600 hover:underline font-medium">View all →</a>
+      <a href="/deadlines" class="text-xs text-indigo-600 hover:underline">View all →</a>
     </div>
     {{if not .Deadlines}}
-    <div class="px-5 py-10 text-center">
-      <p class="text-sm font-medium text-gray-400">No upcoming deadlines</p>
-      <p class="text-xs text-gray-300 mt-1">Head to Deadlines to track milestones</p>
+    <div class="px-4 py-10 text-center">
+      <p class="text-sm text-gray-400">No upcoming deadlines</p>
+      <p class="text-xs text-gray-300 mt-1">Track milestones in Deadlines</p>
     </div>
     {{else}}
     <div class="divide-y divide-gray-50">
       {{range .Deadlines}}
-      <div class="px-5 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors">
+      <div class="px-4 py-2.5 flex items-center justify-between hover:bg-gray-50 transition-colors">
         <div class="min-w-0">
-          <p class="text-sm font-semibold text-gray-800">{{.Title}}</p>
+          <p class="text-sm font-medium text-gray-800 truncate">{{.Title}}</p>
           <p class="text-xs text-gray-400">{{.Project}} · {{.DueDate}}</p>
         </div>
-        <div class="flex items-center gap-2 flex-shrink-0">
-          <span class="text-xs font-semibold {{urgencyClass .DaysLeft}}">{{.DaysLeft}}d left</span>
+        <div class="flex items-center gap-2 flex-shrink-0 ml-3">
+          <span class="text-xs font-medium {{urgencyClass .DaysLeft}}">{{.DaysLeft}}d</span>
           <span class="text-xs font-semibold px-2 py-0.5 rounded-full {{priorityClass .Priority}}">{{.Priority}}</span>
         </div>
       </div>
@@ -114,17 +107,15 @@
 
 </div>
 
-<!-- ── Sprint Goal Banner ──────────────────────────────────────────── -->
+<!-- ── Sprint Goal ─────────────────────────────────────────────────── -->
 {{if .Sprint.Goal}}
-<div class="bg-indigo-50 border border-indigo-100 rounded-lg px-5 py-4 flex items-center gap-3">
-  <div class="w-8 h-8 rounded-md bg-indigo-600 flex items-center justify-center flex-shrink-0">
-    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-    </svg>
+<div class="bg-white border border-gray-200 rounded-lg px-4 py-3.5 flex items-center gap-3">
+  <div class="w-7 h-7 rounded bg-indigo-600 flex items-center justify-center flex-shrink-0">
+    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
   </div>
   <div>
-    <p class="text-sm font-semibold text-indigo-800">Sprint Goal — {{.Sprint.Name}}</p>
-    <p class="text-sm text-indigo-600 mt-0.5">{{.Sprint.Goal}}</p>
+    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Sprint Goal — {{.Sprint.Name}}</p>
+    <p class="text-sm text-gray-700 mt-0.5">{{.Sprint.Goal}}</p>
   </div>
 </div>
 {{end}}

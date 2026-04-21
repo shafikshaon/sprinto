@@ -1,105 +1,84 @@
 {{define "content"}}
 
-<!-- ── Filter bar ─────────────────────────────────────────────────────────── -->
-<form method="GET" action="/meetings" class="bg-white border border-gray-200 rounded-xl px-5 py-4 mb-5 flex flex-wrap items-end gap-4 shadow-sm">
+<!-- ── Filter Bar ──────────────────────────────────────────────────── -->
+<form method="GET" action="/meetings" class="bg-white border border-gray-200 rounded-lg px-4 py-3 mb-4 flex flex-wrap items-end gap-3">
   <div class="flex flex-col gap-1">
-    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">From</label>
+    <label class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">From</label>
     <input name="date_from" type="date" value="{{.Filter.DateFrom}}"
-      class="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 text-gray-700"/>
+      class="text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 text-gray-700 bg-white"/>
   </div>
   <div class="flex flex-col gap-1">
-    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">To</label>
+    <label class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">To</label>
     <input name="date_to" type="date" value="{{.Filter.DateTo}}"
-      class="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 text-gray-700"/>
+      class="text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 text-gray-700 bg-white"/>
   </div>
   <div class="flex flex-col gap-1 flex-1 min-w-48">
-    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Search</label>
+    <label class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Search</label>
     <div class="relative">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input name="search" type="text" value="{{.Filter.Search}}" placeholder="Title or notes…"
-        class="w-full text-sm border border-gray-200 rounded-lg pl-8 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 text-gray-700 placeholder-gray-400"/>
+        class="w-full text-sm border border-gray-200 rounded pl-8 pr-3 py-1.5 focus:outline-none focus:border-indigo-400 text-gray-700 placeholder-gray-400"/>
     </div>
   </div>
   <div class="flex flex-col gap-1">
-    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Project</label>
-    <select name="project" class="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 text-gray-700 bg-white">
+    <label class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Project</label>
+    <select name="project" class="text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 text-gray-700 bg-white">
       <option value="">All projects</option>
       {{range .Meta.AllProjects}}
       <option value="{{.ID}}" {{if eq (printf "%d" .ID) (printf "%d" $.Filter.Project)}}selected{{end}}>{{.Name}}</option>
       {{end}}
     </select>
   </div>
-  <div class="flex items-center gap-2 pb-0.5">
-    <button type="submit" class="inline-flex items-center gap-1.5 text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors shadow-sm">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-3.5 h-3.5"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+  <div class="flex items-center gap-2">
+    <button type="submit" class="flex items-center gap-1.5 text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded transition-colors">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-3 h-3"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
       Filter
     </button>
-    <a href="/meetings" class="inline-flex items-center text-xs font-medium text-gray-500 hover:text-gray-800 px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">Clear</a>
+    <a href="/meetings" class="text-xs font-medium text-gray-500 hover:text-gray-700 border border-gray-200 px-3 py-1.5 rounded hover:bg-gray-50 transition-colors">Clear</a>
   </div>
   {{if .Total}}
-  <p class="text-xs text-gray-400 self-end ml-auto pb-0.5">
-    <span class="font-semibold text-gray-600">{{.Total}}</span> meeting{{if gt .Total 1}}s{{end}}
-  </p>
+  <p class="text-xs text-gray-400 self-end ml-auto"><span class="font-semibold text-gray-600">{{.Total}}</span> meeting{{if gt .Total 1}}s{{end}}</p>
   {{end}}
 </form>
 
 {{if not .Meetings}}
-<div class="flex flex-col items-center justify-center py-24 text-center bg-white rounded-xl border border-gray-200">
-  <div class="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center mb-3">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-6 h-6 text-indigo-300"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-  </div>
-  <p class="text-sm font-semibold text-gray-500">No meetings found</p>
-  <p class="text-xs text-gray-400 mt-1">Try adjusting your filters or click "+ New Meeting"</p>
+<div class="bg-white border border-gray-200 rounded-lg px-5 py-16 text-center">
+  <p class="text-sm font-medium text-gray-400">No meetings found</p>
+  <p class="text-xs text-gray-300 mt-1">Adjust filters or click "+ New Meeting"</p>
 </div>
 {{else}}
 
-<!-- ── Card list ──────────────────────────────────────────────────────────── -->
+<!-- ── Meeting List ────────────────────────────────────────────────── -->
 <div class="space-y-3">
   {{range .Meetings}}
-  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+  <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
 
     <!-- Header -->
-    <div class="flex items-center justify-between px-5 py-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+    <div class="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-100">
       <div class="flex items-center gap-3 flex-wrap min-w-0">
-        <!-- Icon + Title + Date -->
-        <div class="flex items-center gap-2 shrink-0">
-          <div class="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" class="w-3.5 h-3.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <div class="w-6 h-6 rounded bg-indigo-600 flex items-center justify-center flex-shrink-0">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" class="w-3 h-3"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
           </div>
-          <div>
-            <span class="text-sm font-bold text-gray-800 tracking-tight">{{.Title}}</span>
-            <span class="text-xs text-gray-400 ml-2">{{.Date}}</span>
-          </div>
+          <span class="text-sm font-semibold text-gray-800">{{.Title}}</span>
+          <span class="text-xs text-gray-400">{{.Date}}</span>
         </div>
-        <!-- Project badge -->
         {{if .Project.Name}}
-        <span class="inline-flex items-center gap-1 text-xs font-semibold bg-violet-50 text-violet-700 border border-violet-200 px-2.5 py-0.5 rounded-full">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3 h-3"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-          {{.Project.Name}}
-        </span>
+        <span class="text-xs font-medium border border-gray-200 text-gray-600 px-2 py-0.5 rounded">{{.Project.Name}}</span>
         {{end}}
-        <!-- Attendees -->
         {{if .Attendees}}
         <div class="flex items-center gap-1 flex-wrap">
           {{range .Attendees}}
-          <span class="inline-flex items-center gap-1 text-xs font-medium bg-indigo-50 text-indigo-600 border border-indigo-100 px-2 py-0.5 rounded-full">
-            <span class="w-3.5 h-3.5 rounded-full bg-indigo-200 text-indigo-700 flex items-center justify-center text-[9px] font-bold shrink-0">{{initials .}}</span>
-            {{.}}
-          </span>
+          <span class="text-xs font-medium bg-indigo-50 text-indigo-600 border border-indigo-100 px-2 py-0.5 rounded-full">{{.}}</span>
           {{end}}
         </div>
         {{end}}
-        <!-- Timestamps -->
         <div class="flex items-center gap-2 text-[11px] text-gray-400">
-          <span>Created {{timeAgo .CreatedAt}}</span>
-          {{if wasEdited .CreatedAt .UpdatedAt}}
-          <span class="text-gray-300">·</span>
-          <span>Updated {{timeAgo .UpdatedAt}}</span>
-          {{end}}
+          <span>{{timeAgo .CreatedAt}}</span>
+          {{if wasEdited .CreatedAt .UpdatedAt}}<span class="text-gray-300">·</span><span>edited {{timeAgo .UpdatedAt}}</span>{{end}}
         </div>
       </div>
-      <!-- Actions -->
-      <div class="flex items-center gap-2 shrink-0 ml-3">
+      <div class="flex items-center gap-1.5 flex-shrink-0 ml-3">
         <button type="button"
           data-edit-meeting-id="{{.ID}}"
           data-edit-meeting-project-id="{{.ProjectID}}"
@@ -107,44 +86,29 @@
           data-edit-meeting-date="{{.Date}}"
           data-edit-meeting-attendees="{{.AttendeeCSV}}"
           data-edit-meeting-notes="{{.Notes}}"
-          class="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-white bg-indigo-50 hover:bg-indigo-600 border border-indigo-200 hover:border-indigo-600 px-3 py-1.5 rounded-lg transition-all">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3 h-3"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          Edit
-        </button>
+          class="text-xs font-medium text-gray-600 hover:text-indigo-600 border border-gray-200 hover:border-indigo-300 px-2.5 py-1 rounded transition-colors">Edit</button>
         <button type="button"
           data-delete-action="/meetings/{{.ID}}/delete"
           data-delete-name="{{.Title}}"
-          class="inline-flex items-center gap-1 text-xs font-semibold text-red-500 hover:text-white bg-red-50 hover:bg-red-500 border border-red-200 hover:border-red-500 px-3 py-1.5 rounded-lg transition-all">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3 h-3"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
-          Delete
-        </button>
+          class="text-xs font-medium text-gray-500 hover:text-red-600 border border-gray-200 hover:border-red-200 px-2.5 py-1 rounded transition-colors">Delete</button>
       </div>
     </div>
 
     <!-- Body -->
-    <div class="px-5 py-4">
+    <div class="px-4 py-3">
       {{if and (not .Notes) (not .ActionItems)}}
       <p class="text-sm text-gray-400 italic">No details recorded.</p>
       {{else}}
-      <div class="grid grid-cols-1 gap-4">
-
+      <div class="space-y-3">
         {{if .Notes}}
-        <div class="rounded-lg bg-gray-50 border border-gray-100 px-4 py-3">
-          <p class="flex items-center gap-1.5 text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3.5 h-3.5 text-gray-400"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-            Notes
-          </p>
+        <div class="bg-gray-50 border border-gray-100 rounded px-3.5 py-3">
+          <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Notes</p>
           <p class="text-sm text-gray-700 leading-relaxed">{{.Notes}}</p>
         </div>
         {{end}}
-
         {{if .ActionItems}}
-        <div class="rounded-lg bg-green-50 border border-green-100 px-4 py-3">
-          <p class="flex items-center gap-1.5 text-[10px] font-bold text-green-700 uppercase tracking-widest mb-2">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3.5 h-3.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-            Action Items
-            <span class="ml-1 text-xs font-semibold bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full">{{len .ActionItems}}</span>
-          </p>
+        <div class="bg-green-50 border border-green-100 rounded px-3.5 py-3">
+          <p class="text-[10px] font-semibold text-green-600 uppercase tracking-wider mb-2">Action Items <span class="text-xs font-semibold bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full ml-1">{{len .ActionItems}}</span></p>
           <div class="space-y-1.5">
             {{range .ActionItems}}
             <div class="flex items-center gap-2.5">
@@ -165,7 +129,6 @@
           </div>
         </div>
         {{end}}
-
       </div>
       {{end}}
     </div>
@@ -174,29 +137,24 @@
   {{end}}
 </div>
 
-<!-- ── Pagination ─────────────────────────────────────────────────────────── -->
+<!-- ── Pagination ──────────────────────────────────────────────────── -->
 {{if gt .TotalPages 1}}
-<div class="flex items-center justify-between mt-6 px-1">
+<div class="flex items-center justify-between mt-4 px-1">
   <p class="text-xs text-gray-400">Page <span class="font-semibold text-gray-600">{{.Page}}</span> of <span class="font-semibold text-gray-600">{{.TotalPages}}</span></p>
   <div class="flex items-center gap-1">
     {{if gt .Page 1}}
     <a href="/meetings?page={{sub .Page 1}}&date_from={{.Filter.DateFrom}}&date_to={{.Filter.DateTo}}&search={{.Filter.Search}}&project={{.Filter.Project}}"
-      class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-600 transition-colors">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3 h-3"><polyline points="15 18 9 12 15 6"/></svg>
-      Prev
-    </a>
+      class="flex items-center gap-1 px-2.5 py-1 text-xs font-medium border border-gray-200 rounded hover:bg-gray-50 text-gray-600 transition-colors">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3 h-3"><polyline points="15 18 9 12 15 6"/></svg>Prev</a>
     {{end}}
     {{range .Pages}}
     <a href="/meetings?page={{.}}&date_from={{$.Filter.DateFrom}}&date_to={{$.Filter.DateTo}}&search={{$.Filter.Search}}&project={{$.Filter.Project}}"
-      class="px-3 py-1.5 text-xs font-semibold border rounded-lg transition-colors
-        {{if eq . $.Page}}bg-indigo-600 text-white border-indigo-600 shadow-sm{{else}}border-gray-200 text-gray-600 hover:bg-gray-50{{end}}">{{.}}</a>
+      class="px-2.5 py-1 text-xs font-semibold border rounded transition-colors {{if eq . $.Page}}bg-indigo-600 text-white border-indigo-600{{else}}border-gray-200 text-gray-600 hover:bg-gray-50{{end}}">{{.}}</a>
     {{end}}
     {{if lt .Page .TotalPages}}
     <a href="/meetings?page={{add .Page 1}}&date_from={{.Filter.DateFrom}}&date_to={{.Filter.DateTo}}&search={{.Filter.Search}}&project={{.Filter.Project}}"
-      class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-600 transition-colors">
-      Next
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3 h-3"><polyline points="9 18 15 12 9 6"/></svg>
-    </a>
+      class="flex items-center gap-1 px-2.5 py-1 text-xs font-medium border border-gray-200 rounded hover:bg-gray-50 text-gray-600 transition-colors">
+      Next<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3 h-3"><polyline points="9 18 15 12 9 6"/></svg></a>
     {{end}}
   </div>
 </div>
@@ -204,53 +162,88 @@
 
 {{end}}
 
-<!-- ── Edit Meeting Dialog ────────────────────────────────────────────────── -->
-<dialog id="edit-meeting-dialog" class="w-full max-w-xl rounded-2xl border border-gray-200 p-0 shadow-2xl backdrop:bg-black/40">
-  <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50 rounded-t-2xl">
-    <div class="flex items-center gap-2">
-      <div class="w-6 h-6 rounded-md bg-indigo-600 flex items-center justify-center">
-        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" class="w-3.5 h-3.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-      </div>
-      <h3 class="text-sm font-bold text-gray-900">Edit Meeting</h3>
-    </div>
-    <button type="button" onclick="document.getElementById('edit-meeting-dialog').close()" class="w-7 h-7 flex items-center justify-center rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-200 transition-colors text-lg leading-none">×</button>
+<!-- ── New Meeting Dialog ──────────────────────────────────────────── -->
+<dialog id="add-dialog">
+  <div class="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
+    <h3 class="text-sm font-semibold text-gray-900">New Meeting</h3>
+    <button type="button" onclick="document.getElementById('add-dialog').close()" class="text-gray-400 hover:text-gray-600 text-lg leading-none">×</button>
   </div>
-  <form id="edit-meeting-form" method="POST" action="" class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+  <form method="POST" action="/meetings" class="px-5 py-4 space-y-3 max-h-[80vh] overflow-y-auto">
     <div>
-      <label class="text-xs font-semibold text-gray-600 block mb-1.5">Project <span class="text-gray-400 font-normal">(optional)</span></label>
-      <select id="edit-meeting-project-id" name="project_id"
-        class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400 bg-white">
+      <label class="text-xs font-medium text-gray-600 block mb-1">Project <span class="text-gray-400 font-normal">(optional)</span></label>
+      <select name="project_id" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
         <option value="">— No project —</option>
-        {{range .Meta.AllProjects}}
-        <option value="{{.ID}}">{{.Name}}</option>
-        {{end}}
+        {{range .Meta.AllProjects}}<option value="{{.ID}}">{{.Name}}</option>{{end}}
       </select>
     </div>
-    <div class="grid grid-cols-2 gap-4">
+    <div class="grid grid-cols-2 gap-3">
       <div>
-        <label class="text-xs font-semibold text-gray-600 block mb-1.5">Meeting Title <span class="text-red-500">*</span></label>
+        <label class="text-xs font-medium text-gray-600 block mb-1">Meeting Title <span class="text-red-400">*</span></label>
+        <input name="title" type="text" required placeholder="e.g. Sprint 13 Planning"
+          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+      </div>
+      <div>
+        <label class="text-xs font-medium text-gray-600 block mb-1">Date <span class="text-red-400">*</span></label>
+        <input name="date" type="text" required placeholder="e.g. Apr 18, 2026"
+          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+      </div>
+    </div>
+    <div>
+      <label class="text-xs font-medium text-gray-600 block mb-1">Attendees <span class="text-gray-400 font-normal">(comma-separated)</span></label>
+      <input name="attendees" type="text" placeholder="Alice Chen, Bob Martinez"
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+    </div>
+    <div>
+      <label class="text-xs font-medium text-gray-600 block mb-1">Notes</label>
+      <textarea name="notes" rows="4" placeholder="Key discussion points, decisions made…"
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 resize-none"></textarea>
+    </div>
+    <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
+      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save Meeting</button>
+      <button type="button" onclick="document.getElementById('add-dialog').close()" class="text-xs text-gray-500 hover:text-gray-700 border border-gray-200 px-3.5 py-2 rounded transition-colors">Cancel</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- ── Edit Meeting Dialog ─────────────────────────────────────────── -->
+<dialog id="edit-meeting-dialog">
+  <div class="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
+    <h3 class="text-sm font-semibold text-gray-900">Edit Meeting</h3>
+    <button type="button" onclick="document.getElementById('edit-meeting-dialog').close()" class="text-gray-400 hover:text-gray-600 text-lg leading-none">×</button>
+  </div>
+  <form id="edit-meeting-form" method="POST" action="" class="px-5 py-4 space-y-3 max-h-[80vh] overflow-y-auto">
+    <div>
+      <label class="text-xs font-medium text-gray-600 block mb-1">Project <span class="text-gray-400 font-normal">(optional)</span></label>
+      <select id="edit-meeting-project-id" name="project_id" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+        <option value="">— No project —</option>
+        {{range .Meta.AllProjects}}<option value="{{.ID}}">{{.Name}}</option>{{end}}
+      </select>
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label class="text-xs font-medium text-gray-600 block mb-1">Meeting Title <span class="text-red-400">*</span></label>
         <input id="edit-meeting-title" name="title" type="text" required
-          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
       </div>
       <div>
-        <label class="text-xs font-semibold text-gray-600 block mb-1.5">Date <span class="text-red-500">*</span></label>
+        <label class="text-xs font-medium text-gray-600 block mb-1">Date <span class="text-red-400">*</span></label>
         <input id="edit-meeting-date" name="date" type="text" required
-          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
       </div>
     </div>
     <div>
-      <label class="text-xs font-semibold text-gray-600 block mb-1.5">Attendees <span class="text-gray-400 font-normal">(comma-separated)</span></label>
+      <label class="text-xs font-medium text-gray-600 block mb-1">Attendees <span class="text-gray-400 font-normal">(comma-separated)</span></label>
       <input id="edit-meeting-attendees" name="attendees" type="text"
-        class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
     </div>
     <div>
-      <label class="text-xs font-semibold text-gray-600 block mb-1.5">Notes</label>
+      <label class="text-xs font-medium text-gray-600 block mb-1">Notes</label>
       <textarea id="edit-meeting-notes" name="notes" rows="4"
-        class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 resize-none text-gray-700"></textarea>
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 resize-none"></textarea>
     </div>
-    <div class="flex items-center gap-3 pt-2 border-t border-gray-100">
-      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-md transition-colors">Save Changes</button>
-      <button type="button" onclick="document.getElementById('edit-meeting-dialog').close()" class="text-sm text-gray-500 hover:text-gray-700 px-4 py-2 rounded-md border border-gray-200 transition-colors">Cancel</button>
+    <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
+      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save Changes</button>
+      <button type="button" onclick="document.getElementById('edit-meeting-dialog').close()" class="text-xs text-gray-500 hover:text-gray-700 border border-gray-200 px-3.5 py-2 rounded transition-colors">Cancel</button>
     </div>
   </form>
 </dialog>
@@ -259,65 +252,14 @@
 document.addEventListener('click', function(e) {
   var btn = e.target.closest('[data-edit-meeting-id]');
   if (!btn) return;
-  document.getElementById('edit-meeting-form').action        = '/meetings/' + btn.dataset.editMeetingId + '/update';
-  document.getElementById('edit-meeting-project-id').value  = btn.dataset.editMeetingProjectId || '';
-  document.getElementById('edit-meeting-title').value       = btn.dataset.editMeetingTitle;
-  document.getElementById('edit-meeting-date').value        = btn.dataset.editMeetingDate;
-  document.getElementById('edit-meeting-attendees').value   = btn.dataset.editMeetingAttendees;
-  document.getElementById('edit-meeting-notes').value       = btn.dataset.editMeetingNotes;
+  document.getElementById('edit-meeting-form').action       = '/meetings/' + btn.dataset.editMeetingId + '/update';
+  document.getElementById('edit-meeting-project-id').value = btn.dataset.editMeetingProjectId || '';
+  document.getElementById('edit-meeting-title').value      = btn.dataset.editMeetingTitle;
+  document.getElementById('edit-meeting-date').value       = btn.dataset.editMeetingDate;
+  document.getElementById('edit-meeting-attendees').value  = btn.dataset.editMeetingAttendees;
+  document.getElementById('edit-meeting-notes').value      = btn.dataset.editMeetingNotes;
   document.getElementById('edit-meeting-dialog').showModal();
 });
 </script>
-
-<!-- ── New Meeting Dialog ─────────────────────────────────────────────────── -->
-<dialog id="add-dialog" class="w-full max-w-xl rounded-2xl border border-gray-200 p-0 shadow-2xl backdrop:bg-black/40">
-  <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50 rounded-t-2xl">
-    <div class="flex items-center gap-2">
-      <div class="w-6 h-6 rounded-md bg-indigo-600 flex items-center justify-center">
-        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" class="w-3.5 h-3.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      </div>
-      <h3 class="text-sm font-bold text-gray-900">Record New Meeting</h3>
-    </div>
-    <button type="button" onclick="document.getElementById('add-dialog').close()" class="w-7 h-7 flex items-center justify-center rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-200 transition-colors text-lg leading-none">×</button>
-  </div>
-  <form method="POST" action="/meetings" class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
-    <div>
-      <label class="text-xs font-semibold text-gray-600 block mb-1.5">Project <span class="text-gray-400 font-normal">(optional)</span></label>
-      <select name="project_id"
-        class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400 bg-white">
-        <option value="">— No project —</option>
-        {{range .Meta.AllProjects}}
-        <option value="{{.ID}}">{{.Name}}</option>
-        {{end}}
-      </select>
-    </div>
-    <div class="grid grid-cols-2 gap-4">
-      <div>
-        <label class="text-xs font-semibold text-gray-600 block mb-1.5">Meeting Title <span class="text-red-500">*</span></label>
-        <input name="title" type="text" required placeholder="e.g. Sprint 13 Planning"
-          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
-      </div>
-      <div>
-        <label class="text-xs font-semibold text-gray-600 block mb-1.5">Date <span class="text-red-500">*</span></label>
-        <input name="date" type="text" required placeholder="e.g. Apr 18, 2026"
-          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
-      </div>
-    </div>
-    <div>
-      <label class="text-xs font-semibold text-gray-600 block mb-1.5">Attendees <span class="text-gray-400 font-normal">(comma-separated)</span></label>
-      <input name="attendees" type="text" placeholder="Alice Chen, Bob Martinez"
-        class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
-    </div>
-    <div>
-      <label class="text-xs font-semibold text-gray-600 block mb-1.5">Notes</label>
-      <textarea name="notes" rows="3" placeholder="Key discussion points, decisions made…"
-        class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 resize-none text-gray-700 placeholder-gray-400"></textarea>
-    </div>
-    <div class="flex items-center gap-3 pt-2 border-t border-gray-100">
-      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-md transition-colors">Save Meeting</button>
-      <button type="button" onclick="document.getElementById('add-dialog').close()" class="text-sm text-gray-500 hover:text-gray-700 px-4 py-2 rounded-md border border-gray-200 transition-colors">Cancel</button>
-    </div>
-  </form>
-</dialog>
 
 {{end}}

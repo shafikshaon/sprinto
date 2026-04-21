@@ -20,44 +20,44 @@
   .preview-md em { font-style:italic; }
   .preview-md a { color:#4f46e5; text-decoration:underline; }
   .preview-md hr { border:none; border-top:1px solid #e5e7eb; margin:.75rem 0; }
-  .md-toolbar button { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:4px; color:#6b7280; transition:background .15s,color .15s; flex-shrink:0; }
+  .md-toolbar button { display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:4px; color:#6b7280; transition:background .15s,color .15s; flex-shrink:0; }
   .md-toolbar button:hover { background:#f3f4f6; color:#111827; }
-  .md-toolbar .sep { width:1px; height:18px; background:#e5e7eb; margin:0 2px; flex-shrink:0; }
+  .md-toolbar .sep { width:1px; height:16px; background:#e5e7eb; margin:0 2px; flex-shrink:0; }
 </style>
 
-<div class="mb-4">
-  <a href="/notes" class="text-xs text-gray-400 hover:text-indigo-600 font-medium">← Sticky Notes</a>
+<div class="mb-3">
+  <a href="/notes" class="text-xs text-gray-400 hover:text-indigo-600 font-medium">← Notes</a>
 </div>
 
 <form method="POST" action="/notes">
   <!-- Title + Color bar -->
-  <div class="bg-white rounded-lg border border-gray-200 px-5 py-4 mb-4 flex items-center gap-4">
+  <div class="bg-white rounded-lg border border-gray-200 px-4 py-3 mb-3 flex items-center gap-3">
     <input name="title" type="text" placeholder="Note title (optional)"
-      class="flex-1 text-sm font-semibold border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+      class="flex-1 text-sm font-semibold border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
     <div class="flex items-center gap-2">
       <span class="text-xs text-gray-400 font-medium">Color:</span>
-      <label class="cursor-pointer" title="Yellow"><input type="radio" name="color" value="yellow" class="sr-only peer" checked><span class="block w-5 h-5 rounded-full bg-yellow-300 ring-2 ring-transparent peer-checked:ring-yellow-500 peer-checked:ring-offset-1 transition-all"></span></label>
-      <label class="cursor-pointer" title="Green"><input type="radio" name="color" value="green" class="sr-only peer"><span class="block w-5 h-5 rounded-full bg-green-300 ring-2 ring-transparent peer-checked:ring-green-500 peer-checked:ring-offset-1 transition-all"></span></label>
-      <label class="cursor-pointer" title="Blue"><input type="radio" name="color" value="blue" class="sr-only peer"><span class="block w-5 h-5 rounded-full bg-blue-300 ring-2 ring-transparent peer-checked:ring-blue-500 peer-checked:ring-offset-1 transition-all"></span></label>
-      <label class="cursor-pointer" title="Pink"><input type="radio" name="color" value="pink" class="sr-only peer"><span class="block w-5 h-5 rounded-full bg-pink-300 ring-2 ring-transparent peer-checked:ring-pink-500 peer-checked:ring-offset-1 transition-all"></span></label>
-      <label class="cursor-pointer" title="Purple"><input type="radio" name="color" value="purple" class="sr-only peer"><span class="block w-5 h-5 rounded-full bg-purple-300 ring-2 ring-transparent peer-checked:ring-purple-500 peer-checked:ring-offset-1 transition-all"></span></label>
+      <label class="cursor-pointer" title="Yellow"><input type="radio" name="color" value="yellow" class="sr-only peer" checked><span class="block w-4 h-4 rounded-full bg-yellow-300 ring-2 ring-transparent peer-checked:ring-yellow-500 peer-checked:ring-offset-1 transition-all"></span></label>
+      <label class="cursor-pointer" title="Green"><input type="radio" name="color" value="green" class="sr-only peer"><span class="block w-4 h-4 rounded-full bg-green-300 ring-2 ring-transparent peer-checked:ring-green-500 peer-checked:ring-offset-1 transition-all"></span></label>
+      <label class="cursor-pointer" title="Blue"><input type="radio" name="color" value="blue" class="sr-only peer"><span class="block w-4 h-4 rounded-full bg-blue-300 ring-2 ring-transparent peer-checked:ring-blue-500 peer-checked:ring-offset-1 transition-all"></span></label>
+      <label class="cursor-pointer" title="Pink"><input type="radio" name="color" value="pink" class="sr-only peer"><span class="block w-4 h-4 rounded-full bg-pink-300 ring-2 ring-transparent peer-checked:ring-pink-500 peer-checked:ring-offset-1 transition-all"></span></label>
+      <label class="cursor-pointer" title="Purple"><input type="radio" name="color" value="purple" class="sr-only peer"><span class="block w-4 h-4 rounded-full bg-purple-300 ring-2 ring-transparent peer-checked:ring-purple-500 peer-checked:ring-offset-1 transition-all"></span></label>
     </div>
-    <div class="flex items-center gap-2 ml-2">
-      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-md transition-colors">Save Note</button>
-      <a href="/notes" class="text-sm text-gray-500 hover:text-gray-700 px-4 py-2 rounded-md border border-gray-200 transition-colors">Cancel</a>
+    <div class="flex items-center gap-2 ml-1">
+      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save Note</button>
+      <a href="/notes" class="text-xs text-gray-500 hover:text-gray-700 border border-gray-200 px-3.5 py-2 rounded transition-colors">Cancel</a>
     </div>
   </div>
 
   <!-- Editor + Preview -->
-  <div class="grid grid-cols-2 gap-4" style="height: calc(100vh - 220px);">
+  <div class="grid grid-cols-2 gap-3" style="height: calc(100vh - 210px);">
     <!-- Editor pane -->
     <div class="flex flex-col min-h-0">
-      <div class="flex items-center justify-between mb-1.5">
+      <div class="flex items-center justify-between mb-1">
         <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Markdown</p>
         <p class="text-[10px] text-gray-300">Ctrl+S to save</p>
       </div>
       <!-- Toolbar -->
-      <div class="md-toolbar flex items-center gap-0.5 bg-white border-[1.5px] border-gray-200 border-b-0 rounded-t px-2 py-1.5 flex-wrap" data-for="note-content">
+      <div class="md-toolbar flex items-center gap-0.5 bg-white border border-gray-200 border-b-0 rounded-t px-2 py-1 flex-wrap" data-for="note-content">
         <button type="button" data-action="bold" title="Bold (Ctrl+B)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-4 h-4"><path d="M6 4h8a4 4 0 010 8H6V4zm0 8h9a4 4 0 010 8H6v-8z"/></svg>
         </button>
@@ -68,15 +68,9 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><line x1="5" y1="12" x2="19" y2="12"/><path d="M16 6C16 6 14.5 4 12 4C9.5 4 7 5.5 7 8C7 10.5 9 11.5 12 12"/><path d="M8 18C8 18 9.5 20 12 20C14.5 20 17 18.5 17 16C17 14.5 16 13.5 14 13"/></svg>
         </button>
         <div class="sep"></div>
-        <button type="button" data-action="h1" title="Heading 1">
-          <span class="text-[11px] font-bold leading-none">H1</span>
-        </button>
-        <button type="button" data-action="h2" title="Heading 2">
-          <span class="text-[11px] font-bold leading-none">H2</span>
-        </button>
-        <button type="button" data-action="h3" title="Heading 3">
-          <span class="text-[11px] font-bold leading-none">H3</span>
-        </button>
+        <button type="button" data-action="h1" title="Heading 1"><span class="text-[11px] font-bold leading-none">H1</span></button>
+        <button type="button" data-action="h2" title="Heading 2"><span class="text-[11px] font-bold leading-none">H2</span></button>
+        <button type="button" data-action="h3" title="Heading 3"><span class="text-[11px] font-bold leading-none">H3</span></button>
         <div class="sep"></div>
         <button type="button" data-action="ul" title="Bullet list">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none"/></svg>
@@ -104,14 +98,14 @@
       </div>
       <textarea id="note-content" name="content" required
         placeholder="Write in Markdown...&#10;&#10;# Heading&#10;**bold**, *italic*, `code`&#10;&#10;- list item&#10;&#10;> blockquote"
-        class="flex-1 w-full text-sm border-[1.5px] border-gray-200 rounded-b px-4 py-3 focus:outline-none focus:border-indigo-400 resize-none font-mono leading-relaxed"></textarea>
+        class="flex-1 w-full text-sm border border-gray-200 rounded-b px-4 py-3 focus:outline-none focus:border-indigo-400 resize-none font-mono leading-relaxed"></textarea>
     </div>
 
     <!-- Preview pane -->
     <div class="flex flex-col min-h-0">
-      <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Preview</p>
+      <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Preview</p>
       <div id="note-preview"
-        class="preview-md flex-1 rounded border-[1.5px] border-gray-100 bg-white px-5 py-4 overflow-auto">
+        class="preview-md flex-1 rounded border border-gray-100 bg-white px-4 py-3 overflow-auto">
         <span class="text-sm text-gray-400 italic">Start typing to see preview...</span>
       </div>
     </div>
@@ -129,14 +123,12 @@ function updatePreview() {
 
 textarea.addEventListener('input', updatePreview);
 
-// ── Markdown toolbar ──────────────────────────────────────────────────
 function mdWrap(before, after, placeholder) {
   var start = textarea.selectionStart, end = textarea.selectionEnd;
   var sel = textarea.value.substring(start, end) || placeholder;
   var replacement = before + sel + after;
   textarea.setRangeText(replacement, start, end, 'select');
   if (!textarea.value.substring(start, end)) {
-    // move cursor inside markers
     textarea.selectionStart = start + before.length;
     textarea.selectionEnd   = start + before.length + placeholder.length;
   }
@@ -176,7 +168,6 @@ document.querySelectorAll('.md-toolbar button[data-action]').forEach(function(bt
   });
 });
 
-// Keyboard shortcuts
 textarea.addEventListener('keydown', function(e) {
   if (e.ctrlKey || e.metaKey) {
     if (e.key === 'b') { e.preventDefault(); mdWrap('**', '**', 'bold text'); }
@@ -185,7 +176,6 @@ textarea.addEventListener('keydown', function(e) {
   }
 });
 
-// Ctrl+S / Cmd+S to save
 document.addEventListener('keydown', function(e) {
   if ((e.ctrlKey || e.metaKey) && e.key === 's') {
     e.preventDefault();

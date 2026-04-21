@@ -20,6 +20,7 @@ type DeadlinesData struct {
 	Meta      Meta
 	Deadlines []models.Deadline
 	Urgency   DeadlineUrgency
+	Projects  []models.Project
 }
 
 type DeadlineHandler struct {
@@ -56,6 +57,7 @@ func (h *DeadlineHandler) List(c *gin.Context) {
 		Meta:      Meta{Title: "Deadlines", CurrentPage: "deadlines", ActionLabel: "Add Deadline", AllProjects: allProjects, ActiveProject: activeProject, CurrentUser: currentUser},
 		Deadlines: deadlines,
 		Urgency:   urgency,
+		Projects:  allProjects,
 	})
 }
 

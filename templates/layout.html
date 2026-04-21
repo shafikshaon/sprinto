@@ -10,133 +10,89 @@
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: #f1f5f9; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
-    dialog { padding: 0; border: none; border-radius: 0.75rem; box-shadow: 0 25px 60px rgba(0,0,0,0.18); max-width: 30rem; width: 92%; }
-    dialog::backdrop { background: rgba(0,0,0,0.22); }
+    dialog { padding: 0; border: none; border-radius: 0.5rem; box-shadow: 0 16px 48px rgba(0,0,0,0.14); max-width: 30rem; width: 92%; }
+    dialog::backdrop { background: rgba(15,23,42,0.25); }
   </style>
 </head>
 <body class="bg-gray-100 text-gray-900 antialiased">
 <div class="flex h-screen overflow-hidden">
 
-  <!-- ── Sidebar ─────────────────────────────────────────────────── -->
+  <!-- ── Sidebar ──────────────────────────────────────────────────────── -->
   <aside class="w-52 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 overflow-hidden">
 
     <!-- Logo -->
-    <div class="h-12 flex items-center px-4 border-b border-gray-100 flex-shrink-0">
-      <div class="flex items-center gap-2.5">
-        <div class="w-6 h-6 bg-indigo-600 rounded-md flex items-center justify-center flex-shrink-0">
+    <div class="h-11 flex items-center px-4 border-b border-gray-100 flex-shrink-0">
+      <a href="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+        <div class="w-6 h-6 bg-indigo-600 rounded flex items-center justify-center flex-shrink-0">
           <span class="text-white font-bold text-[10px] tracking-tight">SP</span>
         </div>
-        <span class="text-gray-900 font-bold text-sm">Sprinto</span>
-      </div>
+        <span class="text-gray-900 font-bold text-sm tracking-tight">Sprinto</span>
+      </a>
     </div>
 
     <!-- Nav -->
     <nav class="flex-1 py-3 px-2 space-y-3 overflow-y-auto">
 
-      <!-- Workspace -->
       <div>
-        <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest px-2 mb-1">Workspace</p>
+        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-widest px-2 mb-1">Workspace</p>
         <div class="space-y-0.5">
-          <a href="/projects"
-             class="{{if eq .Meta.CurrentPage "projects"}}bg-indigo-600 text-white{{else}}text-gray-500 hover:bg-gray-100 hover:text-gray-800{{end}} flex items-center gap-2.5 px-2.5 py-2 rounded-md text-xs font-medium transition-colors">
-            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/>
-            </svg>
+          <a href="/projects" class="{{if eq .Meta.CurrentPage "projects"}}bg-indigo-600 text-white{{else}}text-gray-500 hover:bg-gray-100 hover:text-gray-800{{end}} flex items-center gap-2 px-2.5 py-1.5 rounded text-xs font-medium transition-colors">
+            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg>
             Projects
           </a>
-          <a href="/team"
-             class="{{if eq .Meta.CurrentPage "team"}}bg-indigo-600 text-white{{else}}text-gray-500 hover:bg-gray-100 hover:text-gray-800{{end}} flex items-center gap-2.5 px-2.5 py-2 rounded-md text-xs font-medium transition-colors">
-            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-            </svg>
+          <a href="/team" class="{{if eq .Meta.CurrentPage "team"}}bg-indigo-600 text-white{{else}}text-gray-500 hover:bg-gray-100 hover:text-gray-800{{end}} flex items-center gap-2 px-2.5 py-1.5 rounded text-xs font-medium transition-colors">
+            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
             Team
           </a>
         </div>
       </div>
 
-      <!-- Team Activity -->
       <div>
-        <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest px-2 mb-1">Team Activity</p>
+        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-widest px-2 mb-1">Activity</p>
         <div class="space-y-0.5">
-          <a href="/"
-             class="{{if eq .Meta.CurrentPage "dashboard"}}bg-indigo-600 text-white{{else}}text-gray-500 hover:bg-gray-100 hover:text-gray-800{{end}} flex items-center gap-2.5 px-2.5 py-2 rounded-md text-xs font-medium transition-colors">
-            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
-            </svg>
+          <a href="/" class="{{if eq .Meta.CurrentPage "dashboard"}}bg-indigo-600 text-white{{else}}text-gray-500 hover:bg-gray-100 hover:text-gray-800{{end}} flex items-center gap-2 px-2.5 py-1.5 rounded text-xs font-medium transition-colors">
+            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
             Dashboard
           </a>
-          <a href="/standups"
-             class="{{if eq .Meta.CurrentPage "standups"}}bg-indigo-600 text-white{{else}}text-gray-500 hover:bg-gray-100 hover:text-gray-800{{end}} flex items-center gap-2.5 px-2.5 py-2 rounded-md text-xs font-medium transition-colors">
-            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-            </svg>
-            Daily Standups
+          <a href="/standups" class="{{if eq .Meta.CurrentPage "standups"}}bg-indigo-600 text-white{{else}}text-gray-500 hover:bg-gray-100 hover:text-gray-800{{end}} flex items-center gap-2 px-2.5 py-1.5 rounded text-xs font-medium transition-colors">
+            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            Standups
           </a>
         </div>
       </div>
 
-      <!-- Sprint -->
       <div>
-        <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest px-2 mb-1">Sprint</p>
+        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-widest px-2 mb-1">Sprint</p>
         <div class="space-y-0.5">
-          <a href="/sprints"
-             class="{{if eq .Meta.CurrentPage "sprints"}}bg-indigo-600 text-white{{else}}text-gray-500 hover:bg-gray-100 hover:text-gray-800{{end}} flex items-center gap-2.5 px-2.5 py-2 rounded-md text-xs font-medium transition-colors">
-            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/>
-            </svg>
+          <a href="/sprints" class="{{if eq .Meta.CurrentPage "sprints"}}bg-indigo-600 text-white{{else}}text-gray-500 hover:bg-gray-100 hover:text-gray-800{{end}} flex items-center gap-2 px-2.5 py-1.5 rounded text-xs font-medium transition-colors">
+            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/></svg>
             Sprint Board
           </a>
-          <a href="/devtasks"
-             class="{{if eq .Meta.CurrentPage "devtasks"}}bg-indigo-600 text-white{{else}}text-gray-500 hover:bg-gray-100 hover:text-gray-800{{end}} flex items-center gap-2.5 px-2.5 py-2 rounded-md text-xs font-medium transition-colors">
-            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
-            </svg>
+          <a href="/devtasks" class="{{if eq .Meta.CurrentPage "devtasks"}}bg-indigo-600 text-white{{else}}text-gray-500 hover:bg-gray-100 hover:text-gray-800{{end}} flex items-center gap-2 px-2.5 py-1.5 rounded text-xs font-medium transition-colors">
+            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
             Dev Tasks
           </a>
         </div>
       </div>
 
-      <!-- Planning -->
       <div>
-        <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest px-2 mb-1">Planning</p>
+        <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-widest px-2 mb-1">Planning</p>
         <div class="space-y-0.5">
-          <a href="/deadlines"
-             class="{{if eq .Meta.CurrentPage "deadlines"}}bg-indigo-600 text-white{{else}}text-gray-500 hover:bg-gray-100 hover:text-gray-800{{end}} flex items-center gap-2.5 px-2.5 py-2 rounded-md text-xs font-medium transition-colors">
-            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-            </svg>
+          <a href="/deadlines" class="{{if eq .Meta.CurrentPage "deadlines"}}bg-indigo-600 text-white{{else}}text-gray-500 hover:bg-gray-100 hover:text-gray-800{{end}} flex items-center gap-2 px-2.5 py-1.5 rounded text-xs font-medium transition-colors">
+            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
             Deadlines
           </a>
-          <a href="/meetings"
-             class="{{if eq .Meta.CurrentPage "meetings"}}bg-indigo-600 text-white{{else}}text-gray-500 hover:bg-gray-100 hover:text-gray-800{{end}} flex items-center gap-2.5 px-2.5 py-2 rounded-md text-xs font-medium transition-colors">
-            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-            </svg>
+          <a href="/meetings" class="{{if eq .Meta.CurrentPage "meetings"}}bg-indigo-600 text-white{{else}}text-gray-500 hover:bg-gray-100 hover:text-gray-800{{end}} flex items-center gap-2 px-2.5 py-1.5 rounded text-xs font-medium transition-colors">
+            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
             Meetings
           </a>
-          <a href="/slack"
-             class="{{if eq .Meta.CurrentPage "slack"}}bg-indigo-600 text-white{{else}}text-gray-500 hover:bg-gray-100 hover:text-gray-800{{end}} flex items-center gap-2.5 px-2.5 py-2 rounded-md text-xs font-medium transition-colors">
-            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
-            </svg>
+          <a href="/slack" class="{{if eq .Meta.CurrentPage "slack"}}bg-indigo-600 text-white{{else}}text-gray-500 hover:bg-gray-100 hover:text-gray-800{{end}} flex items-center gap-2 px-2.5 py-1.5 rounded text-xs font-medium transition-colors">
+            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
             Slack Threads
           </a>
-          <a href="/notes"
-             class="{{if eq .Meta.CurrentPage "notes"}}bg-indigo-600 text-white{{else}}text-gray-500 hover:bg-gray-100 hover:text-gray-800{{end}} flex items-center gap-2.5 px-2.5 py-2 rounded-md text-xs font-medium transition-colors">
-            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-            </svg>
-            Sticky Notes
+          <a href="/notes" class="{{if eq .Meta.CurrentPage "notes"}}bg-indigo-600 text-white{{else}}text-gray-500 hover:bg-gray-100 hover:text-gray-800{{end}} flex items-center gap-2 px-2.5 py-1.5 rounded text-xs font-medium transition-colors">
+            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            Notes
           </a>
         </div>
       </div>
@@ -144,12 +100,12 @@
     </nav>
 
     <!-- Project switcher -->
-    <div class="border-t border-gray-100 p-3 flex-shrink-0">
+    <div class="border-t border-gray-100 p-2.5 flex-shrink-0">
       {{if .Meta.AllProjects}}
       <p class="text-[9px] font-semibold text-gray-400 uppercase tracking-widest px-1 mb-1.5">Active Project</p>
       <form method="POST" action="/switch-project">
         <select name="project_id" onchange="this.form.submit()"
-          class="w-full text-xs text-gray-700 bg-gray-50 border-[1.5px] border-gray-200 rounded px-2.5 py-1.5 focus:outline-none focus:border-indigo-400 cursor-pointer">
+          class="w-full text-xs text-gray-700 bg-gray-50 border border-gray-200 rounded px-2.5 py-1.5 focus:outline-none focus:border-indigo-400 cursor-pointer">
           <option value="">— none —</option>
           {{range .Meta.AllProjects}}
           <option value="{{.ID}}" {{if (and $.Meta.ActiveProject (eq $.Meta.ActiveProject.ID .ID))}}selected{{end}}>{{.Name}}</option>
@@ -158,9 +114,7 @@
       </form>
       {{else}}
       <a href="/projects" class="flex items-center gap-1.5 px-1 text-xs text-indigo-600 hover:underline font-medium">
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
-        </svg>
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
         Create project
       </a>
       {{end}}
@@ -168,32 +122,31 @@
 
   </aside>
 
-  <!-- ── Main ────────────────────────────────────────────────────── -->
+  <!-- ── Main ─────────────────────────────────────────────────────────── -->
   <div class="flex-1 flex flex-col overflow-hidden">
 
     <!-- Top bar -->
-    <header class="h-12 bg-white border-b border-gray-200 flex items-center justify-between px-6 flex-shrink-0">
-      <div class="flex items-center gap-2">
+    <header class="h-11 bg-white border-b border-gray-200 flex items-center justify-between px-5 flex-shrink-0">
+      <div>
         {{if .Meta.SprintLabel}}
-        <span class="text-xs text-gray-400 bg-gray-50 border border-gray-200 px-2.5 py-1 rounded-md">{{.Meta.SprintLabel}}</span>
+        <span class="text-xs text-gray-400 bg-gray-50 border border-gray-200 px-2 py-0.5 rounded">{{.Meta.SprintLabel}}</span>
         {{end}}
       </div>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-3">
         {{if .Meta.ActiveProject}}
-        <span class="text-xs font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-1 rounded-md">{{.Meta.ActiveProject.Name}}</span>
+        <span class="text-xs font-medium text-indigo-700 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded">{{.Meta.ActiveProject.Name}}</span>
         <span class="text-gray-200">|</span>
         {{end}}
-        <!-- Gregorian date -->
-        <span class="text-xs text-gray-600 font-medium">{{gregorianDate}}</span>
-        <span class="text-gray-200">|</span>
+        <span class="text-xs text-gray-500 font-medium">{{gregorianDate}}</span>
         {{if .Meta.CurrentUser}}
+        <span class="text-gray-200">|</span>
         <div class="flex items-center gap-2">
-          <div class="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
+          <div class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
             <span class="text-indigo-700 font-bold text-[10px]">{{initials .Meta.CurrentUser.FullName}}</span>
           </div>
           <span class="text-xs font-medium text-gray-700">{{.Meta.CurrentUser.FullName}}</span>
           <form method="POST" action="/logout" class="inline">
-            <button type="submit" class="text-xs text-gray-400 hover:text-red-500 transition-colors font-medium">Sign out</button>
+            <button type="submit" class="text-xs text-gray-400 hover:text-red-500 transition-colors">Sign out</button>
           </form>
         </div>
         {{end}}
@@ -201,17 +154,15 @@
     </header>
 
     <!-- Page content -->
-    <main class="flex-1 overflow-y-auto bg-gray-100 px-6 py-5">
+    <main class="flex-1 overflow-y-auto bg-gray-100 px-5 py-4">
 
-      <!-- Page header: title + action button -->
-      <div class="flex items-center justify-between mb-5">
-        <h1 class="text-2xl font-bold text-indigo-700">{{.Meta.Title}}</h1>
+      <!-- Page header -->
+      <div class="flex items-center justify-between mb-4">
+        <h1 class="text-lg font-bold text-gray-900">{{.Meta.Title}}</h1>
         {{if .Meta.ActionLabel}}
         <button type="button" onclick="document.getElementById('add-dialog').showModal()"
-           class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded-md transition-colors shadow-sm">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
-          </svg>
+           class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3 py-1.5 rounded transition-colors">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
           {{.Meta.ActionLabel}}
         </button>
         {{end}}
@@ -222,28 +173,27 @@
 
   </div>
 </div>
-<!-- ── Delete Confirmation Dialog ─────────────────────────────────── -->
+
+<!-- ── Delete Confirmation Dialog ───────────────────────────────────── -->
 <dialog id="confirm-delete-dialog">
-  <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-    <div class="flex items-center gap-2.5">
-      <div class="w-7 h-7 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
-        <svg class="w-3.5 h-3.5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-        </svg>
+  <div class="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
+    <div class="flex items-center gap-2">
+      <div class="w-6 h-6 rounded-full bg-red-50 border border-red-100 flex items-center justify-center flex-shrink-0">
+        <svg class="w-3 h-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
       </div>
-      <h3 class="text-sm font-semibold text-gray-900">Delete</h3>
+      <h3 class="text-sm font-semibold text-gray-900">Confirm Delete</h3>
     </div>
-    <button type="button" onclick="document.getElementById('confirm-delete-dialog').close()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+    <button type="button" onclick="document.getElementById('confirm-delete-dialog').close()" class="text-gray-400 hover:text-gray-600 text-lg leading-none">×</button>
   </div>
   <div class="px-5 py-4">
-    <p class="text-sm text-gray-600 leading-relaxed">Are you sure you want to delete <span id="delete-item-name" class="font-semibold text-gray-900"></span>?</p>
-    <p class="text-xs text-gray-400 mt-1">This action cannot be undone.</p>
+    <p class="text-sm text-gray-600">Delete <span id="delete-item-name" class="font-semibold text-gray-900"></span>?</p>
+    <p class="text-xs text-gray-400 mt-1">This cannot be undone.</p>
   </div>
   <form id="delete-form" method="POST" class="px-5 pb-5">
     <input type="hidden" id="delete-extra-input" name="" value="">
     <div class="flex items-center gap-2">
-      <button type="submit" class="bg-red-500 hover:bg-red-600 text-white text-sm font-semibold px-4 py-2 rounded-md transition-colors">Yes, Delete</button>
-      <button type="button" onclick="document.getElementById('confirm-delete-dialog').close()" class="text-sm text-gray-500 hover:text-gray-700 px-4 py-2 rounded-md border border-gray-200 transition-colors">Cancel</button>
+      <button type="submit" class="bg-red-500 hover:bg-red-600 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Delete</button>
+      <button type="button" onclick="document.getElementById('confirm-delete-dialog').close()" class="text-xs text-gray-500 hover:text-gray-700 border border-gray-200 px-3.5 py-2 rounded transition-colors">Cancel</button>
     </div>
   </form>
 </dialog>
@@ -253,20 +203,16 @@
   document.addEventListener('click', function (e) {
     var btn = e.target.closest('[data-delete-action]');
     if (!btn) return;
-
     var action     = btn.dataset.deleteAction;
     var name       = btn.dataset.deleteName || 'this item';
     var extraName  = btn.dataset.deleteExtraName  || '';
     var extraValue = btn.dataset.deleteExtraValue || '';
-
     document.getElementById('delete-form').action = action;
     document.getElementById('delete-item-name').textContent = '\u201c' + name + '\u201d';
-
     var extra = document.getElementById('delete-extra-input');
     extra.name     = extraName;
     extra.value    = extraValue;
     extra.disabled = !extraName;
-
     document.getElementById('confirm-delete-dialog').showModal();
   });
 })();

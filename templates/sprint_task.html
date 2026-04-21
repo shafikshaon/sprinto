@@ -1,17 +1,17 @@
 {{define "content"}}
 
 <!-- ── Task Header ─────────────────────────────────────────────────── -->
-<div class="bg-white rounded-lg border border-gray-200 px-5 py-4 mb-4">
+<div class="bg-white border border-gray-200 rounded-lg px-4 py-4 mb-4">
   <a href="/sprints" class="text-xs text-gray-400 hover:text-indigo-600 font-medium">← Sprint Board</a>
-  <div class="flex items-start justify-between mt-2.5">
+  <div class="flex items-start justify-between mt-3">
     <div class="min-w-0">
-      <h2 class="text-sm font-semibold text-gray-900">{{.Task.Title}}</h2>
-      <div class="flex items-center gap-2.5 mt-2">
+      <h2 class="text-base font-semibold text-gray-900">{{.Task.Title}}</h2>
+      <div class="flex items-center gap-2 mt-2 flex-wrap">
         {{if .Task.Assignees}}
         <div class="flex items-center gap-1.5">
           {{range .Task.Assignees}}
-          <div class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0" title="{{.Name}}">
-            <span class="text-indigo-700 font-bold text-[10px]">{{initials .Name}}</span>
+          <div class="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0" title="{{.Name}}">
+            <span class="text-indigo-700 font-bold text-[9px]">{{initials .Name}}</span>
           </div>
           {{end}}
           <span class="text-xs text-gray-500">{{range $i, $a := .Task.Assignees}}{{if $i}}, {{end}}{{$a.Name}}{{end}}</span>
@@ -21,35 +21,34 @@
         <span class="text-xs font-semibold px-2 py-0.5 rounded-full {{priorityClass .Task.Priority}}">{{.Task.Priority}}</span>
       </div>
     </div>
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-1.5 flex-shrink-0 ml-4">
       <button type="button" onclick="document.getElementById('edit-task-dialog').showModal()"
-        class="text-xs text-white bg-indigo-600 hover:bg-indigo-700 px-2.5 py-1 rounded transition-colors font-medium">Edit</button>
+        class="text-xs font-medium text-gray-600 hover:text-indigo-600 border border-gray-200 hover:border-indigo-300 px-2.5 py-1.5 rounded transition-colors">Edit</button>
       <button type="button"
         data-delete-action="/sprints/tasks/{{.Task.ID}}/delete"
         data-delete-name="{{.Task.Title}}"
-        class="text-xs text-white bg-red-500 hover:bg-red-600 px-2.5 py-1 rounded transition-colors font-medium">Delete</button>
+        class="text-xs font-medium text-gray-500 hover:text-red-600 border border-gray-200 hover:border-red-200 px-2.5 py-1.5 rounded transition-colors">Delete</button>
     </div>
   </div>
 </div>
 
 <!-- ── Comments ────────────────────────────────────────────────────── -->
-<div class="bg-white rounded-lg border border-gray-200 overflow-hidden mb-4">
-  <div class="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
+<div class="bg-white border border-gray-200 rounded-lg overflow-hidden mb-4">
+  <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
     <h3 class="text-sm font-semibold text-gray-800">Comments</h3>
     <span class="text-xs text-gray-400">{{len .Task.Comments}} comment{{if ne (len .Task.Comments) 1}}s{{end}}</span>
   </div>
-
   {{if not .Task.Comments}}
-  <div class="px-5 py-10 text-center">
-    <p class="text-sm font-medium text-gray-400">No comments yet</p>
-    <p class="text-xs text-gray-300 mt-1">Be the first to leave a comment on this task</p>
+  <div class="px-4 py-10 text-center">
+    <p class="text-sm text-gray-400">No comments yet</p>
+    <p class="text-xs text-gray-300 mt-1">Be the first to leave a comment</p>
   </div>
   {{else}}
-  <div class="divide-y divide-gray-50">
+  <div class="divide-y divide-gray-100">
     {{range .Task.Comments}}
-    <div class="px-5 py-4 flex items-start gap-3 hover:bg-gray-50 transition-colors group">
-      <div class="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-        <span class="text-indigo-700 font-semibold text-xs">{{initials .Author}}</span>
+    <div class="px-4 py-3 flex items-start gap-3 hover:bg-gray-50 transition-colors">
+      <div class="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+        <span class="text-indigo-700 font-semibold text-[10px]">{{initials .Author}}</span>
       </div>
       <div class="flex-1 min-w-0">
         <div class="flex items-center gap-2 mb-1">
@@ -71,82 +70,78 @@
 </div>
 
 <!-- ── Add Comment ─────────────────────────────────────────────────── -->
-<div class="bg-white rounded-lg border border-gray-200 px-5 py-4">
+<div class="bg-white border border-gray-200 rounded-lg px-4 py-4">
   <h3 class="text-sm font-semibold text-gray-800 mb-3">Add Comment</h3>
   <form method="POST" action="/sprints/tasks/{{.Task.ID}}/comments">
     <div class="space-y-3">
       <div>
-        <label class="text-xs font-medium text-gray-600 block mb-1.5">Your Name</label>
-        <input name="author" type="text" value="{{if .Meta.CurrentUser}}{{.Meta.CurrentUser.FullName}}{{end}}" placeholder="e.g. Alice Chen"
-          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
+        <label class="text-xs font-medium text-gray-600 block mb-1">Your Name</label>
+        <input name="author" type="text" value="{{if .Meta.CurrentUser}}{{.Meta.CurrentUser.FullName}}{{end}}" placeholder="Your name"
+          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
       </div>
       <div>
-        <label class="text-xs font-medium text-gray-600 block mb-1.5">Comment <span class="text-red-400">*</span></label>
+        <label class="text-xs font-medium text-gray-600 block mb-1">Comment <span class="text-red-400">*</span></label>
         <textarea name="content" rows="3" required placeholder="Add a comment, update, or blocker note..."
-          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400 resize-none"></textarea>
+          class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 resize-none"></textarea>
       </div>
-      <div>
-        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-md transition-colors">Post Comment</button>
-      </div>
+      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Post Comment</button>
     </div>
   </form>
 </div>
 
 <!-- ── Edit Task Dialog ─────────────────────────────────────────────── -->
 <dialog id="edit-task-dialog">
-  <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+  <div class="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
     <h3 class="text-sm font-semibold text-gray-900">Edit Task</h3>
-    <button type="button" onclick="document.getElementById('edit-task-dialog').close()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+    <button type="button" onclick="document.getElementById('edit-task-dialog').close()" class="text-gray-400 hover:text-gray-600 text-lg leading-none">×</button>
   </div>
-  <form method="POST" action="/sprints/tasks/{{.Task.ID}}/update" class="p-5">
-    <div class="space-y-3 mb-5">
+  <form method="POST" action="/sprints/tasks/{{.Task.ID}}/update" class="px-5 py-4 space-y-3">
+    <div>
+      <label class="text-xs font-medium text-gray-600 block mb-1">Title <span class="text-red-400">*</span></label>
+      <input name="title" type="text" required value="{{.Task.Title}}"
+        class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400"/>
+    </div>
+    {{if .Members}}
+    <div>
+      <label class="text-xs font-medium text-gray-600 block mb-1">Assignees</label>
+      <select id="edit-task-assignees" name="assignees" multiple class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 h-20">
+        {{range .Members}}<option value="{{.ID}}">{{.Name}}{{if .Role}} · {{.Role}}{{end}}</option>{{end}}
+      </select>
+      <p class="text-xs text-gray-400 mt-0.5">Hold Ctrl / Cmd to select multiple</p>
+      <script>
+      (function(){
+        var current = [{{range $i,$a := .Task.Assignees}}{{if $i}},{{end}}"{{$a.ID}}"{{end}}];
+        var sel = document.getElementById('edit-task-assignees');
+        for (var i = 0; i < sel.options.length; i++) {
+          if (current.indexOf(sel.options[i].value) !== -1) sel.options[i].selected = true;
+        }
+      })();
+      </script>
+    </div>
+    {{end}}
+    <div class="grid grid-cols-2 gap-3">
       <div>
-        <label class="text-xs font-medium text-gray-600 block mb-1.5">Title <span class="text-red-400">*</span></label>
-        <input name="title" type="text" required value="{{.Task.Title}}"
-          class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400"/>
-      </div>
-      <div>
-        <label class="text-xs font-medium text-gray-600 block mb-1.5">Assignees</label>
-        {{if .Members}}
-        <select id="edit-task-assignees" name="assignees" multiple class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400 h-24">
-          {{range .Members}}<option value="{{.ID}}">{{.Name}}{{if .Role}} · {{.Role}}{{end}}</option>{{end}}
+        <label class="text-xs font-medium text-gray-600 block mb-1">Status</label>
+        <select name="status" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+          <option {{if eq .Task.Status "Todo"}}selected{{end}}>Todo</option>
+          <option {{if eq .Task.Status "In Progress"}}selected{{end}}>In Progress</option>
+          <option {{if eq .Task.Status "Done"}}selected{{end}}>Done</option>
+          <option {{if eq .Task.Status "Blocked"}}selected{{end}}>Blocked</option>
         </select>
-        <p class="text-xs text-gray-400 mt-1">Hold Ctrl / Cmd to select multiple</p>
-        <script>
-        (function(){
-          var current = [{{range $i,$a := .Task.Assignees}}{{if $i}},{{end}}"{{$a.ID}}"{{end}}];
-          var sel = document.getElementById('edit-task-assignees');
-          for (var i = 0; i < sel.options.length; i++) {
-            if (current.indexOf(sel.options[i].value) !== -1) sel.options[i].selected = true;
-          }
-        })();
-        </script>
-        {{end}}
       </div>
-      <div class="grid grid-cols-2 gap-3">
-        <div>
-          <label class="text-xs font-medium text-gray-600 block mb-1.5">Status</label>
-          <select name="status" class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400">
-            <option {{if eq .Task.Status "Todo"}}selected{{end}}>Todo</option>
-            <option {{if eq .Task.Status "In Progress"}}selected{{end}}>In Progress</option>
-            <option {{if eq .Task.Status "Done"}}selected{{end}}>Done</option>
-            <option {{if eq .Task.Status "Blocked"}}selected{{end}}>Blocked</option>
-          </select>
-        </div>
-        <div>
-          <label class="text-xs font-medium text-gray-600 block mb-1.5">Priority</label>
-          <select name="priority" class="w-full text-sm border-[1.5px] border-gray-200 rounded px-3 py-2 focus:outline-none focus:border-indigo-400">
-            <option {{if eq .Task.Priority "Low"}}selected{{end}}>Low</option>
-            <option {{if eq .Task.Priority "Medium"}}selected{{end}}>Medium</option>
-            <option {{if eq .Task.Priority "High"}}selected{{end}}>High</option>
-            <option {{if eq .Task.Priority "Critical"}}selected{{end}}>Critical</option>
-          </select>
-        </div>
+      <div>
+        <label class="text-xs font-medium text-gray-600 block mb-1">Priority</label>
+        <select name="priority" class="w-full text-sm border border-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-indigo-400 bg-white">
+          <option {{if eq .Task.Priority "Low"}}selected{{end}}>Low</option>
+          <option {{if eq .Task.Priority "Medium"}}selected{{end}}>Medium</option>
+          <option {{if eq .Task.Priority "High"}}selected{{end}}>High</option>
+          <option {{if eq .Task.Priority "Critical"}}selected{{end}}>Critical</option>
+        </select>
       </div>
     </div>
-    <div class="flex items-center gap-2">
-      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-md transition-colors">Save Changes</button>
-      <button type="button" onclick="document.getElementById('edit-task-dialog').close()" class="text-sm text-gray-500 hover:text-gray-700 px-4 py-2 rounded-md border border-gray-200 transition-colors">Cancel</button>
+    <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
+      <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded transition-colors">Save Changes</button>
+      <button type="button" onclick="document.getElementById('edit-task-dialog').close()" class="text-xs text-gray-500 hover:text-gray-700 border border-gray-200 px-3.5 py-2 rounded transition-colors">Cancel</button>
     </div>
   </form>
 </dialog>
